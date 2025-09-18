@@ -1,0 +1,633 @@
+'use client'
+
+import { useState } from 'react'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { useNSFW } from '@/contexts/nsfw-context'
+import { 
+  Sparkles, 
+  Star, 
+  Crown, 
+  Heart,
+  Upload,
+  Edit,
+  Play,
+  CheckCircle,
+  ArrowRight,
+  Zap,
+  Shield,
+  Lock,
+  CreditCard,
+  HelpCircle,
+  Users,
+  TrendingUp,
+  Clock
+} from 'lucide-react'
+
+interface Influencer {
+  id: string
+  name: string
+  age: number
+  verified: boolean
+  bio: string
+  image: string
+  followers: string
+  engagement: string
+  tags: string[]
+}
+
+interface PricingPlan {
+  id: string
+  name: string
+  price: string
+  period: string
+  description: string
+  features: string[]
+  popular?: boolean
+  buttonText: string
+}
+
+interface FAQItem {
+  question: string
+  answer: string
+}
+
+export default function ShowcasePage() {
+  const { isNSFW } = useNSFW()
+  const [activeTab, setActiveTab] = useState('process')
+
+  const sfwColors = {
+    primary: '#FF6B35', // vibrant coral orange
+    secondary: '#4ECDC4', // bright turquoise
+    accent: '#FFE66D', // golden yellow
+    bg: 'from-orange-200 via-cyan-200 to-yellow-200',
+    particle: '#FF6B35',
+    cardBg: 'rgba(255, 255, 255, 0.9)',
+    cardBorder: 'rgba(0, 0, 0, 0.1)',
+    textPrimary: '#1A202C', // dark gray
+    textSecondary: '#2D3748', // medium gray
+    textLight: '#4A5568', // light gray
+    textOnWhite: '#2D3748' // text on white backgrounds
+  }
+
+  const nsfwColors = {
+    primary: '#FF1493', // deep hot pink
+    secondary: '#00CED1', // dark turquoise
+    accent: '#FF1744', // vibrant red
+    bg: 'from-pink-900 via-purple-900 to-red-900',
+    particle: '#FF69B4',
+    cardBg: 'rgba(30, 0, 30, 0.85)',
+    cardBorder: 'rgba(255, 20, 147, 0.5)',
+    textPrimary: '#FFFFFF',
+    textSecondary: '#E0E0E0',
+    textLight: '#B0B0B0',
+    textOnWhite: '#FFFFFF'
+  }
+
+  const colors = isNSFW ? nsfwColors : sfwColors
+
+  const processSteps = [
+    {
+      step: 1,
+      title: "Describe Your Dream Influencer",
+      description: "Start by describing your ideal influencer and uploading 6-15 reference images to train the AI model.",
+      icon: Upload,
+      image: "/hero-create-sfw.jpg",
+      features: [
+        "Detailed personality traits",
+        "Physical characteristics",
+        "Style preferences",
+        "Reference image upload"
+      ]
+    },
+    {
+      step: 2,
+      title: "Customize With Our Smart Editor",
+      description: "Fine-tune age, body type, ethnicity, style, and more with our intuitive customization tools.",
+      icon: Edit,
+      image: "/hero-dashboard-sfw.jpg",
+      features: [
+        "Age and appearance adjustment",
+        "Style and clothing options",
+        "Background and setting selection",
+        "Real-time preview"
+      ]
+    },
+    {
+      step: 3,
+      title: "Generate Stunning Content",
+      description: "Create high-quality photos and videos of your influencer in various scenarios and settings.",
+      icon: Play,
+      image: "/hero-distribute-sfw.jpg",
+      features: [
+        "High-resolution image generation",
+        "Video content creation",
+        "Multiple scenarios and poses",
+        "Batch processing capabilities"
+      ]
+    }
+  ]
+
+  const influencers: Influencer[] = [
+    {
+      id: 'emma',
+      name: 'Emma',
+      age: 22,
+      verified: true,
+      bio: 'Fashion lover with a sweet smile ✨ | Coffee addict by day, dreamer by night 🌙 | Let\'s create something beautiful...',
+      image: '/marketplace-item-1.jpg',
+      followers: '125K',
+      engagement: '8.2%',
+      tags: ['Fashion', 'Lifestyle', 'Beauty']
+    },
+    {
+      id: 'sophia',
+      name: 'Sophia',
+      age: 21,
+      verified: true,
+      bio: 'Beach vibes and sunset lover 🌅 | Fitness enthusiast with a passion for adventure 🏃‍♀️ | Living life to the fullest...',
+      image: '/marketplace-item-2.jpg',
+      followers: '98K',
+      engagement: '7.8%',
+      tags: ['Fitness', 'Travel', 'Lifestyle']
+    },
+    {
+      id: 'isabella',
+      name: 'Isabella',
+      age: 23,
+      verified: true,
+      bio: 'Blonde bombshell with a heart of gold 💛 | Art student by day, party starter by night 🎨 | Follow for daily inspiration...',
+      image: '/marketplace-item-3.jpg',
+      followers: '156K',
+      engagement: '9.1%',
+      tags: ['Art', 'Party', 'Lifestyle']
+    },
+    {
+      id: 'olivia',
+      name: 'Olivia',
+      age: 20,
+      verified: true,
+      bio: 'Cozy vibes and warm hugs 🤗 | Bookworm with a wild side 📚 | Student life mixed with spontaneous adventures...',
+      image: '/marketplace-item-4.jpg',
+      followers: '87K',
+      engagement: '6.9%',
+      tags: ['Lifestyle', 'Books', 'Student']
+    },
+    {
+      id: 'ava',
+      name: 'Ava',
+      age: 24,
+      verified: true,
+      bio: 'Rooftop sunsets and city lights 🌆 | Travel enthusiast exploring the world ✈️ | Join me on this incredible journey...',
+      image: '/marketplace-item-5.jpg',
+      followers: '203K',
+      engagement: '8.7%',
+      tags: ['Travel', 'City', 'Photography']
+    },
+    {
+      id: 'mia',
+      name: 'Mia',
+      age: 19,
+      verified: true,
+      bio: 'Asian beauty with a playful spirit 🌸 | Dance lover and fitness fanatic 💃 | Spreading positivity one post at a time...',
+      image: '/marketplace-item-6.jpg',
+      followers: '142K',
+      engagement: '9.3%',
+      tags: ['Dance', 'Fitness', 'Asian']
+    },
+    {
+      id: 'charlotte',
+      name: 'Charlotte',
+      age: 22,
+      verified: true,
+      bio: 'Blonde goddess with morning glow ☀️ | Wellness coach and yoga instructor 🧘‍♀️ | Finding balance in a chaotic world...',
+      image: '/marketplace-item-7.jpg',
+      followers: '178K',
+      engagement: '8.5%',
+      tags: ['Wellness', 'Yoga', 'Lifestyle']
+    },
+    {
+      id: 'amelia',
+      name: 'Amelia',
+      age: 23,
+      verified: true,
+      bio: 'Kitchen queen with a cozy aesthetic ☕ | Home chef and lifestyle blogger 👩‍🍳 | Making everyday moments magical...',
+      image: '/marketplace-item-8.jpg',
+      followers: '134K',
+      engagement: '7.6%',
+      tags: ['Food', 'Lifestyle', 'Cooking']
+    }
+  ]
+
+  const pricingPlans: PricingPlan[] = [
+    {
+      id: 'basic',
+      name: 'EDN Basic',
+      price: '$49',
+      period: '/month',
+      description: 'Essential EDN features for individual creators and small teams',
+      features: [
+        '100 EDN generations per month',
+        'Basic EDN customization tools',
+        'Standard EDN resolution output',
+        'EDN community support',
+        '3 EDN profiles',
+        'EDN template library'
+      ],
+      buttonText: 'Start EDN Basic'
+    },
+    {
+      id: 'pro',
+      name: 'EDN Pro',
+      price: '$129',
+      period: '/month',
+      description: 'Advanced EDN capabilities for professional content creators',
+      features: [
+        '500 EDN generations per month',
+        'Advanced EDN customization suite',
+        'High-definition EDN output',
+        'Priority EDN support',
+        '10 EDN profiles',
+        'EDN commercial license',
+        'EDN analytics dashboard',
+        'EDN collaboration tools'
+      ],
+      popular: true,
+      buttonText: 'Start EDN Pro'
+    },
+    {
+      id: 'enterprise',
+      name: 'EDN Enterprise',
+      price: '$299',
+      period: '/month',
+      description: 'Complete EDN solution for agencies and large organizations',
+      features: [
+        'Unlimited EDN generations',
+        'Full EDN customization suite',
+        '4K ultra HD EDN output',
+        '24/7 dedicated EDN support',
+        'Unlimited EDN profiles',
+        'EDN API access',
+        'Custom EDN training models',
+        'EDN white-label options',
+        'EDN team management',
+        'EDN advanced analytics'
+      ],
+      buttonText: 'Contact EDN Sales'
+    }
+  ]
+
+  const faqItems: FAQItem[] = [
+    {
+      question: "Can I use this for SFW content only?",
+      answer: "Yes, we offer both SFW and NSFW content creation options. You can choose your preferred mode and our AI will generate content accordingly while maintaining platform guidelines."
+    },
+    {
+      question: "How does credit usage work?",
+      answer: "Each plan includes a set number of monthly credits. One credit equals one AI generation. Unused credits roll over to the next month, and you can purchase additional credits if needed."
+    },
+    {
+      question: "What's the difference between EDN plans?",
+      answer: "EDN plans differ in the number of monthly generations, customization options, output quality, support level, and number of profiles. Higher tiers offer more EDN features and commercial usage rights."
+    },
+    {
+      question: "Can I upgrade my EDN plan anytime?",
+      answer: "Absolutely! You can upgrade or downgrade your EDN plan at any time. Changes take effect immediately, and we'll prorate the difference for upgrades."
+    },
+    {
+      question: "Is my EDN data private and secure?",
+      answer: "Yes, we take EDN data security seriously. All your content and personal information are encrypted and stored securely. We never share your EDN data with third parties without your consent."
+    },
+    {
+      question: "Do I own the EDN content I create?",
+      answer: "Yes, you own full rights to all EDN content created with our platform. EDN Pro and Enterprise plans include commercial usage rights, allowing you to use EDN content for business purposes."
+    }
+  ]
+
+  const ProcessStepCard = ({ step }: { step: typeof processSteps[0] }) => (
+    <Card className="h-full backdrop-blur-sm border-2 hover:shadow-lg transition-all duration-300 hover:scale-105" style={{ backgroundColor: colors.cardBg, borderColor: colors.cardBorder }}>
+      <CardHeader className="pb-4">
+        <div className="flex items-center gap-4 mb-4">
+          <div className="w-12 h-12 rounded-full flex items-center justify-center text-white font-bold text-lg" style={{ backgroundColor: colors.primary }}>
+            {step.step}
+          </div>
+          <div className="flex-1">
+            <CardTitle className="text-xl" style={{ color: colors.primary }}>{step.title}</CardTitle>
+          </div>
+        </div>
+        <CardDescription style={{ color: colors.textSecondary }} className="text-base">
+          {step.description}
+        </CardDescription>
+      </CardHeader>
+      
+      <CardContent className="space-y-4">
+        <div className="relative h-48 rounded-lg overflow-hidden">
+          <img 
+            src={step.image} 
+            alt={step.title}
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
+          <div className="absolute bottom-4 left-4 text-white">
+            <div className="flex items-center gap-2">
+              <step.icon className="h-5 w-5" />
+              <span className="text-sm font-medium">EDN Creator Interface</span>
+            </div>
+          </div>
+        </div>
+        
+        <div className="space-y-2">
+          <h4 className="font-semibold" style={{ color: colors.textPrimary }}>Key Features:</h4>
+          <ul className="space-y-1">
+            {step.features.map((feature, idx) => (
+              <li key={idx} className="flex items-center gap-2 text-sm" style={{ color: colors.textSecondary }}>
+                <CheckCircle className="h-4 w-4 text-green-500" />
+                {feature}
+              </li>
+            ))}
+          </ul>
+        </div>
+      </CardContent>
+    </Card>
+  )
+
+  const InfluencerCard = ({ influencer }: { influencer: Influencer }) => (
+    <Card className="backdrop-blur-sm border-2 hover:shadow-lg transition-all duration-300 hover:scale-105" style={{ backgroundColor: colors.cardBg, borderColor: colors.cardBorder }}>
+      <div className="relative">
+        <div className="h-64 overflow-hidden">
+          <img 
+            src={influencer.image} 
+            alt={influencer.name}
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+          <div className="absolute top-4 right-4">
+            {influencer.verified && (
+              <Badge className="bg-gradient-to-r from-yellow-400 to-orange-500 text-black">
+                <CheckCircle className="mr-1 h-3 w-3" />
+                EDN Verified
+              </Badge>
+            )}
+          </div>
+          <div className="absolute bottom-4 left-4 text-white">
+            <h3 className="text-xl font-bold">{influencer.name}</h3>
+            <p className="text-sm opacity-90">{influencer.age}</p>
+          </div>
+        </div>
+      </div>
+      
+      <CardContent className="p-4">
+        <p className="text-sm mb-4 line-clamp-3" style={{ color: colors.textSecondary }}>
+          {influencer.bio}
+        </p>
+        
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-4">
+            <div>
+              <p className="text-xs" style={{ color: colors.textLight }}>Followers</p>
+              <p className="font-semibold" style={{ color: colors.primary }}>{influencer.followers}</p>
+            </div>
+            <div>
+              <p className="text-xs" style={{ color: colors.textLight }}>Engagement</p>
+              <p className="font-semibold" style={{ color: colors.primary }}>{influencer.engagement}</p>
+            </div>
+          </div>
+        </div>
+        
+        <div className="flex flex-wrap gap-1 mb-4">
+          {influencer.tags.map((tag, idx) => (
+            <Badge key={idx} variant="secondary" className="text-xs" style={{ backgroundColor: colors.accent, color: colors.textOnWhite }}>
+              {tag}
+            </Badge>
+          ))}
+        </div>
+        
+        <Button className="w-full" style={{ backgroundColor: colors.primary }}>
+          View EDN Profile
+          <ArrowRight className="ml-2 h-4 w-4" />
+        </Button>
+      </CardContent>
+    </Card>
+  )
+
+  const PricingCard = ({ plan }: { plan: PricingPlan }) => (
+    <Card className={`h-full backdrop-blur-sm border-2 hover:shadow-lg transition-all duration-300 relative ${
+      plan.popular ? 'ring-2 ring-yellow-400 scale-105' : ''
+    }`} style={{ backgroundColor: colors.cardBg, borderColor: colors.cardBorder }}>
+      {plan.popular && (
+        <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
+          <Badge className="bg-gradient-to-r from-yellow-400 to-orange-500 text-black px-3 py-1">
+            <Crown className="mr-1 h-3 w-3" />
+            Most Popular EDN
+          </Badge>
+        </div>
+      )}
+      
+      <CardHeader className="text-center pb-4">
+        <CardTitle className="text-2xl" style={{ color: colors.primary }}>{plan.name}</CardTitle>
+        <div className="mt-4">
+          <span className="text-4xl font-bold" style={{ color: colors.primary }}>{plan.price}</span>
+          <span className="text-lg" style={{ color: colors.textSecondary }}>{plan.period}</span>
+        </div>
+        <CardDescription style={{ color: colors.textSecondary }} className="text-base">
+          {plan.description}
+        </CardDescription>
+      </CardHeader>
+      
+      <CardContent className="space-y-4">
+        <ul className="space-y-3">
+          {plan.features.map((feature, idx) => (
+            <li key={idx} className="flex items-center gap-3" style={{ color: colors.textSecondary }}>
+              <CheckCircle className="h-5 w-5 text-green-500 flex-shrink-0" />
+              <span className="text-sm">{feature}</span>
+            </li>
+          ))}
+        </ul>
+        
+        <Button 
+          className={`w-full ${plan.popular ? 'bg-gradient-to-r from-yellow-400 to-orange-500 text-black' : ''}`}
+          style={!plan.popular ? { backgroundColor: colors.primary } : {}}
+        >
+          {plan.buttonText}
+        </Button>
+      </CardContent>
+    </Card>
+  )
+
+  const FAQItem = ({ item }: { item: FAQItem }) => {
+    const [isOpen, setIsOpen] = useState(false)
+    
+    return (
+      <Card className="backdrop-blur-sm border-2" style={{ backgroundColor: colors.cardBg, borderColor: colors.cardBorder }}>
+        <CardContent className="p-4">
+          <button 
+            className="w-full flex items-center justify-between text-left"
+            onClick={() => setIsOpen(!isOpen)}
+          >
+            <h3 className="font-semibold text-lg" style={{ color: colors.primary }}>{item.question}</h3>
+            <HelpCircle className={`h-5 w-5 transition-transform ${isOpen ? 'rotate-180' : ''}`} style={{ color: colors.textSecondary }} />
+          </button>
+          
+          {isOpen && (
+            <div className="mt-3 pt-3 border-t" style={{ borderColor: colors.cardBorder }}>
+              <p style={{ color: colors.textSecondary }}>{item.answer}</p>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    )
+  }
+
+  return (
+    <div className={`min-h-screen bg-gradient-to-br ${colors.bg}`}>
+      {/* Hero Section */}
+      <div className="relative h-96 overflow-hidden">
+        <img 
+          src={isNSFW ? "/hero-create-nsfw.jpg" : "/hero-create-sfw.jpg"} 
+          alt="EDN Influencer Showcase" 
+          className="w-full h-full object-cover"
+        />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/60 to-black/80"></div>
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div className="text-center text-white max-w-4xl px-6">
+            <h1 className="text-4xl md:text-6xl font-bold mb-4 drop-shadow-lg">
+              EDN Influencer Showcase
+            </h1>
+            <p className="text-xl md:text-2xl mb-8 drop-shadow-md leading-relaxed">
+              Create Your Perfect EDN Influencer in Minutes
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-8">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-full bg-orange-500 flex items-center justify-center">
+                  <Users className="h-4 w-4 text-white" />
+                </div>
+                <span className="text-lg font-semibold">10K+ EDN Creators</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-full bg-cyan-500 flex items-center justify-center">
+                  <Sparkles className="h-4 w-4 text-white" />
+                </div>
+                <span className="text-lg font-semibold">50K+ EDN Influencers Created</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="container mx-auto px-6 py-12">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+          <TabsList className="grid w-full grid-cols-4 mb-12">
+            <TabsTrigger value="process" className="text-lg py-3">EDN Process</TabsTrigger>
+            <TabsTrigger value="showcase" className="text-lg py-3">EDN Showcase</TabsTrigger>
+            <TabsTrigger value="pricing" className="text-lg py-3">EDN Pricing</TabsTrigger>
+            <TabsTrigger value="faq" className="text-lg py-3">EDN FAQ</TabsTrigger>
+          </TabsList>
+
+          {/* Simple Process Tab */}
+          <TabsContent value="process" className="space-y-12">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl md:text-4xl font-bold mb-4" style={{ color: colors.primary }}>
+                Create Your EDN Influencer in 3 Simple Steps
+              </h2>
+              <p className="text-xl" style={{ color: colors.textSecondary }}>
+                Our EDN platform makes it easy to generate custom influencers in minutes
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {processSteps.map((step) => (
+                <ProcessStepCard key={step.step} step={step} />
+              ))}
+            </div>
+
+            <div className="text-center mt-12">
+              <div className="inline-flex items-center gap-4 p-6 rounded-lg backdrop-blur-sm" style={{ backgroundColor: colors.cardBg, borderColor: colors.cardBorder }}>
+                <Clock className="h-8 w-8" style={{ color: colors.primary }} />
+                <div>
+                  <h3 className="text-xl font-bold" style={{ color: colors.primary }}>Start Creating with EDN in Under 2 Minutes</h3>
+                  <p style={{ color: colors.textSecondary }}>Join thousands of EDN creators who are revolutionizing their content strategy with AI-generated influencers.</p>
+                </div>
+              </div>
+            </div>
+          </TabsContent>
+
+          {/* Showcase Tab */}
+          <TabsContent value="showcase" className="space-y-12">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl md:text-4xl font-bold mb-4" style={{ color: colors.primary }}>
+                Stunning EDN Influencers Created By Our Users
+              </h2>
+              <p className="text-xl" style={{ color: colors.textSecondary }}>
+                Browse through our EDN gallery of AI-generated influencers and get inspired
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {influencers.map((influencer) => (
+                <InfluencerCard key={influencer.id} influencer={influencer} />
+              ))}
+            </div>
+          </TabsContent>
+
+          {/* Pricing Tab */}
+          <TabsContent value="pricing" className="space-y-12">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl md:text-4xl font-bold mb-4" style={{ color: colors.primary }}>
+                Choose Your EDN Plan
+              </h2>
+              <p className="text-xl" style={{ color: colors.textSecondary }}>
+                Select the perfect EDN subscription that fits your content creation needs
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {pricingPlans.map((plan) => (
+                <PricingCard key={plan.id} plan={plan} />
+              ))}
+            </div>
+
+            <div className="text-center mt-12">
+              <div className="inline-flex items-center gap-4 p-6 rounded-lg backdrop-blur-sm" style={{ backgroundColor: colors.cardBg, borderColor: colors.cardBorder }}>
+                <Zap className="h-8 w-8" style={{ color: colors.primary }} />
+                <div>
+                  <h3 className="text-xl font-bold" style={{ color: colors.primary }}>Get Started with EDN – No Learning Curve</h3>
+                  <p style={{ color: colors.textSecondary }}>No credit card required to start your EDN journey</p>
+                </div>
+              </div>
+            </div>
+          </TabsContent>
+
+          {/* FAQ Tab */}
+          <TabsContent value="faq" className="space-y-12">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl md:text-4xl font-bold mb-4" style={{ color: colors.primary }}>
+                EDN Frequently Asked Questions
+              </h2>
+              <p className="text-xl" style={{ color: colors.textSecondary }}>
+                Find answers to common questions about EDN Creator Core AI
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+              {faqItems.map((item, idx) => (
+                <FAQItem key={idx} item={item} />
+              ))}
+            </div>
+
+            <div className="text-center mt-12">
+              <div className="inline-flex items-center gap-4 p-6 rounded-lg backdrop-blur-sm" style={{ backgroundColor: colors.cardBg, borderColor: colors.cardBorder }}>
+                <Shield className="h-8 w-8" style={{ color: colors.primary }} />
+                <div>
+                  <h3 className="text-xl font-bold" style={{ color: colors.primary }}>Still Have EDN Questions?</h3>
+                  <p style={{ color: colors.textSecondary }}>Our EDN support team is here to help you 24/7</p>
+                </div>
+              </div>
+            </div>
+          </TabsContent>
+        </Tabs>
+      </div>
+    </div>
+  )
+}

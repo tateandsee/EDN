@@ -1,0 +1,1021 @@
+'use client'
+
+import { useState, useEffect } from 'react'
+import Link from 'next/link'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Slider } from '@/components/ui/slider'
+import { Input } from '@/components/ui/input'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { useNSFW } from '@/contexts/nsfw-context'
+import { useAuth } from '@/contexts/auth-context'
+import { ImageProtection, ProtectedImage, AIModelProtection } from '@/components/image-protection'
+import { ResponsiveContainer, ResponsiveGrid, ResponsiveText } from '@/components/responsive'
+import { LoadingCard, LoadingSpinner } from '@/components/loading-states'
+import { useResponsive } from '@/hooks/use-responsive'
+import { 
+  Sparkles, 
+  Star, 
+  Crown, 
+  Heart, 
+  Eye,
+  Upload,
+  Search,
+  Filter,
+  TrendingUp,
+  Users,
+  DollarSign,
+  Gift,
+  Award,
+  Zap,
+  Plus,
+  ShoppingCart,
+  User,
+  Calendar,
+  MessageSquare,
+  CheckCircle,
+  Clock,
+  Lock,
+  LogIn,
+  RefreshCw
+} from 'lucide-react'
+
+// Import the parent prompt system
+import { ParentPromptSystem, ParentPromptConfig } from '@/lib/parent-prompt'
+// Import the new model generator
+import { generateMarketplaceModels } from '@/lib/marketplace-model-generator'
+
+interface MarketplaceItem {
+  id: string
+  title: string
+  description?: string
+  type: 'AI_MODEL' | 'MENTORSHIP' | 'TEMPLATE' | 'SERVICE' | 'DIGITAL_GOOD'
+  category: 'SFW' | 'NSFW' | 'EDUCATION' | 'PROMPTS'
+  price: number
+  currency: string
+  status: 'ACTIVE' | 'INACTIVE' | 'PENDING' | 'SUSPENDED' | 'SOLD'
+  thumbnail?: string
+  images?: string[]
+  pdfFile?: string
+  pdfFileName?: string
+  pdfFileSize?: number
+  tags?: string[]
+  userId: string
+  createdAt: string
+  updatedAt: string
+  isNsfw: boolean // Add NSFW property
+  promptConfig?: ParentPromptConfig // Add prompt configuration
+  user: {
+    id: string
+    name?: string
+    avatar?: string
+    verified: boolean
+  }
+  reviews: Array<{
+    rating: number
+    comment?: string
+    createdAt: string
+    user: {
+      name?: string
+      avatar?: string
+    }
+  }>
+  _count: {
+    reviews: number
+    orders: number
+  }
+}
+
+export default function MarketplacePage() {
+  const { isNSFW } = useNSFW()
+  const { user } = useAuth()
+  const [activeTab, setActiveTab] = useState('browse')
+  const [priceRange, setPriceRange] = useState([10, 1000])
+  const [selectedCategory, setSelectedCategory] = useState('all')
+  const [showAuthModal, setShowAuthModal] = useState(false)
+  const [authModalReason, setAuthModalReason] = useState<'general' | 'nsfw'>('general')
+  const [currentHeroIndex, setCurrentHeroIndex] = useState(0)
+  
+  const heroImages = {
+    sfw: [
+      "/hero-sfw-1.jpg",
+      "/hero-sfw-2.jpg", 
+      "/hero-sfw-3.jpg"
+    ],
+    nsfw: [
+      "/hero-nsfw-1.jpg",
+      "/hero-nsfw-2.jpg",
+      "/hero-nsfw-3.jpg"
+    ]
+  }
+
+  // Rotate hero images every 5 seconds
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentHeroIndex((prev) => (prev + 1) % 3)
+    }, 5000)
+
+    return () => clearInterval(interval)
+  }, [])
+  const [items, setItems] = useState<MarketplaceItem[]>([])
+  const [loadingItems, setLoadingItems] = useState(true)
+  const [searchTerm, setSearchTerm] = useState('')
+  const [sortBy, setSortBy] = useState('popular')
+  const [isGenerating, setIsGenerating] = useState(false)
+  
+  const sfwColors = {
+    primary: '#FF6B35', // vibrant coral orange
+    secondary: '#4ECDC4', // bright turquoise
+    accent: '#FFE66D', // golden yellow
+    bg: 'from-orange-200 via-cyan-200 to-yellow-200',
+    particle: '#FF6B35',
+    cardBg: 'rgba(255, 255, 255, 0.9)',
+    cardBorder: 'rgba(0, 0, 0, 0.1)',
+    textPrimary: '#1A202C', // dark gray
+    textSecondary: '#2D3748', // medium gray
+    textLight: '#4A5568', // light gray
+    textOnWhite: '#2D3748' // text on white backgrounds
+  }
+
+  const nsfwColors = {
+    primary: '#FF1493', // deep hot pink
+    secondary: '#00CED1', // dark turquoise
+    accent: '#FF1744', // vibrant red
+    bg: 'from-pink-900 via-purple-900 to-red-900',
+    particle: '#FF69B4',
+    cardBg: 'rgba(30, 0, 30, 0.85)',
+    cardBorder: 'rgba(255, 20, 147, 0.5)',
+    textPrimary: '#FFFFFF',
+    textSecondary: '#E0E0E0',
+    textLight: '#B0B0B0',
+    textOnWhite: '#FFFFFF'
+  }
+
+  const colors = isNSFW ? nsfwColors : sfwColors
+
+  const categories = [
+    { id: 'all', name: 'All Items' },
+    { id: 'SFW', name: 'SFW Content' },
+    { id: 'NSFW', name: 'NSFW Content' },
+    { id: 'EDUCATION', name: 'Education' },
+    { id: 'PROMPTS', name: 'Prompts' }
+  ]
+
+  // Generate new unique models
+  const sfwModels = generateMarketplaceModels(false, 30)
+  const nsfwModels = generateMarketplaceModels(true, 30)
+  
+  // Featured items (select best from each category)
+  const featuredItems = [
+    sfwModels[0], // Best SFW model
+    nsfwModels[0], // Best NSFW model
+    sfwModels[1], // Second best SFW
+    nsfwModels[1], // Second best NSFW
+    sfwModels[2], // Third best SFW
+    nsfwModels[2]  // Third best NSFW
+  ].map((model, index) => ({
+    ...model,
+    id: `featured-${model.isNsfw ? 'nsfw' : 'sfw'}-${index + 1}`,
+    featured: true,
+    image: `/marketplace-${model.isNsfw ? 'nsfw' : 'sfw'}-${index + 1}.jpg`
+  }))
+
+  const trendingCategories = [
+    { name: 'EDN Portrait Models', growth: '+45%', items: 15 },
+    { name: 'EDN Beach Models', growth: '+38%', items: 12 },
+    { name: 'EDN Luxury Models', growth: '+32%', items: 10 },
+    { name: 'EDN Studio Models', growth: '+28%', items: 13 },
+    { name: 'EDN Boudoir Models', growth: '+52%', items: 18 },
+    { name: 'EDN Fantasy Models', growth: '+41%', items: 14 }
+  ]
+
+  const [stats, setStats] = useState({
+    totalItems: 0,
+    activeCreators: 0,
+    totalRevenue: '$0',
+    avgRating: 0
+  })
+
+  // Fetch actual marketplace stats
+  useEffect(() => {
+    const fetchMarketplaceStats = async () => {
+      try {
+        const response = await fetch('/api/marketplace/stats')
+        if (response.ok) {
+          const data = await response.json()
+          setStats(data)
+        }
+      } catch (error) {
+        console.error('Error fetching marketplace stats:', error)
+        // Fallback to hardcoded values if API fails
+        setStats({
+          totalItems: 60, // 30 SFW + 30 NSFW
+          activeCreators: 20,
+          totalRevenue: '$12,500',
+          avgRating: 4.9
+        })
+      }
+    }
+
+    fetchMarketplaceStats()
+  }, [])
+
+  // Generate 30 diverse hyper-realistic NSFW female models for EDN marketplace
+  const generateNSFWModels = (): MarketplaceItem[] => {
+    const models = []
+    const creators = ['EDN Master', 'EDN Digital Artist', 'EDN Creative Pro', 'EDN Vision Studio', 'EDN Artisan AI', 'EDN Pixel Perfect', 'EDN Dream Weaver', 'EDN Neural Artist', 'EDN Creative Mind', 'EDN Imagination Lab']
+    
+    // Define NSFW-specific archetypes with their characteristics
+    const archetypes = [
+      {
+        name: 'Boudoir Model',
+        description: 'Sensual, intimate poses with elegant lighting',
+        poses: ['lying seductively', 'intimate gaze', 'elegant recline'],
+        styles: ['sensual', 'elegant', 'intimate']
+      },
+      {
+        name: 'Fantasy Warrior',
+        description: 'Strong, powerful poses with fantasy elements',
+        poses: ['power stance', 'battle ready', 'confident posture'],
+        styles: ['fantasy', 'powerful', 'mythical']
+      },
+      {
+        name: 'Luxury Companion',
+        description: 'High-end, sophisticated looks with premium settings',
+        poses: ['graceful pose', 'sophisticated stance', 'elegant posture'],
+        styles: ['luxury', 'sophisticated', 'premium']
+      },
+      {
+        name: 'Artistic Nude',
+        description: 'Artistic, tasteful nude compositions',
+        poses: ['artistic pose', 'natural form', 'elegant nudity'],
+        styles: ['artistic', 'tasteful', 'classical']
+      }
+    ]
+    
+    // Hair variations for NSFW content
+    const hairTypes = [
+      { color: 'platinum blonde', style: 'long flowing', description: 'silky and luxurious' },
+      { color: 'raven black', style: 'elegant updo', description: 'sophisticated and sleek' },
+      { color: 'fiery red', style: 'voluminous curls', description: 'passionate and bold' },
+      { color: 'chocolate brown', style: 'beach waves', description: 'natural and carefree' }
+    ]
+    
+    // Eye colors
+    const eyeColors = [
+      { color: 'emerald green', description: 'captivating and mysterious' },
+      { color: 'sapphire blue', description: 'deep and enchanting' },
+      { color: 'golden hazel', description: 'warm and inviting' },
+      { color: 'violet purple', description: 'unique and striking' }
+    ]
+    
+    // Attire types for NSFW content
+    const attireTypes = [
+      { type: 'lingerie', description: 'elegant lace, silk, sophisticated designs' },
+      { type: 'bodysuit', description: 'form-fitting, sheer, intricate details' },
+      { type: 'implied nude', description: 'strategic coverage, artistic composition' },
+      { type: 'fantasy armor', description: 'mythical, revealing, battle-worn' }
+    ]
+    
+    // Body types
+    const bodyTypes = [
+      { type: 'curvaceous', description: 'hourglass figure, full-figured' },
+      { type: 'athletic', description: 'toned, defined muscles, fit' },
+      { type: 'slender', description: 'lean, graceful, delicate features' }
+    ]
+    
+    // Breast types
+    const breastTypes = [
+      { type: 'natural', description: 'proportionate, realistic movement' },
+      { type: 'enhanced', description: 'full, rounded, symmetrical' },
+      { type: 'voluptuous', description: 'large, natural-looking curves' }
+    ]
+    
+    // Environments
+    const environments = [
+      { setting: 'luxury bedroom', description: 'silk sheets, soft lighting, elegant decor' },
+      { setting: 'fantasy realm', description: 'mystical atmosphere, ethereal lighting' },
+      { setting: 'art studio', description: 'creative space, dramatic lighting' },
+      { setting: 'natural setting', description: 'outdoor, golden hour, organic' },
+      { setting: 'vip lounge', description: 'exclusive, sophisticated ambiance' }
+    ]
+    
+    // 2025 fashion trends for NSFW content
+    const fashionTrends = [
+      'body chains', 'strappy details', 'sheer fabrics', 'metallic accents', 'cutout designs'
+    ]
+    
+    // Generate 30 unique NSFW models
+    for (let i = 1; i <= 30; i++) {
+      const archetype = archetypes[Math.floor(Math.random() * archetypes.length)]
+      const hair = hairTypes[Math.floor(Math.random() * hairTypes.length)]
+      const eyes = eyeColors[Math.floor(Math.random() * eyeColors.length)]
+      const attire = attireTypes[Math.floor(Math.random() * attireTypes.length)]
+      const bodyType = bodyTypes[Math.floor(Math.random() * bodyTypes.length)]
+      const breastType = breastTypes[Math.floor(Math.random() * breastTypes.length)]
+      const environment = environments[Math.floor(Math.random() * environments.length)]
+      const trend = fashionTrends[Math.floor(Math.random() * fashionTrends.length)]
+      const pose = archetype.poses[Math.floor(Math.random() * archetype.poses.length)]
+      const creator = creators[Math.floor(Math.random() * creators.length)]
+      
+      // Generate price based on features (120-250 range for NSFW content)
+      const basePrice = 120 + Math.floor(Math.random() * 130)
+      
+      models.push({
+        id: `edn-nsfw-model-${i}`,
+        title: `EDN ${archetype.name} - ${hair.color} ${hair.style}`,
+        description: `Premium EDN AI model featuring ${archetype.name} archetype with ${hair.description} hair, ${eyes.description} eyes, wearing ${attire.description}. Set in ${environment.description} with ${trend} accents. ${bodyType.description} physique with ${breastType.description} features. Perfect for exclusive NSFW content creation.`,
+        type: 'AI_MODEL',
+        category: 'NSFW',
+        price: basePrice,
+        currency: 'USD',
+        status: 'ACTIVE',
+        isNsfw: true, // All models are NSFW
+        image: `/marketplace-item-nsfw-${(i % 10) + 1}.jpg`, // Use NSFW images 1-10
+        promptConfig: {
+          archetype: archetype.name,
+          hairColor: hair.color,
+          hairStyle: hair.style,
+          eyeColor: eyes.color,
+          attire: attire.type,
+          bodyType: bodyType.type,
+          breastType: breastType.type,
+          environment: environment.setting,
+          pose: pose,
+          trend: trend,
+          ageRange: '18-30'
+        },
+        userId: `edn-user-${i}`,
+        createdAt: new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000).toISOString(),
+        updatedAt: new Date().toISOString(),
+        user: {
+          id: `edn-user-${i}`,
+          name: creator,
+          avatar: '',
+          verified: true // All EDN creators are verified
+        },
+        reviews: Array.from({ length: Math.floor(Math.random() * 25) + 8 }, (_, idx) => ({
+          rating: Math.floor(Math.random() * 2) + 4, // 4-5 stars
+          comment: `Stunning ${archetype.name} model! Perfect for premium NSFW content creation.`,
+          createdAt: new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000).toISOString(),
+          user: { name: `EDN User${idx + 1}` }
+        })),
+        _count: {
+          reviews: Math.floor(Math.random() * 200) + 25,
+          orders: Math.floor(Math.random() * 400) + 75
+        }
+      })
+    }
+    
+    return models
+  }
+
+  // Generate 30 diverse hyper-realistic SFW female models for EDN marketplace
+  const generateSFWModels = (): MarketplaceItem[] => {
+    const models = []
+    const creators = ['EDN Master', 'EDN Digital Artist', 'EDN Creative Pro', 'EDN Vision Studio', 'EDN Artisan AI', 'EDN Pixel Perfect', 'EDN Dream Weaver', 'EDN Neural Artist', 'EDN Creative Mind', 'EDN Imagination Lab']
+    
+    // Define archetypes with their characteristics
+    const archetypes = [
+      {
+        name: 'Girl Next Door',
+        description: 'Natural makeup, casual yet stylish outfits, warm smiles',
+        poses: ['gentle smile', 'hands in pockets', 'relaxed standing'],
+        styles: ['casual', 'natural', 'approachable']
+      },
+      {
+        name: 'Girlfriend',
+        description: 'Affectionate, relaxed poses, cozy charm',
+        poses: ['warm gaze', 'sitting casually', 'affectionate gesture'],
+        styles: ['cozy', 'comfortable', 'warm']
+      },
+      {
+        name: 'College Girl',
+        description: 'Youthful, playful energy in trendy attire',
+        poses: ['playful twirl', 'leaning forward', 'dynamic movement'],
+        styles: ['youthful', 'trendy', 'energetic']
+      },
+      {
+        name: 'Sexy Office Woman',
+        description: 'Professional, chic outfits with confident poise',
+        poses: ['confident stance', 'professional posture', 'elegant sitting'],
+        styles: ['professional', 'chic', 'sophisticated']
+      }
+    ]
+    
+    // Hair variations
+    const hairTypes = [
+      { color: 'red', style: 'vibrant curls', description: 'fiery and lively' },
+      { color: 'black', style: 'sleek straight', description: 'elegant and polished' },
+      { color: 'black', style: 'soft bun', description: 'professional and chic' },
+      { color: 'blonde', style: 'voluminous waves', description: 'radiant and glamorous' }
+    ]
+    
+    // Eye colors
+    const eyeColors = [
+      { color: 'vibrant blue', description: 'bright and engaging' },
+      { color: 'vivid green', description: 'captivating and warm' },
+      { color: 'rich brown', description: 'deep and inviting' }
+    ]
+    
+    // Attire types
+    const attireTypes = [
+      { type: 'gym wear', description: 'stylish sports bras, fitted leggings, bold patterns' },
+      { type: 'bikini', description: 'trendy, colorful, Y2K-inspired designs' },
+      { type: 'crop top with shorts', description: 'elegant crop tops paired with stylish shorts' },
+      { type: 'tailored blouse with pencil skirt', description: 'professional yet fashionable office attire' }
+    ]
+    
+    // Body types
+    const bodyTypes = [
+      { type: 'voluptuous', description: 'curvy, hourglass, healthy glow' },
+      { type: 'toned', description: 'athletic, defined muscles' },
+      { type: 'slender', description: 'lean, graceful and elegant' }
+    ]
+    
+    // Breast types
+    const breastTypes = [
+      { type: 'natural', description: 'proportionate, realistic' },
+      { type: 'enhanced', description: 'subtle, balanced enhancement' }
+    ]
+    
+    // Environments
+    const environments = [
+      { setting: 'cozy bedroom', description: 'soft bedding, fairy lights, warm ambiance' },
+      { setting: 'modern kitchen', description: 'sleek counters, natural light, minimalist design' },
+      { setting: 'rooftop garden', description: 'lush greenery, sunset glow, city views' },
+      { setting: 'urban loft', description: 'city skyline, warm ambiance, modern decor' },
+      { setting: 'park bench', description: 'sunlit, relaxed, natural surroundings' }
+    ]
+    
+    // 2025 fashion trends
+    const fashionTrends = [
+      'vibrant patterns', 'metallic accents', 'pastel highlights', 'bold textures', 'neon accents'
+    ]
+    
+    // Generate 30 unique models
+    for (let i = 1; i <= 30; i++) {
+      const archetype = archetypes[Math.floor(Math.random() * archetypes.length)]
+      const hair = hairTypes[Math.floor(Math.random() * hairTypes.length)]
+      const eyes = eyeColors[Math.floor(Math.random() * eyeColors.length)]
+      const attire = attireTypes[Math.floor(Math.random() * attireTypes.length)]
+      const bodyType = bodyTypes[Math.floor(Math.random() * bodyTypes.length)]
+      const breastType = breastTypes[Math.floor(Math.random() * breastTypes.length)]
+      const environment = environments[Math.floor(Math.random() * environments.length)]
+      const trend = fashionTrends[Math.floor(Math.random() * fashionTrends.length)]
+      const pose = archetype.poses[Math.floor(Math.random() * archetype.poses.length)]
+      const creator = creators[Math.floor(Math.random() * creators.length)]
+      
+      // Generate price based on features (80-150 range for SFW content)
+      const basePrice = 80 + Math.floor(Math.random() * 70)
+      
+      models.push({
+        id: `edn-sfw-model-${i}`,
+        title: `EDN ${archetype.name} - ${hair.color} ${hair.style}`,
+        description: `Hyper-realistic SFW EDN AI model embodying ${archetype.name} archetype with ${hair.description} hair, ${eyes.description} eyes, wearing ${attire.description}. Set in ${environment.description} with ${trend} accents. ${bodyType.description} physique with ${breastType.description} features.`,
+        type: 'AI_MODEL',
+        category: 'NSFW',
+        price: basePrice,
+        currency: 'USD',
+        status: 'ACTIVE',
+        isNsfw: false, // All models are SFW
+        image: `/marketplace-item-sfw-${(i % 10) + 1}.jpg`, // Use SFW images 1-10
+        promptConfig: {
+          archetype: archetype.name,
+          hairColor: hair.color,
+          hairStyle: hair.style,
+          eyeColor: eyes.color,
+          attire: attire.type,
+          bodyType: bodyType.type,
+          breastType: breastType.type,
+          environment: environment.setting,
+          pose: pose,
+          trend: trend,
+          ageRange: '18-30'
+        },
+        userId: `edn-user-${i}`,
+        createdAt: new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000).toISOString(),
+        updatedAt: new Date().toISOString(),
+        user: {
+          id: `edn-user-${i}`,
+          name: creator,
+          avatar: '',
+          verified: true // All EDN creators are verified
+        },
+        reviews: Array.from({ length: Math.floor(Math.random() * 20) + 5 }, (_, idx) => ({
+          rating: Math.floor(Math.random() * 2) + 4, // 4-5 stars
+          comment: `Amazing ${archetype.name} model! Perfect for SFW content creation.`,
+          createdAt: new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000).toISOString(),
+          user: { name: `EDN User${idx + 1}` }
+        })),
+        _count: {
+          reviews: Math.floor(Math.random() * 150) + 15,
+          orders: Math.floor(Math.random() * 300) + 50
+        }
+      })
+    }
+    
+    return models
+  }
+
+  // Mock data for items - now includes both SFW and NSFW EDN AI models
+  const mockItems: MarketplaceItem[] = [...sfwModels, ...nsfwModels]
+
+  // Initialize with mock data
+  useState(() => {
+    setItems(mockItems)
+    setLoadingItems(false)
+  })
+
+  const handleBuyItem = (itemId: string) => {
+    setAuthModalReason('general')
+    setShowAuthModal(true)
+    console.log('Buying EDN item:', itemId)
+  }
+
+  const handleSellContent = () => {
+    setAuthModalReason('general')
+    setShowAuthModal(true)
+  }
+
+  const handleGenerateNewModels = async () => {
+    setIsGenerating(true)
+    try {
+      // Use the pre-generated models
+      const allNewModels = [...sfwModels, ...nsfwModels]
+      setItems(allNewModels)
+      
+      // Show success message (in a real app, this would be a toast)
+      console.log('Generated new diverse SFW and NSFW EDN models')
+    } catch (error) {
+      console.error('Error generating SFW and NSFW EDN models:', error)
+    } finally {
+      setIsGenerating(false)
+    }
+  }
+
+  const shouldBlurContent = (item: MarketplaceItem) => {
+    return false // Always return false to remove blur from NSFW content
+  }
+
+  const MarketplaceItemCard = ({ item, isFeatured = false }: { item: MarketplaceItem; isFeatured?: boolean }) => {
+    const blurContent = shouldBlurContent(item)
+    
+    return (
+      <Card 
+        key={item.id} 
+        className={`backdrop-blur-sm border-2 hover:shadow-lg relative overflow-hidden ${
+          blurContent ? 'blur-sm' : ''
+        }`} 
+        style={{ backgroundColor: colors.cardBg, borderColor: colors.cardBorder }}
+      >
+        {blurContent && (
+          <div className="absolute inset-0 bg-black/80 flex items-center justify-center z-10 backdrop-blur-sm">
+            <div className="text-center text-white p-6 bg-black/60 rounded-lg border border-white/20">
+              <Lock className="h-12 w-12 mx-auto mb-3 text-yellow-400" />
+              <p className="text-lg font-bold mb-2">EDN NSFW Content</p>
+              <p className="text-sm mb-4 opacity-90">Login to view EDN NSFW content</p>
+              <Button 
+                size="sm" 
+                onClick={() => {
+                  setAuthModalReason('nsfw')
+                  setShowAuthModal(true)
+                }}
+                className="bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 text-white px-6 py-2 font-semibold shadow-lg"
+              >
+                <LogIn className="h-4 w-4 mr-2" />
+                Login to View
+              </Button>
+            </div>
+          </div>
+        )}
+        
+        <CardHeader className="pb-2">
+          <div className="flex items-start justify-between">
+            <div className="flex-1">
+              {isFeatured && (
+                <Badge className="bg-gradient-to-r from-yellow-400 to-orange-500 text-black mb-2">
+                  <Crown className="mr-1 h-3 w-3" />
+                  EDN Featured
+                </Badge>
+              )}
+              <CardTitle className="text-lg" style={{ color: colors.primary }}>
+                {item.title}
+              </CardTitle>
+              <div className="flex items-center gap-2 mt-1">
+                <Badge variant="secondary" className="text-xs" style={{ backgroundColor: colors.accent, color: colors.textOnWhite }}>
+                  {item.category}
+                </Badge>
+                <Badge variant={item.isNsfw ? "destructive" : "default"} className="text-xs">
+                  {item.isNsfw ? "NSFW" : "SFW"}
+                </Badge>
+                <Badge variant="outline" className="text-xs" style={{ borderColor: colors.primary, color: colors.primary }}>
+                  EDN
+                </Badge>
+              </div>
+            </div>
+            {!isFeatured && (
+              <div className="flex items-center gap-1">
+                <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                <span className="text-sm font-medium" style={{ color: colors.textPrimary }}>
+                  {item._count.reviews > 0 ? 
+                    (item.reviews.reduce((sum, review) => sum + review.rating, 0) / item.reviews.length).toFixed(1) : 
+                    'New'
+                  }
+                </span>
+                <span className="text-xs" style={{ color: colors.textLight }}>
+                  ({item._count.reviews})
+                </span>
+              </div>
+            )}
+          </div>
+          <CardDescription style={{ color: colors.textSecondary }}>
+            {item.description}
+          </CardDescription>
+        </CardHeader>
+        
+        <div className="px-6 pb-4">
+          <div className="relative h-48 rounded-lg overflow-hidden">
+            <AIModelProtection watermarkText="EDN AI MODEL">
+              <img 
+                src={item.image || `/marketplace-item-${item.isNsfw ? 'nsfw' : 'sfw'}-${(Math.floor(Math.random() * 10) + 1)}.jpg`} 
+                alt={item.title}
+                className={`w-full h-full object-cover ${blurContent ? 'blur-md' : ''}`}
+              />
+            </AIModelProtection>
+          </div>
+        </div>
+        
+        <CardContent>
+          <div className="flex items-center justify-between mb-4">
+            <div className="text-2xl font-bold" style={{ color: colors.primary }}>
+              ${item.price}
+            </div>
+            {isFeatured && (
+              <div className="flex items-center gap-1">
+                <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                <span className="text-sm font-medium" style={{ color: colors.primary }}>
+                  {item.rating}
+                </span>
+                <span className="text-xs" style={{ color: colors.textLight }}>
+                  ({item.reviews})
+                </span>
+              </div>
+            )}
+          </div>
+          
+          <div className="flex items-center gap-2 mb-4">
+            <div className="w-6 h-6 rounded-full flex items-center justify-center" style={{ backgroundColor: colors.primary }}>
+              <User className="h-3 w-3 text-white" />
+            </div>
+            <span className="text-sm" style={{ color: colors.textPrimary }}>
+              {isFeatured ? item.creator : item.user.name}
+            </span>
+            {(isFeatured ? true : item.user.verified) && (
+              <CheckCircle className="h-4 w-4 text-green-500" />
+            )}
+          </div>
+          
+          {item.promptConfig && (
+            <div className="mb-4 p-2 rounded-lg bg-opacity-20" style={{ backgroundColor: colors.primary }}>
+              <div className="text-xs font-medium mb-1" style={{ color: colors.primary }}>
+                EDN Model Profile:
+              </div>
+              <div className="text-xs" style={{ color: colors.textSecondary }}>
+                {item.promptConfig.archetype} • {item.promptConfig.hairColor} {item.promptConfig.hairStyle} • {item.promptConfig.attire}
+              </div>
+              <div className="text-xs mt-1 italic" style={{ color: colors.textLight }}>
+                Mandated prompt.
+              </div>
+            </div>
+          )}
+          
+          <Button 
+            className={`w-full ${blurContent ? 'opacity-50 cursor-not-allowed' : ''}`}
+            onClick={() => {
+                if (blurContent) {
+                  setAuthModalReason('nsfw')
+                  setShowAuthModal(true)
+                } else {
+                  handleBuyItem(item.id)
+                }
+              }}
+            disabled={blurContent}
+            style={{ backgroundColor: colors.primary }}
+          >
+            <ShoppingCart className="mr-2 h-4 w-4" />
+            {isFeatured ? 'Get EDN Featured Model' : 'Get EDN Model'}
+          </Button>
+        </CardContent>
+      </Card>
+    )
+  }
+
+  const filteredItems = items.filter(item => {
+    const matchesCategory = selectedCategory === 'all' || item.category === selectedCategory
+    const matchesPrice = item.price >= priceRange[0] && item.price <= priceRange[1]
+    const matchesNsfw = isNSFW ? item.isNsfw : !item.isNsfw // Show only NSFW when isNSFW is true, only SFW when false
+    const matchesSearch = searchTerm === '' || 
+                        item.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                        item.description?.toLowerCase().includes(searchTerm.toLowerCase())
+    
+    return matchesCategory && matchesPrice && matchesNsfw && matchesSearch
+  })
+
+  return (
+    <div className={`min-h-screen bg-gradient-to-br ${colors.bg}`}>
+      {/* Hero Section */}
+      <div className="relative h-96 overflow-hidden pt-48">
+        <AIModelProtection watermarkText="EDN MARKETPLACE">
+          <img 
+            src={isNSFW ? heroImages.nsfw[currentHeroIndex] : heroImages.sfw[currentHeroIndex]} 
+            alt="EDN Marketplace" 
+            className="w-full h-full object-cover"
+          />
+        </AIModelProtection>
+        <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/60 to-black/80"></div>
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div className="text-center text-white max-w-4xl px-6">
+            <h1 className={`text-4xl md:text-6xl font-bold mb-4 drop-shadow-lg kinetic-text marketplace ${isNSFW ? 'nsfw' : 'sfw'}`}>
+              {isNSFW ? 'Seductive Gallery with EDN' : 'Premium Gallery with EDN'}
+            </h1>
+            <p className="text-xl md:text-2xl mb-8 drop-shadow-md leading-relaxed">
+              Discover and purchase premium EDN AI models generated with our proprietary parent prompt system
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-8">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-full bg-orange-500 flex items-center justify-center">
+                  <Users className="h-4 w-4 text-white" />
+                </div>
+                <span className="text-lg font-semibold">{stats.activeCreators}+ EDN Creators</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-full bg-cyan-500 flex items-center justify-center">
+                  <ShoppingCart className="h-4 w-4 text-white" />
+                </div>
+                <span className="text-lg font-semibold">{stats.totalItems.toLocaleString()}+ EDN Items</span>
+              </div>
+            </div>
+            <div className="flex gap-4 justify-center">
+              <Button className="bg-gradient-to-r from-orange-500 to-pink-500 hover:from-orange-600 hover:to-pink-600 text-white px-8 py-3 text-lg shadow-lg font-semibold">
+                Start EDN Selling
+                <Upload className="ml-2 h-4 w-4" />
+              </Button>
+              <Button variant="outline" className="border-white text-white hover:bg-white hover:text-orange-600 px-8 py-3 text-lg font-semibold backdrop-blur-sm">
+                Browse EDN Collection
+                <Eye className="ml-2 h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="container mx-auto px-6 py-8">
+        <div className="max-w-7xl mx-auto">
+
+          {/* Stats Overview */}
+          <Card className="backdrop-blur-sm border-2 mb-8" style={{ backgroundColor: colors.cardBg, borderColor: colors.cardBorder }}>
+            <CardHeader>
+              <CardTitle style={{ color: colors.primary }}>
+                EDN AI Models Overview
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div className="text-center">
+                  <div className="text-2xl font-bold mb-1" style={{ color: colors.primary }}>
+                    {stats.totalItems.toLocaleString()}
+                  </div>
+                  <div className="text-sm" style={{ color: colors.textSecondary }}>EDN Items</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl font-bold mb-1" style={{ color: colors.primary }}>
+                    {stats.activeCreators}
+                  </div>
+                  <div className="text-sm" style={{ color: colors.textSecondary }}>EDN Creators</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl font-bold mb-1" style={{ color: colors.primary }}>
+                    {stats.totalRevenue}
+                  </div>
+                  <div className="text-sm" style={{ color: colors.textSecondary }}>EDN Revenue</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl font-bold mb-1" style={{ color: colors.primary }}>
+                    {stats.avgRating} stars
+                  </div>
+                  <div className="text-sm" style={{ color: colors.textSecondary }}>
+                    EDN Avg Rating
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Generate New Models Button */}
+          <Card className="backdrop-blur-sm border-2 mb-8" style={{ backgroundColor: colors.cardBg, borderColor: colors.cardBorder }}>
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-lg font-semibold mb-2" style={{ color: colors.primary }}>
+                    EDN Parent Prompt System
+                  </h3>
+                  <p style={{ color: colors.textSecondary }}>
+                    Generate new EDN AI models using our proprietary parent prompt technology for consistent high-quality results
+                  </p>
+                </div>
+                <Button 
+                  onClick={handleGenerateNewModels}
+                  disabled={isGenerating}
+                  style={{ backgroundColor: colors.primary }}
+                >
+                  {isGenerating ? (
+                    <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
+                  ) : (
+                    <Sparkles className="mr-2 h-4 w-4" />
+                  )}
+                  {isGenerating ? 'Generating...' : 'Generate EDN Models'}
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+            <TabsList className="grid w-full grid-cols-3">
+              <TabsTrigger value="browse">Browse EDN Models</TabsTrigger>
+              <TabsTrigger value="featured">Featured EDN Models</TabsTrigger>
+              <TabsTrigger value="trending">Trending EDN Styles</TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="browse" className="mt-6">
+              <div className="grid lg:grid-cols-4 gap-8">
+                {/* Filters Sidebar */}
+                <div className="lg:col-span-1">
+                  <Card className="backdrop-blur-sm border-2" style={{ backgroundColor: colors.cardBg, borderColor: colors.cardBorder }}>
+                    <CardHeader>
+                      <CardTitle style={{ color: colors.primary }}>
+                        <Filter className="inline mr-2 h-4 w-4" />
+                        EDN Filters
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-6">
+                      <div>
+                        <label className="text-sm font-medium mb-2 block" style={{ color: colors.primary }}>
+                          EDN Model Type
+                        </label>
+                        <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {categories.map(category => (
+                              <SelectItem key={category.id} value={category.id}>
+                                {category.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      <div>
+                        <label className="text-sm font-medium mb-2 block" style={{ color: colors.primary }}>
+                          EDN Price Range: ${priceRange[0]} - ${priceRange[1]}
+                        </label>
+                        <Slider
+                          value={priceRange}
+                          onValueChange={setPriceRange}
+                          max={1000}
+                          min={10}
+                          step={10}
+                          className="w-full"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="text-sm font-medium mb-2 block" style={{ color: colors.primary }}>
+                          Search EDN Models
+                        </label>
+                        <div className="relative">
+                          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4" style={{ color: colors.textLight }} />
+                          <Input
+                            placeholder="Search EDN AI models..."
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            className="backdrop-blur-sm border-2 pl-10"
+                            style={{ backgroundColor: colors.cardBg, borderColor: colors.cardBorder, color: colors.textPrimary }}
+                          />
+                        </div>
+                      </div>
+
+                      <Button 
+                        className="w-full"
+                        style={{ backgroundColor: colors.primary }}
+                        onClick={() => {
+                          setPriceRange([10, 1000])
+                          setSelectedCategory('all')
+                          setSearchTerm('')
+                        }}
+                      >
+                        Reset EDN Filters
+                      </Button>
+                    </CardContent>
+                  </Card>
+                </div>
+
+                {/* Marketplace Grid */}
+                <div className="lg:col-span-3">
+                  <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {filteredItems.map((item) => (
+                      <Link href={`/marketplace/${item.id}`} key={item.id}>
+                        <MarketplaceItemCard item={item} />
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </TabsContent>
+
+            <TabsContent value="featured" className="mt-6">
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {featuredItems.map((item) => (
+                  <Link href={`/marketplace/${item.id}`} key={item.id}>
+                    <MarketplaceItemCard item={item} isFeatured={true} />
+                  </Link>
+                ))}
+              </div>
+            </TabsContent>
+
+            <TabsContent value="trending" className="mt-6">
+              <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+                {trendingCategories.map((category, index) => (
+                  <Card key={index} className="backdrop-blur-sm border-2 hover:shadow-lg" style={{ backgroundColor: colors.cardBg, borderColor: colors.cardBorder }}>
+                    <CardHeader>
+                      <CardTitle className="text-lg" style={{ color: colors.primary }}>
+                        {category.name}
+                      </CardTitle>
+                      <CardDescription className="font-medium" style={{ color: colors.secondary }}>
+                        {category.growth} growth
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="text-3xl font-bold mb-2" style={{ color: colors.primary }}>
+                        {category.items}
+                      </div>
+                      <div className="text-sm" style={{ color: colors.textSecondary }}>
+                        EDN AI Models
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </TabsContent>
+          </Tabs>
+        </div>
+      </div>
+
+      {/* Auth Modal */}
+      {showAuthModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <Card className="w-full max-w-md mx-4" style={{ backgroundColor: colors.cardBg, borderColor: colors.cardBorder }}>
+            <CardHeader>
+              <CardTitle style={{ color: colors.primary }}>
+                {authModalReason === 'nsfw' ? 'EDN NSFW Content Access' : 'EDN Authentication Required'}
+              </CardTitle>
+              <CardDescription style={{ color: colors.textSecondary }}>
+                {authModalReason === 'nsfw' 
+                  ? 'Please sign in to view EDN NSFW content. You must be 18+ to access EDN adult content.'
+                  : 'Please sign in to buy and sell EDN content on the marketplace.'
+                }
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {authModalReason === 'nsfw' && (
+                <div className="flex items-center gap-2 p-3 bg-yellow-500/20 border border-yellow-500/50 rounded-lg">
+                  <Lock className="h-5 w-5 text-yellow-400" />
+                  <span className="text-sm text-yellow-300">EDN age verification required</span>
+                </div>
+              )}
+              <Button className="w-full" style={{ backgroundColor: colors.primary }}>
+                <LogIn className="mr-2 h-4 w-4" />
+                EDN Sign In
+              </Button>
+              <Button variant="outline" className="w-full" style={{ borderColor: colors.primary, color: colors.primary }}>
+                Create EDN Account
+              </Button>
+              <Button 
+                variant="ghost" 
+                className="w-full"
+                style={{ color: colors.textSecondary }}
+                onClick={() => setShowAuthModal(false)}
+              >
+                Cancel
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+    </div>
+  )
+}

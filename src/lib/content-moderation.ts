@@ -23,6 +23,11 @@ export interface ModerationResult {
   adultContent: boolean
   suggestiveContent: boolean
   moderationStatus: 'APPROVED' | 'PENDING' | 'FLAGGED' | 'REJECTED'
+  // New gender and age restriction fields
+  gender: 'MALE' | 'FEMALE' | 'MIXED' | 'UNKNOWN'
+  ageAppropriate: boolean
+  hasRestrictedContent: boolean
+  restrictedContentTypes: string[]
 }
 
 export interface ModerationConfig {
@@ -32,6 +37,13 @@ export interface ModerationConfig {
   allowNude: boolean
   allowArtisticNudity: boolean
   allowAdultContent: boolean
+  // New gender and content restrictions
+  allowMaleContent: boolean
+  allowFemaleContent: boolean
+  allowChildContent: boolean
+  allowAnimalContent: boolean
+  minAge: number
+  maxAge: number
   customThresholds?: {
     explicit: number
     suggestive: number
@@ -67,7 +79,11 @@ class ContentModerationService {
       artisticNudity: analysis.artisticNudity,
       adultContent: analysis.adultContent,
       suggestiveContent: analysis.suggestiveContent,
-      moderationStatus: this.determineModerationStatus(analysis)
+      moderationStatus: this.determineModerationStatus(analysis),
+      gender: analysis.gender,
+      ageAppropriate: analysis.ageAppropriate,
+      hasRestrictedContent: analysis.hasRestrictedContent,
+      restrictedContentTypes: analysis.restrictedContentTypes
     }
   }
 
@@ -89,7 +105,11 @@ class ContentModerationService {
       artisticNudity: analysis.artisticNudity,
       adultContent: analysis.adultContent,
       suggestiveContent: analysis.suggestiveContent,
-      moderationStatus: this.determineModerationStatus(analysis)
+      moderationStatus: this.determineModerationStatus(analysis),
+      gender: analysis.gender,
+      ageAppropriate: analysis.ageAppropriate,
+      hasRestrictedContent: analysis.hasRestrictedContent,
+      restrictedContentTypes: analysis.restrictedContentTypes
     }
   }
 
@@ -111,7 +131,11 @@ class ContentModerationService {
       artisticNudity: analysis.artisticNudity,
       adultContent: analysis.adultContent,
       suggestiveContent: analysis.suggestiveContent,
-      moderationStatus: this.determineModerationStatus(analysis)
+      moderationStatus: this.determineModerationStatus(analysis),
+      gender: analysis.gender,
+      ageAppropriate: analysis.ageAppropriate,
+      hasRestrictedContent: analysis.hasRestrictedContent,
+      restrictedContentTypes: analysis.restrictedContentTypes
     }
   }
 
@@ -193,6 +217,12 @@ class ContentModerationService {
     let artisticNudity = false
     let adultContent = false
     let suggestiveContent = false
+    
+    // New gender and age detection variables
+    let gender: 'MALE' | 'FEMALE' | 'MIXED' | 'UNKNOWN' = 'UNKNOWN'
+    let ageAppropriate = true
+    let hasRestrictedContent = false
+    let restrictedContentTypes: string[] = []
 
     // Calculate scores based on keyword presence with enhanced context
     explicitKeywords.forEach(keyword => {
@@ -293,11 +323,79 @@ class ContentModerationService {
 
     const confidence = Math.max(explicitScore, nudeScore, semiNudeScore, suggestiveScore)
 
+    // Enhanced gender detection
+    const maleKeywords = ['man', 'men', 'male', 'boy', 'boys', 'guy', 'guys', 'gentleman', 'gentlemen']
+    const femaleKeywords = ['woman', 'women', 'female', 'girl', 'girls', 'lady', 'ladies']
+    
+    let maleScore = 0
+    let femaleScore = 0
+    
+    maleKeywords.forEach(keyword => {
+      if (lowerText.includes(keyword)) {
+        maleScore += 1
+      }
+    })
+    
+    femaleKeywords.forEach(keyword => {
+      if (lowerText.includes(keyword)) {
+        femaleScore += 1
+      }
+    })
+    
+    // Determine gender based on keyword frequency
+    if (maleScore > 0 && femaleScore > 0) {
+      gender = 'MIXED'
+    } else if (maleScore > 0) {
+      gender = 'MALE'
+    } else if (femaleScore > 0) {
+      gender = 'FEMALE'
+    } else {
+      gender = 'UNKNOWN'
+    }
+
+    // Enhanced age detection and restrictions
+    const ageKeywords = ['years', 'age', 'old', 'young']
+    const childKeywords = ['child', 'children', 'kid', 'kids', 'baby', 'babies', 'infant', 'infants', 'teen', 'teens', 'teenager', 'teenagers']
+    const animalKeywords = ['animal', 'animals', 'pet', 'pets', 'dog', 'dogs', 'cat', 'cats', 'horse', 'horses', 'bird', 'birds']
+    
+    // Check for restricted content
+    childKeywords.forEach(keyword => {
+      if (lowerText.includes(keyword)) {
+        hasRestrictedContent = true
+        restrictedContentTypes.push('child_content')
+        ageAppropriate = false
+      }
+    })
+    
+    animalKeywords.forEach(keyword => {
+      if (lowerText.includes(keyword)) {
+        hasRestrictedContent = true
+        restrictedContentTypes.push('animal_content')
+      }
+    })
+    
+    // Check age range compliance
+    if (ageKeywords.some(keyword => lowerText.includes(keyword))) {
+      const ageMatches = lowerText.match(/\b(1[8-9]|2[0-9]|3[0-9]|40)\b/g)
+      if (ageMatches) {
+        const ages = ageMatches.map(match => parseInt(match))
+        const allAgesAppropriate = ages.every(age => age >= this.config.minAge && age <= this.config.maxAge)
+        if (!allAgesAppropriate) {
+          ageAppropriate = false
+          restrictedContentTypes.push('age_restricted')
+        }
+      }
+    }
+
     return {
       confidence,
       artisticNudity,
       adultContent,
       suggestiveContent,
+      gender,
+      ageAppropriate,
+      hasRestrictedContent,
+      restrictedContentTypes,
       categories: {
         explicit: explicitScore,
         suggestive: suggestiveScore,
@@ -325,8 +423,61 @@ class ContentModerationService {
         hate: 0,
         other: 0
       },
-      edgeCases: [] as string[]
+      edgeCases: [] as string[],
+      // New gender and age detection fields
+      gender: 'UNKNOWN' as 'MALE' | 'FEMALE' | 'MIXED' | 'UNKNOWN',
+      ageAppropriate: true,
+      hasRestrictedContent: false,
+      restrictedContentTypes: [] as string[]
     }
+
+    // Enhanced gender detection for images
+    const maleKeywords = ['man', 'men', 'male', 'boy', 'boys', 'guy', 'guys']
+    const femaleKeywords = ['woman', 'women', 'female', 'girl', 'girls', 'lady', 'ladies']
+    const childKeywords = ['child', 'children', 'kid', 'kids', 'baby', 'babies', 'teen', 'teens']
+    const animalKeywords = ['animal', 'animals', 'pet', 'pets', 'dog', 'dogs', 'cat', 'cats']
+    
+    let maleScore = 0
+    let femaleScore = 0
+    
+    maleKeywords.forEach(keyword => {
+      if (imageUrl.toLowerCase().includes(keyword)) {
+        maleScore += 1
+      }
+    })
+    
+    femaleKeywords.forEach(keyword => {
+      if (imageUrl.toLowerCase().includes(keyword)) {
+        femaleScore += 1
+      }
+    })
+    
+    // Determine gender based on keyword frequency
+    if (maleScore > 0 && femaleScore > 0) {
+      analysis.gender = 'MIXED'
+    } else if (maleScore > 0) {
+      analysis.gender = 'MALE'
+    } else if (femaleScore > 0) {
+      analysis.gender = 'FEMALE'
+    } else {
+      analysis.gender = 'UNKNOWN'
+    }
+
+    // Check for restricted content
+    childKeywords.forEach(keyword => {
+      if (imageUrl.toLowerCase().includes(keyword)) {
+        analysis.hasRestrictedContent = true
+        analysis.restrictedContentTypes.push('child_content')
+        analysis.ageAppropriate = false
+      }
+    })
+    
+    animalKeywords.forEach(keyword => {
+      if (imageUrl.toLowerCase().includes(keyword)) {
+        analysis.hasRestrictedContent = true
+        analysis.restrictedContentTypes.push('animal_content')
+      }
+    })
 
     // Enhanced context detection with more sophisticated patterns
     const contextPatterns = [
@@ -459,20 +610,52 @@ class ContentModerationService {
     let totalExplicit = 0
     let totalSuggestive = 0
     let edgeCases: string[] = []
+    
+    // New gender and age detection aggregation
+    let genderScores: { [key: string]: number } = { MALE: 0, FEMALE: 0, MIXED: 0, UNKNOWN: 0 }
+    let ageAppropriateCount = 0
+    let hasRestrictedContentCount = 0
+    let restrictedContentTypes: string[] = []
 
     for (let i = 0; i < frameCount; i++) {
       const frameAnalysis = await this.analyzeImageContent(`${videoUrl}-frame-${i}`)
       totalExplicit += frameAnalysis.categories.explicit
       totalSuggestive += frameAnalysis.categories.suggestive
       edgeCases.push(...frameAnalysis.edgeCases)
+      
+      // Aggregate gender and age data
+      if (frameAnalysis.gender) {
+        genderScores[frameAnalysis.gender] += 1
+      }
+      
+      if (frameAnalysis.ageAppropriate) {
+        ageAppropriateCount += 1
+      }
+      
+      if (frameAnalysis.hasRestrictedContent) {
+        hasRestrictedContentCount += 1
+        restrictedContentTypes.push(...frameAnalysis.restrictedContentTypes)
+      }
     }
 
     // Average scores across frames
     const avgExplicit = totalExplicit / frameCount
     const avgSuggestive = totalSuggestive / frameCount
 
-    // Remove duplicate edge cases
+    // Remove duplicate edge cases and restricted content types
     edgeCases = [...new Set(edgeCases)]
+    restrictedContentTypes = [...new Set(restrictedContentTypes)]
+
+    // Determine dominant gender
+    const dominantGender = Object.entries(genderScores).reduce((a, b) => 
+      genderScores[a[0]] > genderScores[b[0]] ? a : b
+    )[0] as 'MALE' | 'FEMALE' | 'MIXED' | 'UNKNOWN'
+
+    // Determine if content is age appropriate (majority of frames)
+    const isAgeAppropriate = ageAppropriateCount > frameCount / 2
+    
+    // Determine if content has restricted elements (any frame)
+    const hasRestrictedContent = hasRestrictedContentCount > 0
 
     return {
       confidence: Math.max(avgExplicit, avgSuggestive),
@@ -483,7 +666,11 @@ class ContentModerationService {
         hate: 0,
         other: 0
       },
-      edgeCases
+      edgeCases,
+      gender: dominantGender,
+      ageAppropriate: isAgeAppropriate,
+      hasRestrictedContent,
+      restrictedContentTypes
     }
   }
 
@@ -530,6 +717,31 @@ class ContentModerationService {
     }
     
     if (contentLevel === 'SEMI_NUDE' && !this.config.allowSemiNude) {
+      return 'REJECTED'
+    }
+    
+    // New gender restrictions - reject male content if not allowed
+    if (analysis.gender === 'MALE' && !this.config.allowMaleContent) {
+      return 'REJECTED'
+    }
+    
+    // New gender restrictions - reject mixed gender content if male is not allowed
+    if (analysis.gender === 'MIXED' && !this.config.allowMaleContent) {
+      return 'REJECTED'
+    }
+    
+    // New content restrictions - reject child content
+    if (analysis.hasRestrictedContent && analysis.restrictedContentTypes.includes('child_content') && !this.config.allowChildContent) {
+      return 'REJECTED'
+    }
+    
+    // New content restrictions - reject animal content
+    if (analysis.hasRestrictedContent && analysis.restrictedContentTypes.includes('animal_content') && !this.config.allowAnimalContent) {
+      return 'REJECTED'
+    }
+    
+    // New age restrictions - reject if not age appropriate
+    if (!analysis.ageAppropriate) {
       return 'REJECTED'
     }
     
@@ -636,6 +848,33 @@ class ContentModerationService {
       recommendations.push('Suggestive content - generally acceptable with proper context')
     }
 
+    // New gender-based recommendations
+    if (analysis.gender === 'MALE' && !this.config.allowMaleContent) {
+      recommendations.push('Male content not allowed - female content only permitted')
+    }
+    
+    if (analysis.gender === 'MIXED' && !this.config.allowMaleContent) {
+      recommendations.push('Mixed gender content not allowed - female content only permitted')
+    }
+
+    // New content restriction recommendations
+    if (analysis.hasRestrictedContent && analysis.restrictedContentTypes.includes('child_content')) {
+      if (!this.config.allowChildContent) {
+        recommendations.push('Child content not allowed - strictly prohibited')
+      }
+    }
+    
+    if (analysis.hasRestrictedContent && analysis.restrictedContentTypes.includes('animal_content')) {
+      if (!this.config.allowAnimalContent) {
+        recommendations.push('Animal content not allowed - strictly prohibited')
+      }
+    }
+
+    // New age restriction recommendations
+    if (!analysis.ageAppropriate) {
+      recommendations.push('Age restrictions violated - subjects must be between 18-40 years old')
+    }
+
     if (analysis.categories.explicit > 0.7) {
       recommendations.push('High explicit content - requires careful review')
     }
@@ -691,7 +930,14 @@ export const contentModeration = new ContentModerationService({
   allowSemiNude: true,      // Allow semi-nude content
   allowNude: true,          // Allow nude content
   allowArtisticNudity: true, // Allow artistic nudity
-  allowAdultContent: false,  // Don't allow explicit adult content by default
+  allowAdultContent: true,  // Allow explicit adult content
+  // New gender and content restrictions (women only policy)
+  allowMaleContent: false,  // Do NOT allow male content
+  allowFemaleContent: true, // Allow female content
+  allowChildContent: false, // Do NOT allow child content
+  allowAnimalContent: false, // Do NOT allow animal content
+  minAge: 18,              // Minimum age 18
+  maxAge: 40,              // Maximum age 40
   customThresholds: {
     explicit: 0.6,
     suggestive: 0.7,

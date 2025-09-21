@@ -5,6 +5,7 @@ import { db } from '@/lib/db'
 import { imageIntegrityService } from '@/lib/image-integrity'
 import { GamificationProgressService } from '@/lib/gamification-progress'
 import { generateTitleFromPrompt, extractTitleFromMarketplaceItem } from '@/lib/marketplace-title-extractor'
+import { contentModeration } from '@/lib/content-moderation'
 
 // Helper function to check if user is admin or if in development mode
 async function shouldBypassRestrictions(): Promise<boolean> {
@@ -160,49 +161,27 @@ export async function GET(request: NextRequest) {
         const parsedTags = item.tags ? JSON.parse(item.tags) : []
         const parsedImages = item.images ? JSON.parse(item.images) : []
         
-        // Apply content restrictions (bypass for admin/dev mode)
+        // Apply content restrictions using enhanced moderation system (bypass for admin/dev mode)
         if (!bypassRestrictions) {
-          const restrictedTags = ['animal', 'child', 'kid', 'baby', 'men', 'male', 'pain', 'death', 'violence', 'blood']
-          const hasRestrictedContent = restrictedTags.some(tag => 
-            parsedTags.some((itemTag: string) => 
-              itemTag.toLowerCase().includes(tag.toLowerCase())
-            )
-          )
+          // Use the moderation system to check content restrictions
+          const itemText = `${item.title} ${item.description || ''} ${item.tags || ''}`
+          const itemModeration = await contentModeration.moderateText(itemText)
           
-          // Check age range (18-40) and gender (women only for NSFW)
-          let ageAppropriate = true
-          let genderAppropriate = true
-          
-          if (item.isNsfw) {
-            // For NSFW content, enforce stricter restrictions
-            const ageTags = parsedTags.filter((tag: string) => 
-              tag.includes('years') || tag.includes('age') || tag.includes('old')
-            )
-            
-            // Check if age is within 18-40 range
-            ageAppropriate = ageTags.every((tag: string) => {
-              const ageMatch = tag.match(/(\d+)/)
-              if (!ageMatch) return true
-              const age = parseInt(ageMatch[1])
-              return age >= 18 && age <= 40
-            })
-            
-            // Check gender restriction (women only for NSFW)
-            const genderTags = parsedTags.filter((tag: string) => 
-              tag.toLowerCase().includes('woman') || 
-              tag.toLowerCase().includes('female') ||
-              tag.toLowerCase().includes('girl') ||
-              tag.toLowerCase().includes('man') ||
-              tag.toLowerCase().includes('male')
-            )
-            
-            genderAppropriate = genderTags.every((tag: string) => 
-              !tag.toLowerCase().includes('man') && !tag.toLowerCase().includes('male')
-            )
+          // Check gender restrictions
+          if (itemModeration.gender === 'MALE' || itemModeration.gender === 'MIXED') {
+            continue
           }
           
-          // Filter out items that violate content restrictions
-          if (hasRestrictedContent || !ageAppropriate || !genderAppropriate) {
+          // Check restricted content
+          if (itemModeration.hasRestrictedContent) {
+            if (itemModeration.restrictedContentTypes.includes('child_content') ||
+                itemModeration.restrictedContentTypes.includes('animal_content')) {
+              continue
+            }
+          }
+          
+          // Check age restrictions
+          if (!itemModeration.ageAppropriate) {
             continue
           }
         }
@@ -314,63 +293,41 @@ export async function POST(request: NextRequest) {
     // Parse and validate tags for content restrictions
     const parsedTags = tags ? tags.split(',').map(t => t.trim()) : []
     
+    // Perform content moderation analysis
+    const textToAnalyze = `${title} ${description || ''} ${tags || ''}`
+    const moderationResult = await contentModeration.moderateText(textToAnalyze)
+    
     // Apply content restrictions (bypass for admin/dev mode)
     if (!bypassRestrictions) {
-      const restrictedTags = ['animal', 'child', 'kid', 'baby', 'men', 'male', 'pain', 'death', 'violence', 'blood']
-      const hasRestrictedContent = restrictedTags.some(tag => 
-        parsedTags.some(itemTag => 
-          itemTag.toLowerCase().includes(tag.toLowerCase())
-        )
-      )
-      
-      if (hasRestrictedContent) {
+      // Use enhanced content moderation system
+      if (moderationResult.gender === 'MALE' || moderationResult.gender === 'MIXED') {
         return NextResponse.json(
-          { error: 'Content violates restrictions. No animals, children, men, pain, death, or violent content allowed.' },
+          { error: 'Male content not allowed. Only female content is permitted.' },
           { status: 400 }
         )
       }
       
-      // Check age range (18-40) and gender (women only for NSFW)
-      if (isNsfw) {
-        // For NSFW content, enforce stricter restrictions
-        const ageTags = parsedTags.filter(tag => 
-          tag.includes('years') || tag.includes('age') || tag.includes('old')
-        )
-        
-        // Check if age is within 18-40 range
-        const ageAppropriate = ageTags.every(tag => {
-          const ageMatch = tag.match(/(\d+)/)
-          if (!ageMatch) return true
-          const age = parseInt(ageMatch[1])
-          return age >= 18 && age <= 40
-        })
-        
-        if (!ageAppropriate) {
+      if (moderationResult.hasRestrictedContent) {
+        if (moderationResult.restrictedContentTypes.includes('child_content')) {
           return NextResponse.json(
-            { error: 'NSFW content must feature subjects aged 18-40 only.' },
+            { error: 'Child content not allowed. Strictly prohibited.' },
             { status: 400 }
           )
         }
         
-        // Check gender restriction (women only for NSFW)
-        const genderTags = parsedTags.filter(tag => 
-          tag.toLowerCase().includes('woman') || 
-          tag.toLowerCase().includes('female') ||
-          tag.toLowerCase().includes('girl') ||
-          tag.toLowerCase().includes('man') ||
-          tag.toLowerCase().includes('male')
-        )
-        
-        const genderAppropriate = genderTags.every(tag => 
-          !tag.toLowerCase().includes('man') && !tag.toLowerCase().includes('male')
-        )
-        
-        if (!genderAppropriate) {
+        if (moderationResult.restrictedContentTypes.includes('animal_content')) {
           return NextResponse.json(
-            { error: 'NSFW content must feature women only.' },
+            { error: 'Animal content not allowed. Strictly prohibited.' },
             { status: 400 }
           )
         }
+      }
+      
+      if (!moderationResult.ageAppropriate) {
+        return NextResponse.json(
+          { error: 'Content must feature subjects aged 18-40 only.' },
+          { status: 400 }
+        )
       }
     }
 

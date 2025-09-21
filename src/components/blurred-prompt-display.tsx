@@ -126,7 +126,7 @@ export function BlurredPromptDisplay({
             </div>
             {showBlurred && (
               <div className="text-xs text-gray-500 dark:text-gray-400 mt-1 italic">
-                Purchase required to view this professional-grade prompt
+                Full prompt and config available after purchase
               </div>
             )}
           </div>
@@ -159,7 +159,7 @@ export function BlurredPromptDisplay({
             </div>
             {showBlurred && (
               <div className="text-xs text-gray-500 dark:text-gray-400 mt-1 italic">
-                Purchase required to view this professional-grade prompt
+                Full prompt and config available after purchase
               </div>
             )}
           </div>

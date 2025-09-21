@@ -49,25 +49,21 @@ export default function Navigation() {
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center">
             <div className="relative">
               <img 
-                src="/logo.png" 
+                src="/logo.png?t=20240921" 
                 alt="EDN Logo" 
-                className="w-10 h-10 rounded-full object-cover shimmer"
-                style={{ boxShadow: `0 0 20px ${isNSFW ? '#FF1493' : '#FF6B35'}40` }}
+                className="h-24 w-auto object-contain shimmer"
               />
               <div className="absolute -top-1 -right-1 w-4 h-4 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full flex items-center justify-center">
                 <Zap className="h-2 w-2 text-white" />
               </div>
             </div>
-            <span className={`font-bold text-xl ${scheme.text}`}>
-              EDN
-            </span>
           </div>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-3">
+          <div className="hidden md:flex items-center space-x-1">
             {[
               { href: '/', icon: Home, label: 'Home' },
               { href: '/marketplace', icon: ShoppingBag, label: 'Marketplace' },

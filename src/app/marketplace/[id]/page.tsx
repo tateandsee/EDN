@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useParams } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -22,9 +22,13 @@ import {
   Share2,
   MessageCircle,
   Package,
-  AlertCircle
+  AlertCircle,
+  Sparkles,
+  FileText,
+  Settings
 } from 'lucide-react'
 import { CoinbasePayment } from '@/components/coinbase-payment'
+import { BlurredPromptDisplay } from '@/components/blurred-prompt-display'
 import Link from 'next/link'
 
 interface MarketplaceItem {
@@ -44,6 +48,9 @@ interface MarketplaceItem {
   updatedAt: string
   isNsfw: boolean
   promptConfig?: any
+  positivePrompt?: string
+  negativePrompt?: string
+  fullPrompt?: string
   user: {
     id: string
     name?: string
@@ -69,38 +76,61 @@ export default function MarketplaceDetailPage() {
   const params = useParams()
   const { isNSFW } = useNSFW()
   const { user } = useAuth()
-  const [showAuthModal, setShowAuthModal] = useState(false)
-  const [authModalReason, setAuthModalReason] = useState<'general' | 'nsfw'>('general')
   const [item, setItem] = useState<MarketplaceItem | null>(null)
   const [loading, setLoading] = useState(true)
   const [notFound, setNotFound] = useState(false)
+  const [userOrder, setUserOrder] = useState<any>(null)
+  const [downloadInfo, setDownloadInfo] = useState<any>(null)
+  const [isGeneratingHD, setIsGeneratingHD] = useState(false)
+  const [showAuthModal, setShowAuthModal] = useState(false)
+  const [authModalReason, setAuthModalReason] = useState<'general' | 'nsfw'>('general')
 
   const itemId = params.id as string
 
-  // Fetch item data
-  useState(() => {
-    const fetchItem = async () => {
+  // Fetch item data and user order status
+  useEffect(() => {
+    const fetchItemAndOrderData = async () => {
       try {
         setLoading(true)
-        const response = await fetch(`/api/marketplace/items/${itemId}`)
-        if (response.ok) {
-          const data = await response.json()
-          setItem(data)
-        } else if (response.status === 404) {
+        
+        // Fetch item details
+        const [itemResponse, ordersResponse] = await Promise.all([
+          fetch(`/api/marketplace/items/${itemId}`),
+          user ? fetch(`/api/marketplace/orders?status=COMPLETED`) : Promise.resolve({ ok: false })
+        ])
+
+        if (itemResponse.ok) {
+          const itemData = await itemResponse.json()
+          setItem(itemData)
+        } else if (itemResponse.status === 404) {
           setNotFound(true)
-        } else {
-          console.error('Error fetching item:', response.statusText)
+        }
+
+        // Check if user has purchased this item
+        if (ordersResponse.ok) {
+          const ordersData = await ordersResponse.json()
+          const userOrderForItem = ordersData.orders?.find((order: any) => order.itemId === itemId)
+          setUserOrder(userOrderForItem || null)
+
+          // If user has an order, fetch download info
+          if (userOrderForItem) {
+            const downloadResponse = await fetch(`/api/marketplace/downloads/${userOrderForItem.id}`)
+            if (downloadResponse.ok) {
+              const downloadData = await downloadResponse.json()
+              setDownloadInfo(downloadData)
+            }
+          }
         }
       } catch (error) {
-        console.error('Error fetching item:', error)
+        console.error('Error fetching item and order data:', error)
         setNotFound(true)
       } finally {
         setLoading(false)
       }
     }
 
-    fetchItem()
-  })
+    fetchItemAndOrderData()
+  }, [itemId, user])
 
   const sfwColors = {
     primary: '#FF6B35',
@@ -136,12 +166,100 @@ export default function MarketplaceDetailPage() {
     return false // Always return false to remove blur from NSFW content
   }
 
-  const handleBuyItem = () => {
+  const handleBuyItem = async () => {
     if (!user) {
       setAuthModalReason('general')
       setShowAuthModal(true)
-    } else {
-      console.log('Buying EDN item:', itemId)
+      return
+    }
+
+    try {
+      const response = await fetch('/api/marketplace/orders', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          itemId,
+          userId: user.id
+        })
+      })
+
+      if (response.ok) {
+        const orderData = await response.json()
+        setUserOrder(orderData.order)
+        
+        // Fetch download info after successful purchase
+        const downloadResponse = await fetch(`/api/marketplace/downloads/${orderData.order.id}`)
+        if (downloadResponse.ok) {
+          const downloadData = await downloadResponse.json()
+          setDownloadInfo(downloadData)
+        }
+      } else {
+        const errorData = await response.json()
+        console.error('Purchase failed:', errorData.error)
+      }
+    } catch (error) {
+      console.error('Error purchasing item:', error)
+    }
+  }
+
+  const handleDownload = async () => {
+    if (!userOrder || !downloadInfo) return
+
+    try {
+      const response = await fetch(`/api/marketplace/downloads/${userOrder.id}`)
+      if (response.ok) {
+        const downloadData = await response.json()
+        
+        // Create download link
+        const link = document.createElement('a')
+        link.href = downloadData.download.downloadUrl
+        link.download = downloadData.download.fileName
+        document.body.appendChild(link)
+        link.click()
+        document.body.removeChild(link)
+        
+        // Update download info
+        setDownloadInfo(downloadData)
+      }
+    } catch (error) {
+      console.error('Error downloading item:', error)
+    }
+  }
+
+  const handleGenerateHD = async () => {
+    if (!userOrder || isGeneratingHD) return
+
+    setIsGeneratingHD(true)
+    try {
+      const response = await fetch(`/api/marketplace/downloads/${userOrder.id}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          generateHighDef: true
+        })
+      })
+
+      if (response.ok) {
+        const hdData = await response.json()
+        
+        // Fetch updated download info
+        const downloadResponse = await fetch(`/api/marketplace/downloads/${userOrder.id}`)
+        if (downloadResponse.ok) {
+          const downloadData = await downloadResponse.json()
+          setDownloadInfo(downloadData)
+        }
+      } else {
+        const errorData = await response.json()
+        console.error('HD generation failed:', errorData.error)
+      }
+    } catch (error) {
+      console.error('Error generating HD image:', error)
+    } finally {
+      setIsGeneratingHD(false)
     }
   }
 
@@ -218,9 +336,9 @@ export default function MarketplaceDetailPage() {
         </Link>
       </div>
 
-      <div className="container mx-auto px-4 pb-12">
-        <div className="grid lg:grid-cols-2 gap-8">
-          {/* Left Column - Image */}
+      <div className="container mx-auto px-4 pb-12 max-w-4xl">
+        <div className="flex flex-col gap-6 md:gap-8">
+          {/* Image Section */}
           <div className="space-y-6">
             <div className="relative rounded-2xl overflow-hidden" style={{ backgroundColor: colors.cardBg, border: `2px solid ${colors.cardBorder}` }}>
               {blurContent && (
@@ -244,12 +362,12 @@ export default function MarketplaceDetailPage() {
                 </div>
               )}
               
-              <div className="aspect-square">
-                <div className="relative w-full h-full">
+              <div className="aspect-[4/3] max-h-[85vh] flex items-center justify-center">
+                <div className="relative w-full h-full flex items-center justify-center">
                   <img 
                     src={item.images?.[0] || item.thumbnail || '/placeholder.jpg'} 
                     alt={item.title}
-                    className={`w-full h-full object-cover ${blurContent ? 'blur-md' : ''}`}
+                    className={`max-w-full max-h-full object-contain ${blurContent ? 'blur-md' : ''}`}
                     onContextMenu={(e) => e.preventDefault()}
                     onDragStart={(e) => e.preventDefault()}
                   />
@@ -272,139 +390,211 @@ export default function MarketplaceDetailPage() {
 
             {/* Action Buttons */}
             <div className="space-y-4">
-              <div className="flex gap-4">
-                <Button 
-                  className={`flex-1 ${blurContent ? 'opacity-50 cursor-not-allowed' : ''}`}
-                  style={{ backgroundColor: colors.primary }}
-                  onClick={handleBuyItem}
-                >
-                  <ShoppingCart className="mr-2 h-4 w-4" />
-                  Buy EDN Model - ${item.price}
-                </Button>
-                <Button variant="outline" className="flex-1" style={{ borderColor: colors.primary, color: colors.primary }}>
-                  <Heart className="mr-2 h-4 w-4" />
-                  Save
-                </Button>
-              </div>
-              
-              {/* Cryptocurrency Payment Option */}
-              <div className="mt-4">
-                <CoinbasePayment
-                  itemName={item.title}
-                  itemDescription={item.description || `Purchase ${item.title} from EDN Marketplace`}
-                  amount={item.price}
-                  currency="USD"
-                  metadata={{
-                    item_id: item.id,
-                    user_id: user?.id || 'anonymous',
-                    item_type: item.type,
-                    category: item.category
-                  }}
-                  onSuccess={(chargeData) => {
-                    console.log('Payment successful:', chargeData)
-                    // Handle successful payment (e.g., show success message, enable download)
-                  }}
-                  onError={(error) => {
-                    console.error('Payment failed:', error)
-                    // Handle payment error
-                  }}
-                />
-              </div>
+              {userOrder ? (
+                <>
+                  {/* Download Section */}
+                  {downloadInfo?.download && (
+                    <div className="space-y-3">
+                      <div className="flex gap-3">
+                        <Button 
+                          className="flex-1"
+                          style={{ backgroundColor: colors.primary }}
+                          onClick={handleDownload}
+                          disabled={downloadInfo.download.remainingDownloads <= 0}
+                        >
+                          <Download className="mr-2 h-4 w-4" />
+                          Download {downloadInfo.download.isHighDef ? 'HD' : 'Image'}
+                        </Button>
+                        {!downloadInfo.download.isHighDef && item.promptConfig && (
+                          <Button 
+                            variant="outline"
+                            className="flex-1"
+                            style={{ borderColor: colors.primary, color: colors.primary }}
+                            onClick={handleGenerateHD}
+                            disabled={isGeneratingHD}
+                          >
+                            {isGeneratingHD ? (
+                              <>
+                                <div className="animate-spin rounded-full h-4 w-4 border-b-2 mr-2" style={{ borderColor: colors.primary }}></div>
+                                Generating...
+                              </>
+                            ) : (
+                              <>
+                                <Sparkles className="mr-2 h-4 w-4" />
+                                Generate HD
+                              </>
+                            )}
+                          </Button>
+                        )}
+                      </div>
+                      
+                      {/* Download Info */}
+                      <div className="text-sm space-y-1" style={{ color: colors.textSecondary }}>
+                        <div>Downloads remaining: {downloadInfo.download.remainingDownloads}</div>
+                        <div>Expires in: {downloadInfo.download.hoursLeft} hours</div>
+                        {downloadInfo.download.isHighDef && (
+                          <div className="flex items-center gap-1">
+                            <Sparkles className="h-3 w-3" style={{ color: colors.primary }} />
+                            High-definition version
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </>
+              ) : (
+                <>
+                  <div className="flex gap-4">
+                    <Button 
+                      className={`flex-1 ${blurContent ? 'opacity-50 cursor-not-allowed' : ''}`}
+                      style={{ backgroundColor: colors.primary }}
+                      onClick={handleBuyItem}
+                    >
+                      <ShoppingCart className="mr-2 h-4 w-4" />
+                      Buy EDN Model - ${item.price}
+                    </Button>
+                    <Button variant="outline" className="flex-1" style={{ borderColor: colors.primary, color: colors.primary }}>
+                      <Heart className="mr-2 h-4 w-4" />
+                      Save
+                    </Button>
+                  </div>
+                  
+                  {/* Cryptocurrency Payment Option */}
+                  <div className="mt-4">
+                    <CoinbasePayment
+                      itemName={item.title}
+                      itemDescription={item.description || `Purchase ${item.title} from EDN Marketplace`}
+                      amount={item.price}
+                      currency="USD"
+                      metadata={{
+                        item_id: item.id,
+                        user_id: user?.id || 'anonymous',
+                        item_type: item.type,
+                        category: item.category
+                      }}
+                      onSuccess={(chargeData) => {
+                        console.log('Payment successful:', chargeData)
+                        // Refresh order status after successful payment
+                        setTimeout(() => {
+                          window.location.reload()
+                        }, 1000)
+                      }}
+                      onError={(error) => {
+                        console.error('Payment failed:', error)
+                      }}
+                    />
+                  </div>
+                </>
+              )}
             </div>
 
             {/* Stats */}
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 md:gap-4">
               <Card className="text-center" style={{ backgroundColor: colors.cardBg, borderColor: colors.cardBorder }}>
-                <CardContent className="p-4">
-                  <Star className="h-6 w-6 mx-auto mb-2 fill-yellow-400 text-yellow-400" />
-                  <div className="text-lg font-bold" style={{ color: colors.primary }}>
+                <CardContent className="p-3 md:p-4">
+                  <Star className="h-5 w-5 md:h-6 md:w-6 mx-auto mb-1 md:mb-2 fill-yellow-400 text-yellow-400" />
+                  <div className="text-base md:text-lg font-bold" style={{ color: colors.primary }}>
                     {item._count.reviews > 0 ? 
                       (item.reviews.reduce((sum, review) => sum + review.rating, 0) / item.reviews.length).toFixed(1) : 
                       'New'
                     }
                   </div>
-                  <div className="text-sm" style={{ color: colors.textSecondary }}>Rating</div>
+                  <div className="text-xs md:text-sm" style={{ color: colors.textSecondary }}>Rating</div>
                 </CardContent>
               </Card>
               
               <Card className="text-center" style={{ backgroundColor: colors.cardBg, borderColor: colors.cardBorder }}>
-                <CardContent className="p-4">
-                  <ShoppingCart className="h-6 w-6 mx-auto mb-2" style={{ color: colors.primary }} />
-                  <div className="text-lg font-bold" style={{ color: colors.primary }}>{item._count.orders}</div>
-                  <div className="text-sm" style={{ color: colors.textSecondary }}>Sales</div>
+                <CardContent className="p-3 md:p-4">
+                  <ShoppingCart className="h-5 w-5 md:h-6 md:w-6 mx-auto mb-1 md:mb-2" style={{ color: colors.primary }} />
+                  <div className="text-base md:text-lg font-bold" style={{ color: colors.primary }}>{item._count.orders}</div>
+                  <div className="text-xs md:text-sm" style={{ color: colors.textSecondary }}>Sales</div>
                 </CardContent>
               </Card>
               
-              <Card className="text-center" style={{ backgroundColor: colors.cardBg, borderColor: colors.cardBorder }}>
-                <CardContent className="p-4">
-                  <Eye className="h-6 w-6 mx-auto mb-2" style={{ color: colors.primary }} />
-                  <div className="text-lg font-bold" style={{ color: colors.primary }}>1.2K</div>
-                  <div className="text-sm" style={{ color: colors.textSecondary }}>Views</div>
+              <Card className="text-center sm:col-span-2 md:col-span-1" style={{ backgroundColor: colors.cardBg, borderColor: colors.cardBorder }}>
+                <CardContent className="p-3 md:p-4">
+                  <Eye className="h-5 w-5 md:h-6 md:w-6 mx-auto mb-1 md:mb-2" style={{ color: colors.primary }} />
+                  <div className="text-base md:text-lg font-bold" style={{ color: colors.primary }}>1.2K</div>
+                  <div className="text-xs md:text-sm" style={{ color: colors.textSecondary }}>Views</div>
                 </CardContent>
               </Card>
             </div>
           </div>
 
-          {/* Right Column - Details */}
-          <div className="space-y-6">
+          {/* Information Section */}
+          <div className="space-y-4 md:space-y-6">
             <Card style={{ backgroundColor: colors.cardBg, borderColor: colors.cardBorder }}>
-              <CardHeader>
-                <div className="flex items-start justify-between">
-                  <div>
-                    <CardTitle className="text-2xl mb-2" style={{ color: colors.textPrimary }}>
+              <CardHeader className="pb-4 md:pb-6">
+                <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+                  <div className="flex-1">
+                    <CardTitle className="text-xl md:text-2xl mb-2" style={{ color: colors.textPrimary }}>
                       {item.title}
                     </CardTitle>
-                    <div className="flex items-center gap-2 mb-4">
-                      <Badge variant="secondary" style={{ backgroundColor: colors.accent, color: colors.textOnWhite }}>
+                    <div className="flex flex-wrap items-center gap-2 mb-3 md:mb-4">
+                      <Badge variant="secondary" className="text-xs" style={{ backgroundColor: colors.accent, color: colors.textOnWhite }}>
                         {item.category}
                       </Badge>
-                      <Badge variant="outline" style={{ borderColor: colors.primary, color: colors.primary }}>
+                      <Badge variant="outline" className="text-xs" style={{ borderColor: colors.primary, color: colors.primary }}>
                         {item.type}
                       </Badge>
                     </div>
                   </div>
-                  <div className="text-right">
-                    <div className="text-3xl font-bold mb-1" style={{ color: colors.primary }}>
+                  <div className="text-right sm:text-left">
+                    <div className="text-2xl md:text-3xl font-bold mb-1" style={{ color: colors.primary }}>
                       ${item.price}
                     </div>
-                    <div className="text-sm" style={{ color: colors.textSecondary }}>
+                    <div className="text-xs md:text-sm" style={{ color: colors.textSecondary }}>
                       {item.currency}
                     </div>
                   </div>
                 </div>
-                <CardDescription className="text-base" style={{ color: colors.textSecondary }}>
+                <CardDescription className="text-sm md:text-base leading-relaxed" style={{ color: colors.textSecondary }}>
                   {item.description}
                 </CardDescription>
               </CardHeader>
               
-              <CardContent className="space-y-6">
+              <CardContent className="space-y-4 md:space-y-6">
                 {/* Creator Info */}
-                <div className="flex items-center justify-between p-4 rounded-lg" style={{ backgroundColor: 'rgba(255,255,255,0.1)' }}>
+                <div className="flex items-center justify-between p-3 md:p-4 rounded-lg" style={{ backgroundColor: 'rgba(255,255,255,0.1)' }}>
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: colors.primary }}>
-                      <User className="h-5 w-5 text-white" />
+                    <div className="w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: colors.primary }}>
+                      <User className="h-4 w-4 md:h-5 md:w-5 text-white" />
                     </div>
                     <div>
-                      <div className="font-semibold" style={{ color: colors.textPrimary }}>
+                      <div className="font-semibold text-sm md:text-base" style={{ color: colors.textPrimary }}>
                         {item.user?.name || 'EDN Creator'}
                       </div>
-                      <div className="text-sm" style={{ color: colors.textSecondary }}>
+                      <div className="text-xs md:text-sm" style={{ color: colors.textSecondary }}>
                         Verified Creator
                       </div>
                     </div>
                   </div>
                   {item.user?.verified && (
-                    <CheckCircle className="h-5 w-5 text-green-500" />
+                    <CheckCircle className="h-4 w-4 md:h-5 md:w-5 text-green-500" />
                   )}
                 </div>
+
+                {/* AI Generation Details */}
+                {(item.positivePrompt || item.negativePrompt || item.promptConfig) && (
+                  <BlurredPromptDisplay
+                    itemId={item.id}
+                    title={item.title}
+                    positivePrompt={item.positivePrompt}
+                    negativePrompt={item.negativePrompt}
+                    promptConfig={item.promptConfig}
+                    price={item.price}
+                    isPurchased={!!userOrder}
+                    onPurchase={handleBuyItem}
+                  />
+                )}
 
                 {/* Tags */}
                 {item.tags && item.tags.length > 0 && (
                   <div>
-                    <h3 className="font-semibold mb-3" style={{ color: colors.textPrimary }}>Tags</h3>
-                    <div className="flex flex-wrap gap-2">
+                    <h3 className="font-semibold mb-2 md:mb-3 text-sm md:text-base" style={{ color: colors.textPrimary }}>Tags</h3>
+                    <div className="flex flex-wrap gap-1 md:gap-2">
                       {item.tags.map((tag, index) => (
-                        <Badge key={index} variant="outline" style={{ borderColor: colors.primary, color: colors.primary }}>
+                        <Badge key={index} variant="outline" className="text-xs" style={{ borderColor: colors.primary, color: colors.primary }}>
                           {tag}
                         </Badge>
                       ))}
@@ -414,26 +604,26 @@ export default function MarketplaceDetailPage() {
 
                 {/* Reviews */}
                 <div>
-                  <h3 className="font-semibold mb-3" style={{ color: colors.textPrimary }}>
+                  <h3 className="font-semibold mb-2 md:mb-3 text-sm md:text-base" style={{ color: colors.textPrimary }}>
                     Reviews ({item._count.reviews})
                   </h3>
-                  <div className="space-y-3">
+                  <div className="space-y-2 md:space-y-3">
                     {item.reviews.slice(0, 3).map((review, index) => (
-                      <div key={index} className="p-3 rounded-lg" style={{ backgroundColor: 'rgba(255,255,255,0.1)' }}>
-                        <div className="flex items-center justify-between mb-2">
+                      <div key={index} className="p-2 md:p-3 rounded-lg" style={{ backgroundColor: 'rgba(255,255,255,0.1)' }}>
+                        <div className="flex items-center justify-between mb-1 md:mb-2">
                           <div className="flex items-center gap-1">
                             {[...Array(5)].map((_, i) => (
                               <Star 
                                 key={i} 
-                                className={`h-4 w-4 ${i < review.rating ? 'fill-yellow-400 text-yellow-400' : 'text-gray-400'}`} 
+                                className={`h-3 w-3 md:h-4 md:w-4 ${i < review.rating ? 'fill-yellow-400 text-yellow-400' : 'text-gray-400'}`} 
                               />
                             ))}
                           </div>
-                          <span className="text-sm" style={{ color: colors.textLight }}>
+                          <span className="text-xs" style={{ color: colors.textLight }}>
                             {new Date(review.createdAt).toLocaleDateString()}
                           </span>
                         </div>
-                        <p className="text-sm" style={{ color: colors.textSecondary }}>
+                        <p className="text-xs md:text-sm leading-relaxed" style={{ color: colors.textSecondary }}>
                           {review.comment}
                         </p>
                         <div className="text-xs mt-1" style={{ color: colors.textLight }}>
@@ -445,13 +635,13 @@ export default function MarketplaceDetailPage() {
                 </div>
 
                 {/* Additional Actions */}
-                <div className="flex gap-3">
-                  <Button variant="outline" className="flex-1" style={{ borderColor: colors.primary, color: colors.primary }}>
-                    <Share2 className="mr-2 h-4 w-4" />
+                <div className="flex gap-2 md:gap-3">
+                  <Button variant="outline" className="flex-1 text-sm" style={{ borderColor: colors.primary, color: colors.primary }}>
+                    <Share2 className="mr-1 md:mr-2 h-3 w-3 md:h-4 md:w-4" />
                     Share
                   </Button>
-                  <Button variant="outline" className="flex-1" style={{ borderColor: colors.primary, color: colors.primary }}>
-                    <MessageCircle className="mr-2 h-4 w-4" />
+                  <Button variant="outline" className="flex-1 text-sm" style={{ borderColor: colors.primary, color: colors.primary }}>
+                    <MessageCircle className="mr-1 md:mr-2 h-3 w-3 md:h-4 md:w-4" />
                     Contact
                   </Button>
                 </div>

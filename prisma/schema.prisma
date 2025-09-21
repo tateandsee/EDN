@@ -61,6 +61,7 @@ model User {
   
   // Download and notification relations
   aiModelDownloads AiModelDownload[]
+  marketplaceDownloads MarketplaceDownload[]
   notifications Notification[]
   
   // Admin relations
@@ -324,6 +325,7 @@ model MarketplaceItem {
   user     User             @relation(fields: [userId], references: [id], onDelete: Cascade)
   reviews  MarketplaceReview[]
   orders   MarketplaceOrder[]
+  downloads MarketplaceDownload[]
 
   @@map("marketplace_items")
 }
@@ -358,6 +360,7 @@ model MarketplaceOrder {
   user User            @relation(fields: [userId], references: [id], onDelete: Cascade)
   item MarketplaceItem @relation(fields: [itemId], references: [id], onDelete: Cascade)
   promptAccess MarketplacePromptAccess?
+  downloads     MarketplaceDownload[]
 
   @@map("marketplace_orders")
 }
@@ -375,6 +378,35 @@ model MarketplacePromptAccess {
   order MarketplaceOrder @relation(fields: [orderId], references: [id], onDelete: Cascade)
 
   @@map("marketplace_prompt_access")
+}
+
+model MarketplaceDownload {
+  id            String   @id @default(cuid())
+  orderId       String
+  userId        String
+  itemId        String
+  fileName      String
+  filePath      String
+  fileSize      Int?
+  mimeType      String?
+  downloadUrl   String
+  expiresAt     DateTime
+  maxDownloads  Int      @default(5)
+  downloadCount Int      @default(0)
+  isHighDef     Boolean  @default(false)
+  isExpired     Boolean  @default(false)
+  isDeleted     Boolean  @default(false)
+  lastDownloadedAt DateTime?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // Relations
+  order MarketplaceOrder @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  user  User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  item  MarketplaceItem @relation(fields: [itemId], references: [id], onDelete: Cascade)
+
+  @@unique([orderId, userId])
+  @@map("marketplace_downloads")
 }
 
 // Gamification Models

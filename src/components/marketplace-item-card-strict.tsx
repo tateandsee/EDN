@@ -7,7 +7,8 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { useNSFW } from '@/contexts/nsfw-context'
 import { useAuth } from '@/contexts/auth-context'
-import ImageWithFallback from '@/components/ui/image-with-fallback'
+import ProtectedStrictImage from '@/components/ui/protected-strict-image'
+import { imageIntegrityService, type ImageValidationResult } from '@/lib/image-integrity'
 import { 
   ShoppingCart, 
   Eye, 
@@ -18,6 +19,8 @@ import {
   Package,
   User,
   Sparkles,
+  AlertTriangle,
+  CheckCircle,
   Lock
 } from 'lucide-react'
 
@@ -62,7 +65,7 @@ interface MarketplaceItem {
   promptConfig?: any
 }
 
-interface MarketplaceItemCardProps {
+interface MarketplaceItemCardStrictProps {
   item: MarketplaceItem
   colors: {
     primary: string
@@ -77,12 +80,23 @@ interface MarketplaceItemCardProps {
     textLight: string
     textOnWhite: string
   }
+  showValidationStatus?: boolean
+  onImageError?: (itemId: string, error: string) => void
+  onImageValid?: (itemId: string, result: ImageValidationResult) => void
 }
 
-export default function MarketplaceItemCard({ item, colors }: MarketplaceItemCardProps) {
+export default function MarketplaceItemCardStrict({ 
+  item, 
+  colors, 
+  showValidationStatus = false,
+  onImageError,
+  onImageValid 
+}: MarketplaceItemCardStrictProps) {
   const { user } = useAuth()
   const nsfwContext = useNSFW()
   const isNSFW = nsfwContext?.isNSFW ?? false
+  const [imageValidationState, setImageValidationState] = useState<'unknown' | 'valid' | 'error'>('unknown')
+  const [imageError, setImageError] = useState<string>('')
 
   // Parse tags field if it's a string
   const parsedTags = item.tags ? (typeof item.tags === 'string' ? JSON.parse(item.tags) : item.tags) : []
@@ -92,7 +106,7 @@ export default function MarketplaceItemCard({ item, colors }: MarketplaceItemCar
     return null
   }
 
-  // Get the best available image URL
+  // Get the best available image URL with validation
   const getImageUrl = () => {
     // Try thumbnail first, then first image from images array
     let imageUrl = item.thumbnail
@@ -105,6 +119,19 @@ export default function MarketplaceItemCard({ item, colors }: MarketplaceItemCar
   }
 
   const imageUrl = getImageUrl()
+
+  // Handle image validation events
+  const handleImageError = (error: string) => {
+    setImageValidationState('error')
+    setImageError(error)
+    onImageError?.(item.id, error)
+  }
+
+  const handleImageValid = (result: ImageValidationResult) => {
+    setImageValidationState('valid')
+    setImageError('')
+    onImageValid?.(item.id, result)
+  }
 
   // Calculate average rating
   const averageRating = item.reviews && item.reviews.length > 0 
@@ -144,9 +171,14 @@ export default function MarketplaceItemCard({ item, colors }: MarketplaceItemCar
     }
   }
 
+  // If no image URL is available, don't show the card at all (strict mode)
+  if (!imageUrl) {
+    return null
+  }
+
   return (
     <Card 
-      className="group overflow-hidden transition-all duration-300 hover:shadow-xl hover:scale-105 w-full"
+      className="group overflow-hidden transition-all duration-300 hover:shadow-xl hover:scale-105"
       style={{ 
         backgroundColor: colors.cardBg, 
         borderColor: colors.cardBorder,
@@ -154,37 +186,52 @@ export default function MarketplaceItemCard({ item, colors }: MarketplaceItemCar
       }}
     >
       <div className="relative">
-        {/* Thumbnail */}
+        {/* Thumbnail with strict validation */}
         <div className="aspect-square relative overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200">
-          {imageUrl ? (
-            <div className="relative w-full h-full">
-              <ImageWithFallback
-                src={imageUrl}
-                alt={item.displayTitle || item.title}
-                className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
-                fallbackClassName="p-4"
-                fallbackText="Image Not Available"
-                retryCount={2}
-              />
-              
-              {/* EDN Protected overlay */}
-              <div className="absolute bottom-1 right-1 bg-black/60 text-white text-xs px-1 py-0.5 rounded opacity-70 pointer-events-none">
-                EDN Protected
+          <div className="relative w-full h-full">
+            <ProtectedStrictImage
+              src={imageUrl}
+              alt={item.displayTitle || item.title}
+              className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+              context={`Marketplace item ${item.id}: ${item.displayTitle || item.title}`}
+              protectionOptions={{
+                showWatermark: true,
+                watermarkText: 'EDN Protected'
+              }}
+              onImageError={handleImageError}
+              onImageValid={handleImageValid}
+              showValidationStatus={showValidationStatus}
+            />
+            
+            {/* Validation status overlay */}
+            {showValidationStatus && (
+              <div className="absolute top-2 left-2 z-10">
+                {imageValidationState === 'valid' && (
+                  <div className="bg-green-500 text-white text-xs px-2 py-1 rounded-full flex items-center gap-1">
+                    <CheckCircle className="w-3 h-3" />
+                    Image Valid
+                  </div>
+                )}
+                {imageValidationState === 'error' && (
+                  <div className="bg-red-500 text-white text-xs px-2 py-1 rounded-full flex items-center gap-1">
+                    <AlertTriangle className="w-3 h-3" />
+                    Image Error
+                  </div>
+                )}
+                {imageValidationState === 'unknown' && (
+                  <div className="bg-yellow-500 text-white text-xs px-2 py-1 rounded-full flex items-center gap-1">
+                    <div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    Validating...
+                  </div>
+                )}
               </div>
+            )}
+            
+            {/* EDN Protected overlay */}
+            <div className="absolute bottom-1 right-1 bg-black/60 text-white text-xs px-1 py-0.5 rounded opacity-70 pointer-events-none">
+              EDN Protected
             </div>
-          ) : (
-            <div className="w-full h-full flex flex-col items-center justify-center p-4">
-              <Package className="h-8 w-8 mb-2" style={{ color: colors.primary }} />
-              <div className="text-center">
-                <div className="text-xs font-medium mb-1" style={{ color: colors.textSecondary }}>
-                  No Image Available
-                </div>
-                <div className="text-xs" style={{ color: colors.textLight }}>
-                  {item.displayTitle || item.title}
-                </div>
-              </div>
-            </div>
-          )}
+          </div>
           
           {/* Overlay */}
           <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-300" />
@@ -237,24 +284,24 @@ export default function MarketplaceItemCard({ item, colors }: MarketplaceItemCar
         </div>
       </div>
 
-      <CardHeader className="pb-2 px-3">
+      <CardHeader className="pb-2">
         <div className="flex items-start justify-between gap-2">
           <div className="flex-1 min-w-0">
             <CardTitle 
-              className="text-sm font-bold line-clamp-2 transition-colors duration-200 group-hover:text-blue-600"
+              className="text-lg font-bold line-clamp-2 transition-colors duration-200 group-hover:text-blue-600"
               style={{ color: colors.textPrimary }}
             >
               {item.displayTitle || item.title}
             </CardTitle>
             <CardDescription 
-              className="text-xs line-clamp-2 mt-1"
+              className="text-sm line-clamp-2 mt-1"
               style={{ color: colors.textSecondary }}
             >
               {item.description}
             </CardDescription>
           </div>
           <div className="flex flex-col items-end gap-1">
-            <div className="text-sm font-bold" style={{ color: colors.primary }}>
+            <div className="text-lg font-bold" style={{ color: colors.primary }}>
               {formatPrice(item.price)}
             </div>
             {item._count?.orders && item._count.orders > 0 && (
@@ -266,21 +313,21 @@ export default function MarketplaceItemCard({ item, colors }: MarketplaceItemCar
         </div>
       </CardHeader>
 
-      <CardContent className="pt-0 px-3">
+      <CardContent className="pt-0">
         {/* Creator Info */}
-        <div className="flex items-center gap-2 mb-2">
+        <div className="flex items-center gap-2 mb-3">
           {item.user?.avatar ? (
             <img 
               src={item.user.avatar} 
               alt={item.user.name} 
-              className="w-5 h-5 rounded-full object-cover"
+              className="w-6 h-6 rounded-full object-cover"
             />
           ) : (
-            <div className="w-5 h-5 rounded-full flex items-center justify-center" style={{ backgroundColor: colors.primary }}>
-              <User className="h-2 w-2 text-white" />
+            <div className="w-6 h-6 rounded-full flex items-center justify-center" style={{ backgroundColor: colors.primary }}>
+              <User className="h-3 w-3 text-white" />
             </div>
           )}
-          <span className="text-xs font-medium truncate" style={{ color: colors.textSecondary }}>
+          <span className="text-sm font-medium truncate" style={{ color: colors.textSecondary }}>
             {item.user?.name || 'Unknown Creator'}
           </span>
           {item.user?.verified && (
@@ -292,8 +339,8 @@ export default function MarketplaceItemCard({ item, colors }: MarketplaceItemCar
 
         {/* Tags */}
         {parsedTags.length > 0 && (
-          <div className="flex flex-wrap gap-1 mb-2">
-            {parsedTags.slice(0, 2).map((tag, index) => (
+          <div className="flex flex-wrap gap-1 mb-3">
+            {parsedTags.slice(0, 3).map((tag, index) => (
               <Badge 
                 key={index} 
                 variant="outline" 
@@ -306,7 +353,7 @@ export default function MarketplaceItemCard({ item, colors }: MarketplaceItemCar
                 {tag}
               </Badge>
             ))}
-            {parsedTags.length > 2 && (
+            {parsedTags.length > 3 && (
               <Badge 
                 variant="outline" 
                 className="text-xs"
@@ -315,7 +362,7 @@ export default function MarketplaceItemCard({ item, colors }: MarketplaceItemCar
                   color: colors.textLight 
                 }}
               >
-                +{parsedTags.length - 2}
+                +{parsedTags.length - 3}
               </Badge>
             )}
           </div>
@@ -323,7 +370,7 @@ export default function MarketplaceItemCard({ item, colors }: MarketplaceItemCar
 
         {/* Prompt Preview (only for AI_MODEL and PROMPT types) */}
         {(item.type === 'AI_MODEL' || item.type === 'PROMPT') && (item.positivePrompt || item.negativePrompt) && (
-          <div className="mb-2">
+          <div className="mb-3">
             <div className="flex items-center gap-1 mb-1">
               <Lock className="h-3 w-3" style={{ color: colors.textLight }} />
               <span className="text-xs font-medium" style={{ color: colors.textSecondary }}>
@@ -331,7 +378,7 @@ export default function MarketplaceItemCard({ item, colors }: MarketplaceItemCar
               </span>
             </div>
             <div 
-              className="text-xs p-1.5 rounded border bg-opacity-50 backdrop-blur-sm transition-all duration-300"
+              className="text-xs p-2 rounded border bg-opacity-50 backdrop-blur-sm transition-all duration-300"
               style={{
                 backgroundColor: colors.cardBg,
                 borderColor: colors.cardBorder,
@@ -341,8 +388,8 @@ export default function MarketplaceItemCard({ item, colors }: MarketplaceItemCar
               }}
             >
               {item.positivePrompt ? 
-                item.positivePrompt.substring(0, 40) + (item.positivePrompt.length > 40 ? '...' : '') : 
-                item.negativePrompt?.substring(0, 40) + (item.negativePrompt.length > 40 ? '...' : '')
+                item.positivePrompt.substring(0, 60) + (item.positivePrompt.length > 60 ? '...' : '') : 
+                item.negativePrompt?.substring(0, 60) + (item.negativePrompt.length > 60 ? '...' : '')
               }
             </div>
             <div className="text-xs text-gray-500 dark:text-gray-400 mt-1 italic" style={{ color: colors.textLight }}>
@@ -352,10 +399,10 @@ export default function MarketplaceItemCard({ item, colors }: MarketplaceItemCar
         )}
 
         {/* Rating and Reviews */}
-        <div className="flex items-center justify-between mb-3">
+        <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-1">
-            <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
-            <span className="text-xs font-medium" style={{ color: colors.textPrimary }}>
+            <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+            <span className="text-sm font-medium" style={{ color: colors.textPrimary }}>
               {averageRating > 0 ? averageRating.toFixed(1) : 'New'}
             </span>
             {item._count?.reviews && item._count.reviews > 0 && (
@@ -376,26 +423,26 @@ export default function MarketplaceItemCard({ item, colors }: MarketplaceItemCar
           <Link href={`/marketplace/${item.id}`} className="flex-1">
             <Button 
               variant="outline" 
-              className="w-full text-xs h-8"
+              className="w-full text-sm"
               style={{ 
                 borderColor: colors.primary,
                 color: colors.primary 
               }}
             >
-              <Eye className="h-3 w-3 mr-1" />
-              View
+              <Eye className="h-4 w-4 mr-2" />
+              View Details
             </Button>
           </Link>
           
           <Button 
-            className="flex-1 text-xs h-8"
+            className="flex-1 text-sm"
             style={{ 
               backgroundColor: colors.primary, 
               color: colors.textOnWhite 
             }}
           >
-            <ShoppingCart className="h-3 w-3 mr-1" />
-            Buy
+            <ShoppingCart className="h-4 w-4 mr-2" />
+            Buy Now
           </Button>
         </div>
       </CardContent>

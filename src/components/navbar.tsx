@@ -30,24 +30,17 @@ export default function Navbar() {
     <nav className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-14 items-center px-4">
         <div className="mr-4 hidden md:flex">
-          <Link href="/" className="mr-6 flex items-center space-x-3">
+          <Link href="/" className="mr-6 flex items-center">
             <div className="relative">
               {/* Logo Image */}
               <img 
-                src="/logo.svg" 
+                src="/logo.svg?t=20240921" 
                 alt="EDN Logo" 
-                className="h-8 w-8 md:h-10 md:w-10"
+                className="h-20 w-auto object-contain"
               />
-              {/* Logo Text */}
-              <div className="hidden md:block ml-3">
-                <div className="text-xl md:text-2xl font-bold">
-                  <span className="text-amber-500">E</span><span className="bg-gradient-to-r from-indigo-500 via-purple-500 to-violet-500 bg-clip-text text-transparent">DN</span>
-                </div>
-                <div className="absolute -bottom-1 left-0 right-0 h-0.5 bg-gradient-to-r from-indigo-500 via-purple-500 to-violet-500 opacity-50"></div>
-              </div>
             </div>
           </Link>
-          <nav className="flex items-center space-x-6 text-sm font-medium">
+          <nav className="flex items-center space-x-3 text-sm font-medium">
             <Link
               href="/dashboard"
               className="transition-colors hover:text-foreground/80 text-foreground/60"

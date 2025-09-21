@@ -1,0 +1,117 @@
+# Robots.txt for EDN Platform
+# Website: https://ednplatform.com
+
+User-agent: *
+Allow: /
+Allow: /api/
+
+# Sitemap location
+Sitemap: https://ednplatform.com/sitemap.xml
+
+# Crawl delay (optional)
+Crawl-delay: 1
+
+# Block common bot paths
+Disallow: /_next/
+Disallow: /api/admin/
+Disallow: /admin/
+Disallow: /auth/
+Disallow: /private/
+Disallow: /temp/
+Disallow: *.json$
+Disallow: */api/*?*
+
+# Allow specific search engines
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+User-agent: Slurp
+Allow: /
+
+User-agent: DuckDuckBot
+Allow: /
+
+User-agent: Baiduspider
+Allow: /
+
+User-agent: YandexBot
+Allow: /
+
+# Block problematic bots
+User-agent: SemrushBot
+Disallow: /
+
+User-agent: AhrefsBot
+Disallow: /
+
+User-agent: MJ12bot
+Disallow: /
+
+User-agent: DotBot
+Disallow: /
+
+User-agent: Rogerbot
+Disallow: /
+
+User-agent: Exabot
+Disallow: /
+
+User-agent: Nutch
+Disallow: /
+
+# Block image scrapers
+User-agent: ImagesiftBot
+Disallow: /
+
+User-agent: Google-Image
+Allow: /
+
+User-agent: Google-Image-Video
+Allow: /
+
+# Rate limiting for aggressive crawlers
+User-agent: *
+Crawl-delay: 2
+
+# Special rules for specific sections
+# Block admin and private areas
+Disallow: /dashboard/
+Disallow: /profile/
+Disallow: /settings/
+Disallow: /billing/
+Disallow: /payouts/
+
+# Allow search engines to access marketplace and showcase
+Allow: /marketplace/
+Allow: /showcase/
+Allow: /blog/
+
+# Block user-generated content that might be sensitive
+Disallow: /api/user/
+Disallow: /api/private/
+Disallow: /uploads/
+
+# Allow CSS and JS files for proper rendering
+Allow: *.css
+Allow: *.js
+Allow: *.ico
+Allow: *.png
+Allow: *.jpg
+Allow: *.jpeg
+Allow: *.gif
+Allow: *.svg
+Allow: *.webp
+
+# Block development and testing URLs
+Disallow: *?test=*
+Disallow: *?debug=*
+Disallow: *?dev=*
+
+# API rate limiting notice
+# Please crawl responsibly. Our API has rate limits in place.
+# For API access, please contact us at support@ednplatform.com
+
+# Last updated: December 2024

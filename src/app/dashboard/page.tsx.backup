@@ -1,0 +1,2219 @@
+'use client'
+
+import { useState, useEffect } from 'react'
+import { motion } from 'framer-motion'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Progress } from '@/components/ui/progress'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Textarea } from '@/components/ui/textarea'
+import { Switch } from '@/components/ui/switch'
+import { Calendar } from '@/components/ui/calendar'
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
+import { useNSFW } from '@/contexts/nsfw-context'
+import { 
+  Sparkles, 
+  DollarSign, 
+  Users, 
+  TrendingUp, 
+  Link, 
+  Copy,
+  Download,
+  BarChart3,
+  PieChart,
+  CreditCard,
+  Bitcoin,
+  Landmark,
+  Gift,
+  Star,
+  Eye,
+  Share2,
+  CheckCircle,
+  Clock,
+  AlertCircle,
+  Target,
+  Award,
+  Crown,
+  Zap,
+  Globe,
+  FileText,
+  Video,
+  Camera,
+  Upload,
+  Edit,
+  Plus,
+  Settings,
+  User,
+  Image as ImageIcon,
+  Wand2,
+  Palette,
+  Store,
+  MessageSquare,
+  Clock,
+  Repeat,
+  X,
+  Save,
+  Trash2,
+  ExternalLink,
+  Heart,
+  ShoppingCart,
+  Tag,
+  Package,
+  PlusCircle,
+  CalendarClock,
+  CalendarDays,
+  Clock3,
+  Send,
+  Image as ImageIcon2,
+  Film,
+  Cpu,
+  Database,
+  CloudUpload,
+  Filter,
+  Search,
+  Bell,
+  Shield
+} from 'lucide-react'
+import { AIChatSuggestion } from '@/components/ai-chat-suggestion'
+
+export default function DashboardPage() {
+  const { isNSFW } = useNSFW()
+  const [activeTab, setActiveTab] = useState('overview')
+  const [copiedLink, setCopiedLink] = useState(false)
+  const [showPayoutModal, setShowPayoutModal] = useState(false)
+  const [payoutAmount, setPayoutAmount] = useState('')
+  const [payoutMethod, setPayoutMethod] = useState('paypal')
+  const [showPaymentDetailsModal, setShowPaymentDetailsModal] = useState(false)
+  const [paymentDetails, setPaymentDetails] = useState({
+    coinbase: { payment_method_id: '' },
+    paypal: { email: '' },
+    bank: { account_number: '', routing_number: '' }
+  })
+  const [onboardingProgress, setOnboardingProgress] = useState({
+    paymentSetupCompleted: false,
+    totalSteps: 5,
+    completedSteps: 3
+  })
+  
+  // New state variables for enhanced features
+  const [showSubscriptionModal, setShowSubscriptionModal] = useState(false)
+  const [showAccountModal, setShowAccountModal] = useState(false)
+  const [showAIModal, setShowAIModal] = useState(false)
+  const [showMarketplaceModal, setShowMarketplaceModal] = useState(false)
+  const [showSocialSchedulerModal, setShowSocialSchedulerModal] = useState(false)
+  const [showContentGeneratorModal, setShowContentGeneratorModal] = useState(false)
+  const [selectedAITab, setSelectedAITab] = useState('images')
+  const [referenceImages, setReferenceImages] = useState<File[]>([])
+  const [generatedContent, setGeneratedContent] = useState<any[]>([])
+  const [scheduledPosts, setScheduledPosts] = useState<any[]>([])
+  
+  const nsfwColors = {
+    primary: '#FF69B4', // neon pink
+    secondary: '#00FFFF', // cyan
+    accent: '#FF4500', // burning red
+    bg: 'from-pink-900 via-purple-900 to-black',
+    particle: '#FF69B4',
+    cardBg: 'rgba(30, 0, 30, 0.85)',
+    cardBorder: 'rgba(255, 20, 147, 0.5)',
+    textPrimary: '#FFFFFF',
+    textSecondary: '#E0E0E0',
+    textLight: '#B0B0B0',
+    textOnWhite: '#FFFFFF'
+  }
+
+  const sfwColors = {
+    primary: '#FF6B35', // vibrant coral orange
+    secondary: '#4ECDC4', // bright turquoise
+    accent: '#FFE66D', // golden yellow
+    bg: 'from-orange-200 via-cyan-200 to-yellow-200',
+    particle: '#FF6B35',
+    cardBg: 'rgba(255, 255, 255, 0.9)',
+    cardBorder: 'rgba(0, 0, 0, 0.1)',
+    textPrimary: '#1A202C', // dark gray
+    textSecondary: '#2D3748', // medium gray
+    textLight: '#4A5568', // light gray
+    textOnWhite: '#2D3748' // text on white backgrounds
+  }
+
+  const colors = isNSFW ? nsfwColors : sfwColors
+
+  const userStats = {
+    totalEarnings: 2847.50,
+    pendingEarnings: 342.00,
+    totalReferrals: 47,
+    conversionRate: 12.8,
+    affiliateLink: 'https://edn.ai/ref/user_12345',
+    tier: 'Gold',
+    commissionRate: 0.20, // 20% for Gold tier
+    minimumPayoutThreshold: 50.00,
+    autoPayoutEnabled: true,
+    subscription: {
+      plan: 'Pro',
+      status: 'active',
+      nextBilling: '2024-02-15',
+      amount: 29.99,
+      features: ['AI Generation', 'Marketplace Access', 'Priority Support']
+    }
+  }
+
+  const commissionData = [
+    { source: 'Membership Referrals', amount: 2847.50, percentage: 100, color: '#FF69B4' }
+  ]
+
+  const recentActivity = [
+    {
+      type: 'referral',
+      description: 'New membership referral commission',
+      amount: 60.00,
+      date: '2 hours ago',
+      status: 'completed'
+    },
+    {
+      type: 'referral',
+      description: 'Membership referral commission',
+      amount: 45.00,
+      date: '5 hours ago',
+      status: 'completed'
+    },
+    {
+      type: 'referral',
+      description: 'New member signup commission',
+      amount: 90.00,
+      date: '1 day ago',
+      status: 'completed'
+    },
+    {
+      type: 'payout',
+      description: 'Payout processed',
+      amount: -500.00,
+      date: '3 days ago',
+      status: 'completed'
+    }
+  ]
+
+  const payoutMethods = [
+    { id: 'paypal', name: 'PayPal', icon: CreditCard, color: '#0070BA' },
+    { id: 'bitcoin', name: 'Bitcoin', icon: Bitcoin, color: '#F7931A' },
+    { id: 'ethereum', name: 'Ethereum', icon: Bitcoin, color: '#627EEA' },
+    { id: 'litecoin', name: 'Litecoin', icon: Bitcoin, color: '#BFBBBB' },
+    { id: 'bank', name: 'Bank Transfer', icon: Landmark, color: '#2E7D32' }
+  ]
+
+  const performanceMetrics = [
+    { metric: 'Click-through Rate', value: '8.2%', change: '+2.1%', positive: true },
+    { metric: 'Conversion Rate', value: '12.8%', change: '+1.5%', positive: true },
+    { metric: 'Avg. Commission', value: '$28.50', change: '+$3.20', positive: true },
+    { metric: 'Active Links', value: '23', change: '+5', positive: true }
+  ]
+
+  const handleCopyLink = () => {
+    navigator.clipboard.writeText(userStats.affiliateLink)
+    setCopiedLink(true)
+    setTimeout(() => setCopiedLink(false), 2000)
+  }
+
+  const handleRequestPayout = () => {
+    if (parseFloat(payoutAmount) >= userStats.minimumPayoutThreshold) {
+      console.log(`Requesting payout of $${payoutAmount} via ${payoutMethod}`)
+      setShowPayoutModal(false)
+      setPayoutAmount('')
+      // Show confetti animation here
+    }
+  }
+
+  const handleSavePaymentDetails = () => {
+    // Validate payment details
+    const hasValidMethod = paymentDetails.coinbase.payment_method_id || 
+                           paymentDetails.paypal.email || 
+                           (paymentDetails.bank.account_number && paymentDetails.bank.routing_number)
+    
+    if (hasValidMethod) {
+      console.log('Saving payment details:', paymentDetails)
+      setOnboardingProgress(prev => ({
+        ...prev,
+        paymentSetupCompleted: true,
+        completedSteps: prev.completedSteps + 1
+      }))
+      setShowPaymentDetailsModal(false)
+      // Show success message
+    }
+  }
+
+  const handlePaymentDetailsChange = (method: string, field: string, value: string) => {
+    setPaymentDetails(prev => ({
+      ...prev,
+      [method]: {
+        ...prev[method as keyof typeof prev],
+        [field]: value
+      }
+    }))
+  }
+
+  return (
+    <div className={`min-h-screen bg-gradient-to-br ${colors.bg} relative overflow-hidden`}>
+      {/* Hero Section */}
+      <div className="relative h-80 overflow-hidden pt-16">
+        <img 
+          src={isNSFW ? "/hero-dashboard-nsfw.jpg" : "/hero-dashboard-sfw.jpg"} 
+          alt="Analytics Dashboard" 
+          className="w-full h-full object-cover"
+        />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/60 to-black/80"></div>
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div className="text-center text-white max-w-4xl px-6">
+            <h1 className={`text-4xl md:text-5xl font-bold mb-4 drop-shadow-lg kinetic-text dashboard ${isNSFW ? 'nsfw' : 'sfw'}`}>
+              {isNSFW ? 'Seductive Analytics with EDN' : 'Analytics Excellence with EDN'}
+            </h1>
+            <p className="text-xl md:text-2xl drop-shadow-md">
+              Track your earnings, manage referrals, and grow your income
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Animated background particles */}
+      <div className="absolute inset-0 overflow-hidden" style={{ top: '320px' }}>
+        {[...Array(25)].map((_, i) => (
+          <motion.div
+            key={i}
+            className="absolute w-2 h-2 rounded-full opacity-60"
+            style={{
+              left: `${Math.random() * 100}%`,
+              top: `${Math.random() * 100}%`,
+              backgroundColor: colors.particle || colors.primary,
+            }}
+            animate={{
+              y: [0, -150, 0],
+              x: [0, Math.random() * 100 - 50, 0],
+              opacity: [0.3, 0.9, 0.3],
+              scale: [0.8, 1.2, 0.8],
+            }}
+            transition={{
+              duration: 4 + Math.random() * 3,
+              repeat: Infinity,
+              delay: Math.random() * 2,
+              ease: "easeInOut"
+            }}
+          />
+        ))}
+      </div>
+
+      <div className="relative z-10 px-6 py-8" style={{ paddingTop: '0' }}>
+        <div className="max-w-7xl mx-auto">
+          {/* User Info */}
+          <div className="flex justify-center items-center gap-6 mb-6">
+            <Badge className="bg-yellow-500 text-black">
+              {userStats.tier} Tier
+            </Badge>
+            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
+              <Users className="h-5 w-5 text-white" />
+            </div>
+          </div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1 }}
+            className="mb-8"
+          >
+            <h1 className={`text-4xl md:text-5xl font-bold mb-4 kinetic-text dashboard ${isNSFW ? 'nsfw' : 'sfw'}`} style={{ color: colors.primary }}>
+              {isNSFW ? 'Seductive Analytics with EDN' : 'Analytics Excellence with EDN'}
+            </h1>
+            <p className="text-xl" style={{ color: colors.secondary }}>
+              Track your earnings, manage referrals, and grow your income
+            </p>
+          </motion.div>
+
+          {/* Stats Overview */}
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <Card className="backdrop-blur-sm border-2"
+              style={{ 
+                backgroundColor: colors.cardBg,
+                borderColor: colors.cardBorder
+              }}>
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm mb-1" style={{ color: colors.textSecondary }}>Total Earnings</p>
+                    <p className="text-2xl font-bold" style={{ color: colors.primary }}>
+                      ${userStats.totalEarnings.toLocaleString()}
+                    </p>
+                  </div>
+                  <DollarSign className="h-8 w-8" style={{ color: colors.primary }} />
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="backdrop-blur-sm border-2"
+              style={{ 
+                backgroundColor: colors.cardBg,
+                borderColor: colors.cardBorder
+              }}>
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm mb-1" style={{ color: colors.textSecondary }}>Pending</p>
+                    <p className="text-2xl font-bold" style={{ color: colors.secondary }}>
+                      ${userStats.pendingEarnings.toLocaleString()}
+                    </p>
+                  </div>
+                  <Clock className="h-8 w-8" style={{ color: colors.secondary }} />
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="backdrop-blur-sm border-2"
+              style={{ 
+                backgroundColor: colors.cardBg,
+                borderColor: colors.cardBorder
+              }}>
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm mb-1" style={{ color: colors.textSecondary }}>Referrals</p>
+                    <p className="text-2xl font-bold" style={{ color: colors.accent }}>
+                      {userStats.totalReferrals}
+                    </p>
+                  </div>
+                  <Users className="h-8 w-8" style={{ color: colors.accent }} />
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="backdrop-blur-sm border-2"
+              style={{ 
+                backgroundColor: colors.cardBg,
+                borderColor: colors.cardBorder
+              }}>
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm mb-1" style={{ color: colors.textSecondary }}>Conversion</p>
+                    <p className="text-2xl font-bold" style={{ color: '#FFD700' }}>
+                      {userStats.conversionRate}%
+                    </p>
+                  </div>
+                  <Target className="h-8 w-8" style={{ color: '#FFD700' }} />
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+            <TabsList className="grid w-full grid-cols-11">
+              <TabsTrigger value="overview">Overview</TabsTrigger>
+              <TabsTrigger value="affiliate">Affiliate</TabsTrigger>
+              <TabsTrigger value="subscriptions">Subscriptions</TabsTrigger>
+              <TabsTrigger value="ai-tools">AI Tools</TabsTrigger>
+              <TabsTrigger value="marketplace">Marketplace</TabsTrigger>
+              <TabsTrigger value="social">Social</TabsTrigger>
+              <TabsTrigger value="distribution">Distribution</TabsTrigger>
+              <TabsTrigger value="content">Content</TabsTrigger>
+              <TabsTrigger value="analytics">Analytics</TabsTrigger>
+              <TabsTrigger value="gamification">Gamification</TabsTrigger>
+              <TabsTrigger value="payouts">Payouts</TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="overview" className="mt-6">
+              <div className="grid lg:grid-cols-3 gap-8">
+                {/* Affiliate Link Card */}
+                <div className="lg:col-span-1">
+                  <Card className="backdrop-blur-sm border-2"
+              style={{ 
+                backgroundColor: colors.cardBg,
+                borderColor: colors.cardBorder
+              }}>
+                    <CardHeader>
+                      <CardTitle style={{ color: colors.primary }}>
+                        <Link className="inline mr-2 h-5 w-5" />
+                        Your Affiliate Link
+                      </CardTitle>
+                      <CardDescription style={{ color: colors.textSecondary }}>
+                        Share this link to earn {(userStats.commissionRate * 100).toFixed(0)}% commission
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div className="p-3 rounded-lg" style={{ backgroundColor: isNSFW ? 'rgba(0, 0, 0, 0.3)' : 'rgba(0, 0, 0, 0.1)' }}>
+                        <p className="text-sm break-all" style={{ color: colors.textPrimary }}>
+                          {userStats.affiliateLink}
+                        </p>
+                      </div>
+                      
+                      <div className="flex gap-2">
+                        <Button
+                          onClick={handleCopyLink}
+                          className="flex-1"
+                          style={{ backgroundColor: colors.primary }}
+                        >
+                          {copiedLink ? (
+                            <>
+                              <CheckCircle className="mr-2 h-4 w-4" />
+                              Copied!
+                            </>
+                          ) : (
+                            <>
+                              <Copy className="mr-2 h-4 w-4" />
+                              Copy Link
+                            </>
+                          )}
+                        </Button>
+                        
+                        <Button
+                          variant="outline"
+                          className="flex-1"
+                          style={{ borderColor: colors.secondary, color: colors.secondary }}
+                        >
+                          <Share2 className="mr-2 h-4 w-4" />
+                          Share
+                        </Button>
+                      </div>
+
+                      <div className="text-xs space-y-1" style={{ color: colors.textLight }}>
+                        <p>• Earn {(userStats.commissionRate * 100).toFixed(0)}% on new membership signups</p>
+                        <p>• One-time commission per referred user</p>
+                        <p>• Commission paid on first membership purchase</p>
+                        <p>• Current tier: {userStats.tier}</p>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+
+                {/* Commission Breakdown */}
+                <div className="lg:col-span-2">
+                  <Card className="backdrop-blur-sm border-2"
+              style={{ 
+                backgroundColor: colors.cardBg,
+                borderColor: colors.cardBorder
+              }}>
+                    <CardHeader>
+                      <CardTitle style={{ color: colors.primary }}>
+                        <PieChart className="inline mr-2 h-5 w-5" />
+                        Commission Breakdown
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-4">
+                        {commissionData.map((item, index) => (
+                          <div key={item.source} className="space-y-2">
+                            <div className="flex justify-between items-center">
+                              <span className="font-medium" style={{ color: colors.primary }}>
+                                {item.source}
+                              </span>
+                              <span className="font-bold">${item.amount.toLocaleString()}</span>
+                            </div>
+                            <div className="flex items-center gap-3">
+                              <div className="flex-1 bg-black/20 rounded-full h-2">
+                                <div
+                                  className="h-2 rounded-full transition-all duration-500"
+                                  style={{ 
+                                    width: `${item.percentage}%`,
+                                    backgroundColor: item.color
+                                  }}
+                                />
+                              </div>
+                              <span className="text-sm text-white/70">{item.percentage}%</span>
+                            </div>
+                          </div>
+                        ))}
+                        
+                        <div className="pt-4 border-t border-white/20">
+                          <div className="flex justify-between items-center">
+                            <span className="font-semibold text-lg" style={{ color: colors.primary }}>
+                              Total Commissions
+                            </span>
+                            <span className="font-bold text-xl" style={{ color: '#FFD700' }}>
+                              ${userStats.totalEarnings.toLocaleString()}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+              </div>
+
+              {/* Recent Activity */}
+              <Card className="backdrop-blur-sm bg-white/10 border-white/20 mt-8">
+                <CardHeader>
+                  <CardTitle style={{ color: colors.primary }}>
+                    <Calendar className="inline mr-2 h-5 w-5" />
+                    Recent Activity
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    {recentActivity.map((activity, index) => (
+                      <motion.div
+                        key={index}
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ duration: 0.5, delay: 0.1 * index }}
+                        className="flex items-center justify-between p-4 rounded-lg bg-white/5"
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                            activity.type === 'referral' ? 'bg-green-500/20' :
+                            activity.type === 'sale' ? 'bg-blue-500/20' :
+                            activity.type === 'subscription' ? 'bg-purple-500/20' :
+                            'bg-yellow-500/20'
+                          }`}>
+                            {activity.type === 'referral' && <Users className="h-4 w-4 text-green-400" />}
+                            {activity.type === 'sale' && <Gift className="h-4 w-4 text-blue-400" />}
+                            {activity.type === 'subscription' && <Crown className="h-4 w-4 text-purple-400" />}
+                            {activity.type === 'payout' && <Download className="h-4 w-4 text-yellow-400" />}
+                          </div>
+                          <div>
+                            <p className="font-medium text-sm" style={{ color: colors.primary }}>
+                              {activity.description}
+                            </p>
+                            <p className="text-xs text-white/60">{activity.date}</p>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <p className={`font-semibold ${
+                            activity.amount > 0 ? 'text-green-400' : 'text-red-400'
+                          }`}>
+                            {activity.amount > 0 ? '+' : ''}${activity.amount.toFixed(2)}
+                          </p>
+                          <div className="flex items-center gap-1">
+                            <CheckCircle className="h-3 w-3 text-green-400" />
+                            <span className="text-xs text-green-400">Completed</span>
+                          </div>
+                        </div>
+                      </motion.div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="affiliate" className="mt-6">
+              <div className="space-y-8">
+                {/* Referral Link Section */}
+                <Card className="backdrop-blur-sm border-2"
+                  style={{ 
+                    backgroundColor: colors.cardBg,
+                    borderColor: colors.cardBorder
+                  }}>
+                  <CardHeader>
+                    <CardTitle style={{ color: colors.primary }}>
+                      <Link className="inline mr-2 h-5 w-5" />
+                      Your Referral Link
+                    </CardTitle>
+                    <CardDescription style={{ color: colors.textSecondary }}>
+                      Share this link to earn commissions on every signup
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      <div className="flex gap-2">
+                        <input
+                          type="text"
+                          value="https://edn.com/ref/YOURCODE123"
+                          readOnly
+                          className="flex-1 px-4 py-2 rounded-lg border border-white/20 bg-white/10 text-white"
+                          style={{ 
+                            backgroundColor: isNSFW ? 'rgba(0, 0, 0, 0.3)' : 'rgba(0, 0, 0, 0.1)',
+                            color: colors.textPrimary,
+                            borderColor: colors.cardBorder
+                          }}
+                        />
+                        <Button
+                          onClick={handleCopyLink}
+                          variant="outline"
+                          className="flex items-center gap-2"
+                          style={{ borderColor: colors.secondary, color: colors.secondary }}
+                        >
+                          {copiedLink ? <CheckCircle className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+                          {copiedLink ? 'Copied!' : 'Copy'}
+                        </Button>
+                      </div>
+                      <div className="grid md:grid-cols-2 gap-4">
+                        <Button 
+                          className="flex items-center gap-2" 
+                          style={{ backgroundColor: colors.primary }}
+                          onClick={() => {
+                            // Share on social media functionality
+                            const url = 'https://edn.com/ref/YOURCODE123'
+                            const text = 'Join EDN and get amazing AI content creation tools!'
+                            window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`, '_blank')
+                          }}
+                        >
+                          <Share2 className="h-4 w-4" />
+                          Share on Social Media
+                        </Button>
+                        <Button 
+                          variant="outline" 
+                          className="flex items-center gap-2"
+                          style={{ borderColor: colors.accent, color: colors.accent }}
+                          onClick={() => {
+                            // Generate custom link functionality
+                            const customCode = prompt('Enter your custom code (alphanumeric, max 10 characters):')
+                            if (customCode && /^[a-zA-Z0-9]{1,10}$/.test(customCode)) {
+                              alert(`Custom link generated: https://edn.com/ref/${customCode.toUpperCase()}`)
+                            } else if (customCode) {
+                              alert('Invalid code format. Please use only letters and numbers (max 10 characters).')
+                            }
+                          }}
+                        >
+                          <Link className="h-4 w-4" />
+                          Generate Custom Link
+                        </Button>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Marketing Materials */}
+                <Card className="backdrop-blur-sm border-2"
+                  style={{ 
+                    backgroundColor: colors.cardBg,
+                    borderColor: colors.cardBorder
+                  }}>
+                  <CardHeader>
+                    <CardTitle style={{ color: colors.primary }}>
+                      <BarChart3 className="inline mr-2 h-5 w-5" />
+                      Marketing Materials
+                    </CardTitle>
+                    <CardDescription style={{ color: colors.textSecondary }}>
+                      High-converting marketing materials to boost your referrals
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
+                      {[
+                        {
+                          type: 'Banner Ads',
+                          description: 'High-converting banner ads in various sizes',
+                          formats: ['728x90', '300x250', '160x600'],
+                          icon: BarChart3
+                        },
+                        {
+                          type: 'Email Templates',
+                          description: 'Pre-written email templates for your campaigns',
+                          formats: ['Welcome', 'Promotional', 'Follow-up'],
+                          icon: MessageSquare
+                        },
+                        {
+                          type: 'Social Media Posts',
+                          description: 'Ready-to-share social media content',
+                          formats: ['Instagram', 'Twitter', 'Facebook', 'LinkedIn'],
+                          icon: Share2
+                        },
+                        {
+                          type: 'Video Content',
+                          description: 'Promotional videos and tutorials',
+                          formats: ['30s Spot', 'Demo Video', 'Tutorial'],
+                          icon: Video
+                        }
+                      ].map((material, index) => (
+                        <div key={material.type} className="p-4 rounded-lg border" style={{ borderColor: colors.cardBorder }}>
+                          <material.icon className="h-8 w-8 mb-3" style={{ color: colors.secondary }} />
+                          <h4 className="font-semibold mb-2" style={{ color: colors.primary }}>{material.type}</h4>
+                          <p className="text-sm mb-3" style={{ color: colors.textSecondary }}>{material.description}</p>
+                          <div className="flex flex-wrap gap-1 mb-3">
+                            {material.formats.map((format, i) => (
+                              <Badge key={format} variant="outline" className="text-xs">
+                                {format}
+                              </Badge>
+                            ))}
+                          </div>
+                          <Button 
+                            size="sm" 
+                            className="w-full"
+                            style={{ backgroundColor: colors.primary }}
+                          >
+                            Download
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Recent Referrals */}
+                <Card className="backdrop-blur-sm border-2"
+                  style={{ 
+                    backgroundColor: colors.cardBg,
+                    borderColor: colors.cardBorder
+                  }}>
+                  <CardHeader>
+                    <CardTitle style={{ color: colors.primary }}>
+                      <Users className="inline mr-2 h-5 w-5" />
+                      Recent Referrals
+                    </CardTitle>
+                    <CardDescription style={{ color: colors.textSecondary }}>
+                      Track your referral activity and earnings
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      {[
+                        {
+                          name: 'John Doe',
+                          email: 'john@example.com',
+                          plan: 'Pro',
+                          commission: 10,
+                          date: '2024-01-15',
+                          status: 'Active'
+                        },
+                        {
+                          name: 'Jane Smith',
+                          email: 'jane@example.com',
+                          plan: 'Elite',
+                          commission: 20,
+                          date: '2024-01-12',
+                          status: 'Active'
+                        },
+                        {
+                          name: 'Mike Johnson',
+                          email: 'mike@example.com',
+                          plan: 'Basic',
+                          commission: 2,
+                          date: '2024-01-10',
+                          status: 'Active'
+                        }
+                      ].map((referral, index) => (
+                        <div key={index} className="flex items-center justify-between p-4 rounded-lg" style={{ backgroundColor: isNSFW ? 'rgba(0, 0, 0, 0.2)' : 'rgba(0, 0, 0, 0.05)' }}>
+                          <div>
+                            <p className="font-semibold" style={{ color: colors.primary }}>{referral.name}</p>
+                            <p className="text-sm" style={{ color: colors.textSecondary }}>{referral.email}</p>
+                          </div>
+                          <div className="text-right">
+                            <p className="font-semibold" style={{ color: colors.primary }}>{referral.plan}</p>
+                            <p className="text-sm" style={{ color: colors.textSecondary }}>${referral.commission} commission</p>
+                          </div>
+                          <div className="text-right">
+                            <Badge variant="outline">{referral.status}</Badge>
+                            <p className="text-sm mt-1" style={{ color: colors.textSecondary }}>{referral.date}</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Payout History */}
+                <Card className="backdrop-blur-sm border-2"
+                  style={{ 
+                    backgroundColor: colors.cardBg,
+                    borderColor: colors.cardBorder
+                  }}>
+                  <CardHeader>
+                    <CardTitle style={{ color: colors.primary }}>
+                      <CreditCard className="inline mr-2 h-5 w-5" />
+                      Payout History
+                    </CardTitle>
+                    <CardDescription style={{ color: colors.textSecondary }}>
+                      View your earnings and payout history
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      {[
+                        {
+                          amount: 1200,
+                          date: '2024-01-01',
+                          method: 'PayPal',
+                          status: 'Completed'
+                        },
+                        {
+                          amount: 850,
+                          date: '2023-12-15',
+                          method: 'Bank Transfer',
+                          status: 'Completed'
+                        },
+                        {
+                          amount: 500,
+                          date: '2023-12-01',
+                          method: 'PayPal',
+                          status: 'Completed'
+                        }
+                      ].map((payout, index) => (
+                        <div key={index} className="flex items-center justify-between p-4 rounded-lg" style={{ backgroundColor: isNSFW ? 'rgba(0, 0, 0, 0.2)' : 'rgba(0, 0, 0, 0.05)' }}>
+                          <div>
+                            <p className="font-semibold" style={{ color: colors.primary }}>${payout.amount}</p>
+                            <p className="text-sm" style={{ color: colors.textSecondary }}>{payout.method}</p>
+                          </div>
+                          <div className="text-right">
+                            <Badge variant={payout.status === 'Completed' ? 'default' : 'secondary'}>
+                              {payout.status}
+                            </Badge>
+                            <p className="text-sm mt-1" style={{ color: colors.textSecondary }}>{payout.date}</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            </TabsContent>
+
+            <TabsContent value="distribution" className="mt-6">
+              <div className="grid lg:grid-cols-3 gap-8">
+                {/* Connected Platforms */}
+                <div className="lg:col-span-2">
+                  <Card className="backdrop-blur-sm border-2"
+                    style={{ 
+                      backgroundColor: colors.cardBg,
+                      borderColor: colors.cardBorder
+                    }}>
+                    <CardHeader>
+                      <CardTitle style={{ color: colors.primary }}>
+                        <Globe className="inline mr-2 h-5 w-5" />
+                        Connected Platforms
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="grid md:grid-cols-2 gap-4">
+                        {[
+                          { name: 'OnlyFans', status: 'connected', views: '15.4K', lastPosted: '2h ago' },
+                          { name: 'Fansly', status: 'connected', views: '8.9K', lastPosted: '5h ago' },
+                          { name: 'Instagram', status: 'connected', views: '45.6K', lastPosted: '30m ago' },
+                          { name: 'TikTok', status: 'connected', views: '128.9K', lastPosted: '45m ago' },
+                          { name: 'Patreon', status: 'disconnected', views: '-', lastPosted: 'Never' },
+                          { name: 'ManyVids', status: 'connected', views: '22.1K', lastPosted: '1d ago' }
+                        ].map((platform, index) => (
+                          <div key={platform.name} className="p-4 rounded-lg border" style={{ borderColor: colors.cardBorder }}>
+                            <div className="flex items-center justify-between mb-2">
+                              <h4 className="font-medium" style={{ color: colors.primary }}>{platform.name}</h4>
+                              <div className={`w-2 h-2 rounded-full ${platform.status === 'connected' ? 'bg-green-400' : 'bg-red-400'}`}></div>
+                            </div>
+                            <div className="text-sm space-y-1">
+                              <div className="flex justify-between">
+                                <span style={{ color: colors.textLight }}>Views:</span>
+                                <span style={{ color: colors.textPrimary }}>{platform.views}</span>
+                              </div>
+                              <div className="flex justify-between">
+                                <span style={{ color: colors.textLight }}>Last posted:</span>
+                                <span style={{ color: colors.textPrimary }}>{platform.lastPosted}</span>
+                              </div>
+                            </div>
+                            <Button 
+                              size="sm" 
+                              className="w-full mt-3"
+                              style={{ 
+                                backgroundColor: platform.status === 'connected' ? 'transparent' : colors.primary,
+                                border: platform.status === 'connected' ? `1px solid ${colors.cardBorder}` : 'none',
+                                color: platform.status === 'connected' ? colors.textPrimary : 'white'
+                              }}
+                            >
+                              {platform.status === 'connected' ? 'Manage' : 'Connect'}
+                            </Button>
+                          </div>
+                        ))}
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+
+                {/* Quick Actions */}
+                <div className="space-y-6">
+                  <Card className="backdrop-blur-sm border-2"
+                    style={{ 
+                      backgroundColor: colors.cardBg,
+                      borderColor: colors.cardBorder
+                    }}>
+                    <CardHeader>
+                      <CardTitle style={{ color: colors.primary }}>
+                        <Zap className="inline mr-2 h-5 w-5" />
+                        Quick Actions
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-3">
+                      <Button className="w-full" style={{ backgroundColor: colors.primary }}>
+                        <Upload className="mr-2 h-4 w-4" />
+                        Upload Content
+                      </Button>
+                      <Button variant="outline" className="w-full" style={{ borderColor: colors.cardBorder, color: colors.textPrimary }}>
+                        <Share2 className="mr-2 h-4 w-4" />
+                        Schedule Posts
+                      </Button>
+                      <Button variant="outline" className="w-full" style={{ borderColor: colors.cardBorder, color: colors.textPrimary }}>
+                        <BarChart3 className="mr-2 h-4 w-4" />
+                        View Analytics
+                      </Button>
+                    </CardContent>
+                  </Card>
+
+                  <Card className="backdrop-blur-sm border-2"
+                    style={{ 
+                      backgroundColor: colors.cardBg,
+                      borderColor: colors.cardBorder
+                    }}>
+                    <CardHeader>
+                      <CardTitle style={{ color: colors.primary }}>
+                        <TrendingUp className="inline mr-2 h-5 w-5" />
+                        Distribution Stats
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div className="text-center">
+                        <div className="text-2xl font-bold" style={{ color: colors.primary }}>24</div>
+                        <div className="text-sm" style={{ color: colors.textLight }}>Total Posts</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-2xl font-bold" style={{ color: colors.secondary }}>189.5K</div>
+                        <div className="text-sm" style={{ color: colors.textLight }}>Total Views</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-2xl font-bold" style={{ color: colors.accent }}>4.2%</div>
+                        <div className="text-sm" style={{ color: colors.textLight }}>Engagement Rate</div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+              </div>
+            </TabsContent>
+
+            <TabsContent value="content" className="mt-6">
+              <div className="grid lg:grid-cols-3 gap-8">
+                {/* Content Library */}
+                <div className="lg:col-span-2">
+                  <Card className="backdrop-blur-sm border-2"
+                    style={{ 
+                      backgroundColor: colors.cardBg,
+                      borderColor: colors.cardBorder
+                    }}>
+                    <CardHeader>
+                      <CardTitle style={{ color: colors.primary }}>
+                        <FileText className="inline mr-2 h-5 w-5" />
+                        Content Library
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-4">
+                        {[
+                          { 
+                            title: 'Neon Bikini Beach Shoot', 
+                            type: 'Image', 
+                            resolution: '4K', 
+                            size: '8.2MB', 
+                            created: '2h ago',
+                            platforms: 3,
+                            views: '15.4K'
+                          },
+                          { 
+                            title: 'Cyberpunk Fashion Video', 
+                            type: 'Video', 
+                            resolution: '1080p', 
+                            size: '95.4MB', 
+                            created: '5h ago',
+                            platforms: 4,
+                            views: '89.2K'
+                          },
+                          { 
+                            title: 'Elegant Evening Look', 
+                            type: 'Image', 
+                            resolution: '4K', 
+                            size: '7.8MB', 
+                            created: '1d ago',
+                            platforms: 2,
+                            views: '22.1K'
+                          }
+                        ].map((content, index) => (
+                          <div key={index} className="flex items-center justify-between p-4 rounded-lg border" style={{ borderColor: colors.cardBorder }}>
+                            <div className="flex items-center gap-4">
+                              <div className="w-16 h-16 rounded-lg bg-gradient-to-br from-purple-500/20 to-pink-500/20 flex items-center justify-center">
+                                {content.type === 'Image' ? (
+                                  <Eye className="h-6 w-6 text-white/50" />
+                                ) : (
+                                  <Video className="h-6 w-6 text-white/50" />
+                                )}
+                              </div>
+                              <div>
+                                <h4 className="font-medium" style={{ color: colors.primary }}>{content.title}</h4>
+                                <div className="flex items-center gap-4 text-sm">
+                                  <span style={{ color: colors.textLight }}>{content.type} • {content.resolution}</span>
+                                  <span style={{ color: colors.textLight }}>{content.size}</span>
+                                  <span style={{ color: colors.textLight }}>{content.views} views</span>
+                                </div>
+                                <p className="text-xs" style={{ color: colors.textLight }}>
+                                  Created {content.created} • Posted to {content.platforms} platforms
+                                </p>
+                              </div>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <Button size="sm" variant="outline" style={{ borderColor: colors.cardBorder, color: colors.textPrimary }}>
+                                <Edit className="h-4 w-4" />
+                              </Button>
+                              <Button size="sm" variant="outline" style={{ borderColor: colors.cardBorder, color: colors.textPrimary }}>
+                                <Share2 className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+
+                {/* Create New Content */}
+                <div className="space-y-6">
+                  <Card className="backdrop-blur-sm border-2"
+                    style={{ 
+                      backgroundColor: colors.cardBg,
+                      borderColor: colors.cardBorder
+                    }}>
+                    <CardHeader>
+                      <CardTitle style={{ color: colors.primary }}>
+                        <Plus className="inline mr-2 h-5 w-5" />
+                        Create New
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-3">
+                      <Button className="w-full" style={{ backgroundColor: colors.primary }}>
+                        <Camera className="mr-2 h-4 w-4" />
+                        Generate Image
+                      </Button>
+                      <Button variant="outline" className="w-full" style={{ borderColor: colors.cardBorder, color: colors.textPrimary }}>
+                        <Video className="mr-2 h-4 w-4" />
+                        Generate Video
+                      </Button>
+                      <Button variant="outline" className="w-full" style={{ borderColor: colors.cardBorder, color: colors.textPrimary }}>
+                        <Upload className="mr-2 h-4 w-4" />
+                        Upload Content
+                      </Button>
+                    </CardContent>
+                  </Card>
+
+                  <Card className="backdrop-blur-sm border-2"
+                    style={{ 
+                      backgroundColor: colors.cardBg,
+                      borderColor: colors.cardBorder
+                    }}>
+                    <CardHeader>
+                      <CardTitle style={{ color: colors.primary }}>
+                        <BarChart3 className="inline mr-2 h-5 w-5" />
+                        Content Performance
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div className="text-center">
+                        <div className="text-2xl font-bold" style={{ color: colors.primary }}>18</div>
+                        <div className="text-sm" style={{ color: colors.textLight }}>Total Content</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-2xl font-bold" style={{ color: colors.secondary }}>126.7K</div>
+                        <div className="text-sm" style={{ color: colors.textLight }}>Total Views</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-2xl font-bold" style={{ color: colors.accent }}>4.8%</div>
+                        <div className="text-sm" style={{ color: colors.textLight }}>Avg. Engagement</div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+              </div>
+            </TabsContent>
+
+            <TabsContent value="analytics" className="mt-6">
+              <div className="grid lg:grid-cols-2 gap-8">
+                <Card className="backdrop-blur-sm border-2"
+              style={{ 
+                backgroundColor: colors.cardBg,
+                borderColor: colors.cardBorder
+              }}>
+                  <CardHeader>
+                    <CardTitle style={{ color: colors.primary }}>
+                      Earnings Overview
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      <div className="h-48 bg-gradient-to-br from-purple-500/20 to-pink-500/20 rounded-lg flex items-center justify-center">
+                        <BarChart3 className="h-16 w-16 text-white/50" />
+                      </div>
+                      <div className="grid grid-cols-2 gap-4 text-center">
+                        <div>
+                          <p className="text-2xl font-bold" style={{ color: colors.primary }}>
+                            $2,847
+                          </p>
+                          <p className="text-sm text-white/70">This Month</p>
+                        </div>
+                        <div>
+                          <p className="text-2xl font-bold" style={{ color: colors.secondary }}>
+                            +23%
+                          </p>
+                          <p className="text-sm text-white/70">Growth</p>
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card className="backdrop-blur-sm border-2"
+              style={{ 
+                backgroundColor: colors.cardBg,
+                borderColor: colors.cardBorder
+              }}>
+                  <CardHeader>
+                    <CardTitle style={{ color: colors.primary }}>
+                      Top Referral Sources
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      {[
+                        { source: 'Twitter', clicks: 1234, conversions: 158 },
+                        { source: 'Instagram', clicks: 892, conversions: 114 },
+                        { source: 'Direct', clicks: 567, conversions: 89 },
+                        { source: 'Email', clicks: 445, conversions: 67 }
+                      ].map((item, index) => (
+                        <div key={item.source} className="space-y-2">
+                          <div className="flex justify-between items-center">
+                            <span className="font-medium" style={{ color: colors.primary }}>
+                              {item.source}
+                            </span>
+                            <span className="text-sm text-white/70">
+                              {item.conversions} conversions
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-3">
+                            <div className="flex-1 bg-black/20 rounded-full h-2">
+                              <div
+                                className="h-2 rounded-full transition-all duration-500"
+                                style={{ 
+                                  width: `${(item.conversions / 158) * 100}%`,
+                                  backgroundColor: colors.primary
+                                }}
+                              />
+                            </div>
+                            <span className="text-xs text-white/70">{item.clicks}</span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            </TabsContent>
+
+            <TabsContent value="payouts" className="mt-6">
+              <div className="grid lg:grid-cols-3 gap-8">
+                <div className="lg:col-span-2">
+                  <Card className="backdrop-blur-sm border-2"
+              style={{ 
+                backgroundColor: colors.cardBg,
+                borderColor: colors.cardBorder
+              }}>
+                    <CardHeader>
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <CardTitle style={{ color: colors.primary }}>
+                            <Download className="inline mr-2 h-5 w-5" />
+                            Payout History
+                          </CardTitle>
+                          <CardDescription className="text-white/80">
+                            Your payout request history
+                          </CardDescription>
+                        </div>
+                        <Button
+                          onClick={() => setShowPayoutModal(true)}
+                          style={{ backgroundColor: '#FFD700', color: '#000' }}
+                        >
+                          Request Payout
+                        </Button>
+                      </div>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-4">
+                        {[
+                          { amount: 500.00, method: 'PayPal', date: '2024-01-15', status: 'Completed' },
+                          { amount: 750.00, method: 'Bitcoin', date: '2024-01-01', status: 'Completed' },
+                          { amount: 300.00, method: 'Bank Transfer', date: '2023-12-15', status: 'Completed' }
+                        ].map((payout, index) => (
+                          <motion.div
+                            key={index}
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.5, delay: 0.1 * index }}
+                            className="flex items-center justify-between p-4 rounded-lg bg-white/5"
+                          >
+                            <div className="flex items-center gap-3">
+                              <div className="w-10 h-10 rounded-full bg-green-500/20 flex items-center justify-center">
+                                <CheckCircle className="h-5 w-5 text-green-400" />
+                              </div>
+                              <div>
+                                <p className="font-medium" style={{ color: colors.primary }}>
+                                  ${payout.amount.toLocaleString()}
+                                </p>
+                                <p className="text-sm text-white/70">
+                                  {payout.method} • {payout.date}
+                                </p>
+                              </div>
+                            </div>
+                            <Badge className="bg-green-500 text-white">
+                              {payout.status}
+                            </Badge>
+                          </motion.div>
+                        ))}
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+
+                <div className="lg:col-span-1">
+                  {/* Payment Details Setup Card */}
+                  <Card className="backdrop-blur-sm border-2 mb-6"
+                    style={{ 
+                      backgroundColor: colors.cardBg,
+                      borderColor: colors.cardBorder
+                    }}>
+                    <CardHeader>
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <CardTitle style={{ color: colors.primary }}>
+                            <CreditCard className="inline mr-2 h-5 w-5" />
+                            Payment Details
+                          </CardTitle>
+                          <CardDescription className="text-white/80">
+                            Setup your payout methods
+                          </CardDescription>
+                        </div>
+                        {!onboardingProgress.paymentSetupCompleted && (
+                          <Badge className="bg-yellow-500 text-black">
+                            Setup Required
+                          </Badge>
+                        )}
+                      </div>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div className="space-y-3">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <Bitcoin className="h-4 w-4" style={{ color: '#F7931A' }} />
+                            <span className="text-sm text-white/80">Coinbase</span>
+                          </div>
+                          {paymentDetails.coinbase.payment_method_id ? (
+                            <CheckCircle className="h-4 w-4 text-green-400" />
+                          ) : (
+                            <AlertCircle className="h-4 w-4 text-yellow-400" />
+                          )}
+                        </div>
+                        
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <CreditCard className="h-4 w-4" style={{ color: '#0070BA' }} />
+                            <span className="text-sm text-white/80">PayPal</span>
+                          </div>
+                          {paymentDetails.paypal.email ? (
+                            <CheckCircle className="h-4 w-4 text-green-400" />
+                          ) : (
+                            <AlertCircle className="h-4 w-4 text-yellow-400" />
+                          )}
+                        </div>
+                        
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <Landmark className="h-4 w-4" style={{ color: '#2E7D32' }} />
+                            <span className="text-sm text-white/80">Bank Transfer</span>
+                          </div>
+                          {paymentDetails.bank.account_number ? (
+                            <CheckCircle className="h-4 w-4 text-green-400" />
+                          ) : (
+                            <AlertCircle className="h-4 w-4 text-yellow-400" />
+                          )}
+                        </div>
+                      </div>
+
+                      <Button
+                        onClick={() => setShowPaymentDetailsModal(true)}
+                        className="w-full"
+                        style={{ backgroundColor: colors.primary }}
+                      >
+                        {onboardingProgress.paymentSetupCompleted ? 'Update Details' : 'Setup Payment Details'}
+                      </Button>
+
+                      {!onboardingProgress.paymentSetupCompleted && (
+                        <div className="text-xs text-yellow-400 bg-yellow-400/10 p-2 rounded">
+                          <p>⚠️ Payment details required for payouts</p>
+                          <p>Complete this step to enable automatic payouts</p>
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+
+                  <Card className="backdrop-blur-sm border-2"
+              style={{ 
+                backgroundColor: colors.cardBg,
+                borderColor: colors.cardBorder
+              }}>
+                    <CardHeader>
+                      <CardTitle style={{ color: colors.primary }}>
+                        Payout Information
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div>
+                        <h4 className="font-medium mb-2" style={{ color: colors.primary }}>
+                          Minimum Payout
+                        </h4>
+                        <p className="text-2xl font-bold" style={{ color: '#FFD700' }}>
+                          ${userStats.minimumPayoutThreshold.toLocaleString()}
+                        </p>
+                      </div>
+
+                      <div>
+                        <h4 className="font-medium mb-2" style={{ color: colors.primary }}>
+                          Auto Payout
+                        </h4>
+                        <div className="flex items-center gap-2">
+                          {userStats.autoPayoutEnabled ? (
+                            <CheckCircle className="h-4 w-4 text-green-400" />
+                          ) : (
+                            <AlertCircle className="h-4 w-4 text-yellow-400" />
+                          )}
+                          <span className="text-sm text-white/80">
+                            {userStats.autoPayoutEnabled ? 'Enabled' : 'Disabled'}
+                          </span>
+                        </div>
+                      </div>
+
+                      <div>
+                        <h4 className="font-medium mb-2" style={{ color: colors.primary }}>
+                          Available Balance
+                        </h4>
+                        <p className="text-2xl font-bold" style={{ color: colors.secondary }}>
+                          ${userStats.pendingEarnings.toLocaleString()}
+                        </p>
+                      </div>
+
+                      <div>
+                        <h4 className="font-medium mb-2" style={{ color: colors.primary }}>
+                          Processing Time
+                        </h4>
+                        <p className="text-sm text-white/70">
+                          7 business days
+                        </p>
+                      </div>
+
+                      <div className="pt-4 border-t border-white/20">
+                        <h4 className="font-medium mb-3" style={{ color: colors.primary }}>
+                          Available Methods
+                        </h4>
+                        <div className="space-y-2">
+                          {payoutMethods.slice(0, 3).map(method => (
+                            <div key={method.id} className="flex items-center gap-2 text-sm">
+                              <method.icon className="h-4 w-4" style={{ color: method.color }} />
+                              <span className="text-white/80">{method.name}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+              </div>
+            </TabsContent>
+
+            {/* Subscriptions Tab */}
+            <TabsContent value="subscriptions" className="mt-6">
+              <div className="grid lg:grid-cols-3 gap-8">
+                {/* Current Subscription */}
+                <div className="lg:col-span-2">
+                  <Card className="backdrop-blur-sm border-2"
+                    style={{ 
+                      backgroundColor: colors.cardBg,
+                      borderColor: colors.cardBorder
+                    }}>
+                    <CardHeader>
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <CardTitle style={{ color: colors.primary }}>
+                            <Crown className="inline mr-2 h-5 w-5" />
+                            Current Subscription
+                          </CardTitle>
+                          <CardDescription className="text-white/80">
+                            Manage your subscription plan
+                          </CardDescription>
+                        </div>
+                        <Badge className={`${userStats.subscription.status === 'active' ? 'bg-green-500' : 'bg-yellow-500'} text-white`}>
+                          {userStats.subscription.status.charAt(0).toUpperCase() + userStats.subscription.status.slice(1)}
+                        </Badge>
+                      </div>
+                    </CardHeader>
+                    <CardContent className="space-y-6">
+                      <div className="grid md:grid-cols-2 gap-6">
+                        <div>
+                          <h4 className="font-medium mb-2" style={{ color: colors.primary }}>Plan</h4>
+                          <p className="text-2xl font-bold" style={{ color: colors.secondary }}>{userStats.subscription.plan}</p>
+                        </div>
+                        <div>
+                          <h4 className="font-medium mb-2" style={{ color: colors.primary }}>Monthly Cost</h4>
+                          <p className="text-2xl font-bold" style={{ color: colors.accent }}>${userStats.subscription.amount}</p>
+                        </div>
+                      </div>
+                      
+                      <div>
+                        <h4 className="font-medium mb-3" style={{ color: colors.primary }}>Features</h4>
+                        <div className="space-y-2">
+                          {userStats.subscription.features.map((feature, index) => (
+                            <div key={index} className="flex items-center gap-2">
+                              <CheckCircle className="h-4 w-4 text-green-400" />
+                              <span className="text-sm" style={{ color: colors.textPrimary }}>{feature}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                      
+                      <div className="pt-4 border-t border-white/20">
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="text-sm" style={{ color: colors.textLight }}>Next Billing Date</span>
+                          <span className="font-medium" style={{ color: colors.primary }}>{userStats.subscription.nextBilling}</span>
+                        </div>
+                        <div className="flex gap-2">
+                          <Button 
+                            onClick={() => setShowSubscriptionModal(true)}
+                            variant="outline"
+                            className="flex-1"
+                            style={{ borderColor: colors.cardBorder, color: colors.textPrimary }}
+                          >
+                            Change Plan
+                          </Button>
+                          <Button 
+                            variant="outline"
+                            className="flex-1"
+                            style={{ borderColor: '#EF4444', color: '#EF4444' }}
+                          >
+                            Cancel Subscription
+                          </Button>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+
+                {/* Payment Methods */}
+                <div className="space-y-6">
+                  <Card className="backdrop-blur-sm border-2"
+                    style={{ 
+                      backgroundColor: colors.cardBg,
+                      borderColor: colors.cardBorder
+                    }}>
+                    <CardHeader>
+                      <CardTitle style={{ color: colors.primary }}>
+                        <CreditCard className="inline mr-2 h-5 w-5" />
+                        Payment Methods
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div className="space-y-3">
+                        <div className="flex items-center justify-between p-3 rounded-lg border" style={{ borderColor: colors.cardBorder }}>
+                          <div className="flex items-center gap-2">
+                            <CreditCard className="h-4 w-4" style={{ color: '#0070BA' }} />
+                            <span className="text-sm" style={{ color: colors.textPrimary }}>•••• 4242</span>
+                          </div>
+                          <Badge className="bg-green-500 text-white text-xs">Default</Badge>
+                        </div>
+                        
+                        <div className="flex items-center justify-between p-3 rounded-lg border" style={{ borderColor: colors.cardBorder }}>
+                          <div className="flex items-center gap-2">
+                            <Bitcoin className="h-4 w-4" style={{ color: '#F7931A' }} />
+                            <span className="text-sm" style={{ color: colors.textPrimary }}>Bitcoin Wallet</span>
+                          </div>
+                          <Button size="sm" variant="ghost" style={{ color: colors.textLight }}>
+                            Remove
+                          </Button>
+                        </div>
+                      </div>
+                      
+                      <Button 
+                        className="w-full"
+                        variant="outline"
+                        style={{ borderColor: colors.cardBorder, color: colors.textPrimary }}
+                      >
+                        <Plus className="mr-2 h-4 w-4" />
+                        Add Payment Method
+                      </Button>
+                    </CardContent>
+                  </Card>
+
+                  <Card className="backdrop-blur-sm border-2"
+                    style={{ 
+                      backgroundColor: colors.cardBg,
+                      borderColor: colors.cardBorder
+                    }}>
+                    <CardHeader>
+                      <CardTitle style={{ color: colors.primary }}>
+                        <Settings className="inline mr-2 h-5 w-5" />
+                        Account Settings
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-3">
+                      <Button 
+                        onClick={() => setShowAccountModal(true)}
+                        className="w-full"
+                        variant="outline"
+                        style={{ borderColor: colors.cardBorder, color: colors.textPrimary }}
+                      >
+                        <User className="mr-2 h-4 w-4" />
+                        Manage Account
+                      </Button>
+                      <Button 
+                        className="w-full"
+                        variant="outline"
+                        style={{ borderColor: colors.cardBorder, color: colors.textPrimary }}
+                      >
+                        <Bell className="mr-2 h-4 w-4" />
+                        Notification Settings
+                      </Button>
+                      <Button 
+                        className="w-full"
+                        variant="outline"
+                        style={{ borderColor: colors.cardBorder, color: colors.textPrimary }}
+                      >
+                        <Shield className="mr-2 h-4 w-4" />
+                        Privacy & Security
+                      </Button>
+                    </CardContent>
+                  </Card>
+                </div>
+                
+                {/* AI Chat Suggestions for Elite, Master, and VIP members */}
+                {(userStats.subscription.plan === 'Elite' || userStats.subscription.plan === 'Master' || userStats.subscription.plan === 'Ultimate') && (
+                  <div className="lg:col-span-3 mt-6">
+                    <AIChatSuggestion 
+                      membershipTier={
+                        userStats.subscription.plan === 'Ultimate' ? 'VIP' : 
+                        userStats.subscription.plan === 'Elite' ? 'ELITE' : 'MASTER'
+                      }
+                    />
+                  </div>
+                )}
+              </div>
+            </TabsContent>
+
+            {/* Payout Modal */}
+            {showPayoutModal && (
+              <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+                <Card className="w-full max-w-md backdrop-blur-sm bg-white/10 border-white/20">
+                  <CardHeader>
+                    <CardTitle style={{ color: colors.primary }}>
+                      Request Payout
+                    </CardTitle>
+                    <CardDescription className="text-white/80">
+                      Request a payout to your preferred payment method
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div>
+                      <Label className="text-sm font-medium" style={{ color: colors.primary }}>
+                        Payout Amount
+                      </Label>
+                      <Input
+                        type="number"
+                        value={payoutAmount}
+                        onChange={(e) => setPayoutAmount(e.target.value)}
+                        placeholder="Enter amount"
+                        className="mt-1"
+                        style={{ 
+                          backgroundColor: isNSFW ? 'rgba(255, 255, 255, 0.1)' : 'white',
+                          borderColor: colors.cardBorder,
+                          color: colors.textPrimary
+                        }}
+                      />
+                    </div>
+
+                    <div>
+                      <Label className="text-sm font-medium" style={{ color: colors.primary }}>
+                        Payment Method
+                      </Label>
+                      <Select value={payoutMethod} onValueChange={setPayoutMethod}>
+                        <SelectTrigger className="mt-1" style={{ 
+                          backgroundColor: isNSFW ? 'rgba(255, 255, 255, 0.1)' : 'white',
+                          borderColor: colors.cardBorder,
+                          color: colors.textPrimary
+                        }}>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {payoutMethods.map((method) => (
+                            <SelectItem key={method.id} value={method.id}>
+                              <div className="flex items-center gap-2">
+                                <method.icon className="h-4 w-4" style={{ color: method.color }} />
+                                {method.name}
+                              </div>
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div className="text-xs text-white/60">
+                      <p>• Processing time: 7 business days</p>
+                      <p>• Admin approval required</p>
+                      <p>• Available balance: ${userStats.pendingEarnings.toLocaleString()}</p>
+                    </div>
+
+                    <div className="flex gap-2 pt-4">
+                      <Button 
+                        variant="outline" 
+                        className="flex-1"
+                        onClick={() => setShowPayoutModal(false)}
+                      >
+                        Cancel
+                      </Button>
+                      <Button 
+                        className="flex-1"
+                        onClick={handleRequestPayout}
+                        disabled={parseFloat(payoutAmount) < userStats.minimumPayoutThreshold}
+                        style={{ backgroundColor: '#FFD700', color: '#000' }}
+                      >
+                        Submit Payout
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            )}
+
+            {/* AI Tools Tab */}
+            <TabsContent value="ai-tools" className="mt-6">
+              <div className="grid lg:grid-cols-3 gap-8">
+                {/* AI Generation Tools */}
+                <div className="lg:col-span-2">
+                  <Card className="backdrop-blur-sm border-2"
+                    style={{ 
+                      backgroundColor: colors.cardBg,
+                      borderColor: colors.cardBorder
+                    }}>
+                    <CardHeader>
+                      <CardTitle style={{ color: colors.primary }}>
+                        <Wand2 className="inline mr-2 h-5 w-5" />
+                        AI Generation Tools
+                      </CardTitle>
+                      <CardDescription className="text-white/80">
+                        Create AI-powered content, images, and videos
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <Tabs value={selectedAITab} onValueChange={setSelectedAITab} className="w-full">
+                        <TabsList className="grid w-full grid-cols-3">
+                          <TabsTrigger value="images">Images</TabsTrigger>
+                          <TabsTrigger value="videos">Videos</TabsTrigger>
+                          <TabsTrigger value="models">Models</TabsTrigger>
+                        </TabsList>
+                        
+                        <TabsContent value="images" className="mt-6">
+                          <div className="space-y-6">
+                            <div className="grid md:grid-cols-2 gap-4">
+                              <Button 
+                                onClick={() => setShowContentGeneratorModal(true)}
+                                className="h-20 flex-col"
+                                style={{ backgroundColor: colors.primary }}
+                              >
+                                <ImageIcon className="h-6 w-6 mb-2" />
+                                Generate from Prompt
+                              </Button>
+                              <Button 
+                                onClick={() => setShowContentGeneratorModal(true)}
+                                variant="outline"
+                                className="h-20 flex-col"
+                                style={{ borderColor: colors.cardBorder, color: colors.textPrimary }}
+                              >
+                                <Database className="h-6 w-6 mb-2" />
+                                Train from References
+                              </Button>
+                            </div>
+                            
+                            <div className="text-center">
+                              <h4 className="font-medium mb-2" style={{ color: colors.primary }}>Recent Generations</h4>
+                              <div className="grid grid-cols-4 gap-2">
+                                {[1, 2, 3, 4].map((i) => (
+                                  <div key={i} className="aspect-square rounded-lg bg-gradient-to-br from-purple-500/20 to-pink-500/20 flex items-center justify-center">
+                                    <ImageIcon className="h-8 w-8 text-white/50" />
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          </div>
+                        </TabsContent>
+                        
+                        <TabsContent value="videos" className="mt-6">
+                          <div className="space-y-6">
+                            <div className="grid md:grid-cols-2 gap-4">
+                              <Button 
+                                className="h-20 flex-col"
+                                style={{ backgroundColor: colors.primary }}
+                              >
+                                <Film className="h-6 w-6 mb-2" />
+                                Generate Video
+                              </Button>
+                              <Button 
+                                variant="outline"
+                                className="h-20 flex-col"
+                                style={{ borderColor: colors.cardBorder, color: colors.textPrimary }}
+                              >
+                                <Edit className="h-6 w-6 mb-2" />
+                                Edit Video
+                              </Button>
+                            </div>
+                            
+                            <div className="text-center">
+                              <h4 className="font-medium mb-2" style={{ color: colors.primary }}>Recent Videos</h4>
+                              <div className="grid grid-cols-2 gap-2">
+                                {[1, 2].map((i) => (
+                                  <div key={i} className="aspect-video rounded-lg bg-gradient-to-br from-blue-500/20 to-purple-500/20 flex items-center justify-center">
+                                    <Film className="h-8 w-8 text-white/50" />
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          </div>
+                        </TabsContent>
+                        
+                        <TabsContent value="models" className="mt-6">
+                          <div className="space-y-6">
+                            <div className="grid md:grid-cols-2 gap-4">
+                              <Button 
+                                className="h-20 flex-col"
+                                style={{ backgroundColor: colors.primary }}
+                              >
+                                <Cpu className="h-6 w-6 mb-2" />
+                                Train New Model
+                              </Button>
+                              <Button 
+                                variant="outline"
+                                className="h-20 flex-col"
+                                style={{ borderColor: colors.cardBorder, color: colors.textPrimary }}
+                              >
+                                <Database className="h-6 w-6 mb-2" />
+                                Browse Models
+                              </Button>
+                            </div>
+                            
+                            <div className="text-center">
+                              <h4 className="font-medium mb-2" style={{ color: colors.primary }}>Your Models</h4>
+                              <div className="grid grid-cols-3 gap-2">
+                                {[1, 2, 3].map((i) => (
+                                  <div key={i} className="aspect-square rounded-lg bg-gradient-to-br from-green-500/20 to-blue-500/20 flex items-center justify-center">
+                                    <Cpu className="h-8 w-8 text-white/50" />
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          </div>
+                        </TabsContent>
+                      </Tabs>
+                    </CardContent>
+                  </Card>
+                </div>
+
+                {/* AI Usage Stats */}
+                <div className="space-y-6">
+                  <Card className="backdrop-blur-sm border-2"
+                    style={{ 
+                      backgroundColor: colors.cardBg,
+                      borderColor: colors.cardBorder
+                    }}>
+                    <CardHeader>
+                      <CardTitle style={{ color: colors.primary }}>
+                        <BarChart3 className="inline mr-2 h-5 w-5" />
+                        Usage Statistics
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div className="space-y-3">
+                        <div>
+                          <div className="flex justify-between items-center mb-1">
+                            <span className="text-sm" style={{ color: colors.textLight }}>Images Generated</span>
+                            <span className="text-sm font-medium" style={{ color: colors.primary }}>847/1000</span>
+                          </div>
+                          <Progress value={84.7} className="h-2" />
+                        </div>
+                        
+                        <div>
+                          <div className="flex justify-between items-center mb-1">
+                            <span className="text-sm" style={{ color: colors.textLight }}>Video Minutes</span>
+                            <span className="text-sm font-medium" style={{ color: colors.primary }}>23/60</span>
+                          </div>
+                          <Progress value={38.3} className="h-2" />
+                        </div>
+                        
+                        <div>
+                          <div className="flex justify-between items-center mb-1">
+                            <span className="text-sm" style={{ color: colors.textLight }}>Model Training</span>
+                            <span className="text-sm font-medium" style={{ color: colors.primary }}>2/5</span>
+                          </div>
+                          <Progress value={40} className="h-2" />
+                        </div>
+                      </div>
+                      
+                      <div className="pt-4 border-t border-white/20">
+                        <p className="text-xs" style={{ color: colors.textLight }}>
+                          Resets on: 2024-03-01
+                        </p>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  <Card className="backdrop-blur-sm border-2"
+                    style={{ 
+                      backgroundColor: colors.cardBg,
+                      borderColor: colors.cardBorder
+                    }}>
+                    <CardHeader>
+                      <CardTitle style={{ color: colors.primary }}>
+                        <Sparkles className="inline mr-2 h-5 w-5" />
+                        Quick Actions
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-3">
+                      <Button 
+                        onClick={() => setShowAIModal(true)}
+                        className="w-full"
+                        style={{ backgroundColor: colors.primary }}
+                      >
+                        <Wand2 className="mr-2 h-4 w-4" />
+                        Open AI Studio
+                      </Button>
+                      <Button 
+                        className="w-full"
+                        variant="outline"
+                        style={{ borderColor: colors.cardBorder, color: colors.textPrimary }}
+                      >
+                        <Download className="mr-2 h-4 w-4" />
+                        Download All
+                      </Button>
+                      <Button 
+                        className="w-full"
+                        variant="outline"
+                        style={{ borderColor: colors.cardBorder, color: colors.textPrimary }}
+                      >
+                        <Trash2 className="mr-2 h-4 w-4" />
+                        Clear History
+                      </Button>
+                    </CardContent>
+                  </Card>
+                </div>
+              </div>
+            </TabsContent>
+
+            {/* Marketplace Tab */}
+            <TabsContent value="marketplace" className="mt-6">
+              <div className="grid lg:grid-cols-3 gap-8">
+                {/* My Listings */}
+                <div className="lg:col-span-2">
+                  <Card className="backdrop-blur-sm border-2"
+                    style={{ 
+                      backgroundColor: colors.cardBg,
+                      borderColor: colors.cardBorder
+                    }}>
+                    <CardHeader>
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <CardTitle style={{ color: colors.primary }}>
+                            <Store className="inline mr-2 h-5 w-5" />
+                            My Marketplace Listings
+                          </CardTitle>
+                          <CardDescription className="text-white/80">
+                            Manage your products and services
+                          </CardDescription>
+                        </div>
+                        <Button 
+                          onClick={() => setShowMarketplaceModal(true)}
+                          style={{ backgroundColor: colors.primary }}
+                        >
+                          <Plus className="mr-2 h-4 w-4" />
+                          Create Listing
+                        </Button>
+                      </div>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-4">
+                        {[
+                          {
+                            title: "Premium AI Art Pack",
+                            type: "Digital Product",
+                            price: 29.99,
+                            sales: 47,
+                            status: "active",
+                            views: 1234,
+                            created: "2 weeks ago"
+                          },
+                          {
+                            title: "Custom Model Training",
+                            type: "Service",
+                            price: 199.99,
+                            sales: 12,
+                            status: "active",
+                            views: 856,
+                            created: "1 month ago"
+                          },
+                          {
+                            title: "Video Editing Templates",
+                            type: "Template",
+                            price: 14.99,
+                            sales: 89,
+                            status: "active",
+                            views: 2341,
+                            created: "3 weeks ago"
+                          }
+                        ].map((listing, index) => (
+                          <div key={index} className="flex items-center justify-between p-4 rounded-lg border" style={{ borderColor: colors.cardBorder }}>
+                            <div className="flex items-center gap-4">
+                              <div className="w-16 h-16 rounded-lg bg-gradient-to-br from-purple-500/20 to-pink-500/20 flex items-center justify-center">
+                                <Package className="h-6 w-6 text-white/50" />
+                              </div>
+                              <div>
+                                <h4 className="font-medium" style={{ color: colors.primary }}>{listing.title}</h4>
+                                <div className="flex items-center gap-4 text-sm">
+                                  <span style={{ color: colors.textLight }}>{listing.type}</span>
+                                  <span style={{ color: colors.textLight }}>{listing.sales} sales</span>
+                                  <span style={{ color: colors.textLight }}>{listing.views} views</span>
+                                </div>
+                                <p className="text-xs" style={{ color: colors.textLight }}>
+                                  Created {listing.created} • {listing.status}
+                                </p>
+                              </div>
+                            </div>
+                            <div className="text-right">
+                              <p className="font-bold text-lg" style={{ color: colors.accent }}>${listing.price}</p>
+                              <div className="flex items-center gap-2 mt-2">
+                                <Button size="sm" variant="outline" style={{ borderColor: colors.cardBorder, color: colors.textPrimary }}>
+                                  <Edit className="h-4 w-4" />
+                                </Button>
+                                <Button size="sm" variant="outline" style={{ borderColor: colors.cardBorder, color: colors.textPrimary }}>
+                                  <Eye className="h-4 w-4" />
+                                </Button>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+
+                {/* Marketplace Stats */}
+                <div className="space-y-6">
+                  <Card className="backdrop-blur-sm border-2"
+                    style={{ 
+                      backgroundColor: colors.cardBg,
+                      borderColor: colors.cardBorder
+                    }}>
+                    <CardHeader>
+                      <CardTitle style={{ color: colors.primary }}>
+                        <TrendingUp className="inline mr-2 h-5 w-5" />
+                        Sales Overview
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div className="text-center">
+                        <div className="text-2xl font-bold" style={{ color: colors.primary }}>$1,247</div>
+                        <div className="text-sm" style={{ color: colors.textLight }}>Total Revenue</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-2xl font-bold" style={{ color: colors.secondary }}>148</div>
+                        <div className="text-sm" style={{ color: colors.textLight }}>Total Sales</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-2xl font-bold" style={{ color: colors.accent }}>4.8</div>
+                        <div className="text-sm" style={{ color: colors.textLight }}>Avg. Rating</div>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  <Card className="backdrop-blur-sm border-2"
+                    style={{ 
+                      backgroundColor: colors.cardBg,
+                      borderColor: colors.cardBorder
+                    }}>
+                    <CardHeader>
+                      <CardTitle style={{ color: colors.primary }}>
+                        <Tag className="inline mr-2 h-5 w-5" />
+                        Categories
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-3">
+                      <div className="space-y-2">
+                        {[
+                          { name: "Digital Art", count: 12, color: colors.primary },
+                          { name: "Services", count: 5, color: colors.secondary },
+                          { name: "Templates", count: 8, color: colors.accent },
+                          { name: "Models", count: 3, color: '#FFD700' }
+                        ].map((category, index) => (
+                          <div key={index} className="flex items-center justify-between">
+                            <span className="text-sm" style={{ color: colors.textPrimary }}>{category.name}</span>
+                            <Badge className="text-xs" style={{ backgroundColor: category.color, color: 'white' }}>
+                              {category.count} items
+                            </Badge>
+                          </div>
+                        ))}
+                      </div>
+                      
+                      <Button 
+                        className="w-full mt-4"
+                        variant="outline"
+                        style={{ borderColor: colors.cardBorder, color: colors.textPrimary }}
+                      >
+                        <Plus className="mr-2 h-4 w-4" />
+                        Add New Category
+                      </Button>
+                    </CardContent>
+                  </Card>
+                </div>
+              </div>
+            </TabsContent>
+
+            {/* Social Media Tab */}
+            <TabsContent value="social" className="mt-6">
+              <div className="grid lg:grid-cols-3 gap-8">
+                {/* Connected Accounts */}
+                <div className="lg:col-span-2">
+                  <Card className="backdrop-blur-sm border-2"
+                    style={{ 
+                      backgroundColor: colors.cardBg,
+                      borderColor: colors.cardBorder
+                    }}>
+                    <CardHeader>
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <CardTitle style={{ color: colors.primary }}>
+                            <MessageSquare className="inline mr-2 h-5 w-5" />
+                            Connected Social Accounts
+                          </CardTitle>
+                          <CardDescription className="text-white/80">
+                            Manage your social media connections
+                          </CardDescription>
+                        </div>
+                        <Button style={{ backgroundColor: colors.primary }}>
+                          <Plus className="mr-2 h-4 w-4" />
+                          Connect Account
+                        </Button>
+                      </div>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="grid md:grid-cols-2 gap-4">
+                        {[
+                          { name: 'Instagram', icon: '📷', followers: '45.2K', connected: true, posts: 234 },
+                          { name: 'Twitter', icon: '🐦', followers: '12.8K', connected: true, posts: 567 },
+                          { name: 'TikTok', icon: '🎵', followers: '128.9K', connected: true, posts: 89 },
+                          { name: 'OnlyFans', icon: '🔥', followers: '8.9K', connected: true, posts: 145 },
+                          { name: 'Fansly', icon: '💎', followers: '5.4K', connected: false, posts: 0 },
+                          { name: 'Patreon', icon: '🎨', followers: '2.1K', connected: false, posts: 0 }
+                        ].map((account, index) => (
+                          <div key={account.name} className="p-4 rounded-lg border" style={{ borderColor: colors.cardBorder }}>
+                            <div className="flex items-center justify-between mb-3">
+                              <div className="flex items-center gap-3">
+                                <span className="text-2xl">{account.icon}</span>
+                                <div>
+                                  <h4 className="font-medium" style={{ color: colors.primary }}>{account.name}</h4>
+                                  <p className="text-sm" style={{ color: colors.textLight }}>{account.followers} followers</p>
+                                </div>
+                              </div>
+                              <div className={`w-2 h-2 rounded-full ${account.connected ? 'bg-green-400' : 'bg-red-400'}`}></div>
+                            </div>
+                            <div className="flex items-center justify-between text-sm">
+                              <span style={{ color: colors.textLight }}>{account.posts} posts</span>
+                              <Button 
+                                size="sm" 
+                                variant="outline"
+                                style={{ 
+                                  backgroundColor: account.connected ? 'transparent' : colors.primary,
+                                  border: account.connected ? `1px solid ${colors.cardBorder}` : 'none',
+                                  color: account.connected ? colors.textPrimary : 'white'
+                                }}
+                              >
+                                {account.connected ? 'Manage' : 'Connect'}
+                              </Button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+
+                {/* Post Scheduler */}
+                <div className="space-y-6">
+                  <Card className="backdrop-blur-sm border-2"
+                    style={{ 
+                      backgroundColor: colors.cardBg,
+                      borderColor: colors.cardBorder
+                    }}>
+                    <CardHeader>
+                      <CardTitle style={{ color: colors.primary }}>
+                        <CalendarClock className="inline mr-2 h-5 w-5" />
+                        Post Scheduler
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <Button 
+                        onClick={() => setShowSocialSchedulerModal(true)}
+                        className="w-full"
+                        style={{ backgroundColor: colors.primary }}
+                      >
+                        <Calendar className="mr-2 h-4 w-4" />
+                        Schedule New Post
+                      </Button>
+                      
+                      <div className="space-y-3">
+                        <h4 className="font-medium" style={{ color: colors.primary }}>Upcoming Posts</h4>
+                        {[
+                          { platform: 'Instagram', time: '2 hours from now', content: 'New photoshoot 📸' },
+                          { platform: 'Twitter', time: '5 hours from now', content: 'Behind the scenes footage' },
+                          { platform: 'TikTok', time: 'Tomorrow, 9 AM', content: 'Dance tutorial 🎵' }
+                        ].map((post, index) => (
+                          <div key={index} className="p-3 rounded-lg bg-white/5">
+                            <div className="flex items-center justify-between mb-1">
+                              <span className="text-sm font-medium" style={{ color: colors.primary }}>{post.platform}</span>
+                              <span className="text-xs" style={{ color: colors.textLight }}>{post.time}</span>
+                            </div>
+                            <p className="text-xs" style={{ color: colors.textSecondary }}>{post.content}</p>
+                          </div>
+                        ))}
+                      </div>
+                      
+                      <Button 
+                        className="w-full"
+                        variant="outline"
+                        style={{ borderColor: colors.cardBorder, color: colors.textPrimary }}
+                      >
+                        <Clock3 className="mr-2 h-4 w-4" />
+                        View All Scheduled
+                      </Button>
+                    </CardContent>
+                  </Card>
+
+                  <Card className="backdrop-blur-sm border-2"
+                    style={{ 
+                      backgroundColor: colors.cardBg,
+                      borderColor: colors.cardBorder
+                    }}>
+                    <CardHeader>
+                      <CardTitle style={{ color: colors.primary }}>
+                        <BarChart3 className="inline mr-2 h-5 w-5" />
+                        Social Analytics
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div className="text-center">
+                        <div className="text-2xl font-bold" style={{ color: colors.primary }}>189.5K</div>
+                        <div className="text-sm" style={{ color: colors.textLight }}>Total Reach</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-2xl font-bold" style={{ color: colors.secondary }}>4.2%</div>
+                        <div className="text-sm" style={{ color: colors.textLight }}>Engagement Rate</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-2xl font-bold" style={{ color: colors.accent }}>+23%</div>
+                        <div className="text-sm" style={{ color: colors.textLight }}>Growth</div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+              </div>
+            </TabsContent>
+          </Tabs>
+        </div>
+      </div>
+
+    </div>
+  )
+}

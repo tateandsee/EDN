@@ -305,7 +305,7 @@ model MarketplaceItem {
   tags        String?          // JSON string of tags
   isNsfw      Boolean          @default(false) // NSFW content flag
   
-  // New categorization fields
+  // Enhanced content categorization fields
   race        ModelRace?       // Race category
   hairColor   ModelHairColor?  // Hair color category
   attire      ModelAttire?     // Attire/clothing category
@@ -313,6 +313,17 @@ model MarketplaceItem {
   product     ModelProduct?    // Product type category
   style       ModelStyle?      // Style category
   bodyType    ModelBodyType?   // Body type category
+  
+  // New content moderation fields
+  contentLevel      ContentLevel?     // Content sensitivity level
+  nudityLevel       NudityLevel?      // Nudity classification level
+  adultContent      Boolean           @default(false) // Explicit adult content flag
+  suggestiveContent Boolean           @default(false) // Suggestive content flag
+  artisticNudity    Boolean           @default(false) // Artistic nudity flag
+  moderationStatus  ModerationStatus  @default(APPROVED) // Content moderation status
+  moderationNotes   String?           // Moderator notes
+  moderatedAt       DateTime?         // When content was last moderated
+  moderatedBy       String?           // Moderator who approved/rejected
   
   promptConfig Json?           // AI model prompt configuration
   positivePrompt String?        // Enhanced positive prompt
@@ -1207,6 +1218,31 @@ enum LogLevel {
   WARN
   ERROR
   FATAL
+}
+
+// Content Moderation Enums
+enum ContentLevel {
+  SAFE
+  SUGGESTIVE
+  SEMI_NUDE
+  NUDE
+  EXPLICIT
+}
+
+enum NudityLevel {
+  NONE
+  IMPLIED
+  PARTIAL
+  FULL
+  SEXUAL
+}
+
+enum ModerationStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  FLAGGED
+  UNDER_REVIEW
 }
 
 // Membership Usage Tracking Model

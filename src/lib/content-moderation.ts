@@ -1,28 +1,42 @@
 /**
  * Enhanced Content Moderation System
- * Handles NSFW content detection with edge case support
+ * Handles NSFW content detection with support for semi-nude and nude content
  */
 
 export interface ModerationResult {
   isNSFW: boolean
   confidence: number
+  contentLevel: 'SAFE' | 'SUGGESTIVE' | 'SEMI_NUDE' | 'NUDE' | 'EXPLICIT'
+  nudityLevel: 'NONE' | 'IMPLIED' | 'PARTIAL' | 'FULL' | 'SEXUAL'
   categories: {
     explicit: number
     suggestive: number
+    semiNude: number
+    nude: number
     violent: number
     hate: number
     other: number
   }
   edgeCases: string[]
   recommendations: string[]
+  artisticNudity: boolean
+  adultContent: boolean
+  suggestiveContent: boolean
+  moderationStatus: 'APPROVED' | 'PENDING' | 'FLAGGED' | 'REJECTED'
 }
 
 export interface ModerationConfig {
   strictness: 'low' | 'medium' | 'high' | 'strict'
   enableEdgeCaseDetection: boolean
+  allowSemiNude: boolean
+  allowNude: boolean
+  allowArtisticNudity: boolean
+  allowAdultContent: boolean
   customThresholds?: {
     explicit: number
     suggestive: number
+    semiNude: number
+    nude: number
     violent: number
     hate: number
   }
@@ -36,7 +50,7 @@ class ContentModerationService {
   }
 
   /**
-   * Moderate text content for NSFW detection
+   * Moderate text content for NSFW detection with new content guidelines
    */
   async moderateText(text: string): Promise<ModerationResult> {
     // Simulate AI content analysis
@@ -45,14 +59,20 @@ class ContentModerationService {
     return {
       isNSFW: this.determineNSFWStatus(analysis),
       confidence: analysis.confidence,
+      contentLevel: this.determineContentLevel(analysis),
+      nudityLevel: this.determineNudityLevel(analysis),
       categories: analysis.categories,
       edgeCases: analysis.edgeCases,
-      recommendations: this.generateRecommendations(analysis)
+      recommendations: this.generateRecommendations(analysis),
+      artisticNudity: analysis.artisticNudity,
+      adultContent: analysis.adultContent,
+      suggestiveContent: analysis.suggestiveContent,
+      moderationStatus: this.determineModerationStatus(analysis)
     }
   }
 
   /**
-   * Moderate image content for NSFW detection
+   * Moderate image content for NSFW detection with new content guidelines
    */
   async moderateImage(imageUrl: string): Promise<ModerationResult> {
     // Simulate image content analysis
@@ -61,14 +81,20 @@ class ContentModerationService {
     return {
       isNSFW: this.determineNSFWStatus(analysis),
       confidence: analysis.confidence,
+      contentLevel: this.determineContentLevel(analysis),
+      nudityLevel: this.determineNudityLevel(analysis),
       categories: analysis.categories,
       edgeCases: analysis.edgeCases,
-      recommendations: this.generateRecommendations(analysis)
+      recommendations: this.generateRecommendations(analysis),
+      artisticNudity: analysis.artisticNudity,
+      adultContent: analysis.adultContent,
+      suggestiveContent: analysis.suggestiveContent,
+      moderationStatus: this.determineModerationStatus(analysis)
     }
   }
 
   /**
-   * Moderate video content for NSFW detection
+   * Moderate video content for NSFW detection with new content guidelines
    */
   async moderateVideo(videoUrl: string): Promise<ModerationResult> {
     // Simulate video content analysis (frame by frame)
@@ -77,9 +103,15 @@ class ContentModerationService {
     return {
       isNSFW: this.determineNSFWStatus(analysis),
       confidence: analysis.confidence,
+      contentLevel: this.determineContentLevel(analysis),
+      nudityLevel: this.determineNudityLevel(analysis),
       categories: analysis.categories,
       edgeCases: analysis.edgeCases,
-      recommendations: this.generateRecommendations(analysis)
+      recommendations: this.generateRecommendations(analysis),
+      artisticNudity: analysis.artisticNudity,
+      adultContent: analysis.adultContent,
+      suggestiveContent: analysis.suggestiveContent,
+      moderationStatus: this.determineModerationStatus(analysis)
     }
   }
 
@@ -112,16 +144,26 @@ class ContentModerationService {
   }
 
   /**
-   * Analyze text content for NSFW elements
+   * Analyze text content for NSFW elements with new content guidelines
    */
   private async analyzeTextContent(text: string): Promise<any> {
     const lowerText = text.toLowerCase()
     
     // Enhanced keyword detection with context awareness
     const explicitKeywords = [
-      'explicit', 'nude', 'naked', 'sex', 'porn', 'xxx', 'adult', 'mature',
-      'erotic', 'sensual', 'intimate', 'provocative', 'seductive', 'hardcore',
+      'explicit', 'hardcore', 'porn', 'xxx', 'adult', 'mature',
+      'erotic', 'intimate', 'provocative', 'hardcore',
       'fetish', 'bdsm', 'kink', 'taboo', 'x-rated'
+    ]
+    
+    const nudeKeywords = [
+      'nude', 'naked', 'fully nude', 'completely naked', 'bare',
+      'unclothed', 'undressed', 'stripped', 'exposed'
+    ]
+    
+    const semiNudeKeywords = [
+      'semi-nude', 'topless', 'bottomless', 'partially nude',
+      'see-through', 'sheer', 'revealing', 'implied nudity'
     ]
     
     const suggestiveKeywords = [
@@ -130,29 +172,67 @@ class ContentModerationService {
       'curvy', 'voluptuous', 'seductive', 'teasing', 'flirtatious'
     ]
     
+    // Artistic nudity keywords
+    const artisticKeywords = [
+      'artistic', 'fine art', 'sculpture', 'painting', 'classical',
+      'renaissance', 'museum', 'gallery', 'art', 'aesthetic'
+    ]
+    
     // Enhanced edge case keywords that need context analysis
     const edgeCaseKeywords = [
-      'artistic', 'medical', 'educational', 'fitness', 'yoga', 'dance',
+      'medical', 'educational', 'fitness', 'yoga', 'dance',
       'modeling', 'fashion', 'beauty', 'health', 'wellness', 'therapy',
       'anatomy', 'clinical', 'research', 'academic', 'cultural', 'ceremony'
     ]
 
     let explicitScore = 0
+    let nudeScore = 0
+    let semiNudeScore = 0
     let suggestiveScore = 0
     let edgeCases: string[] = []
+    let artisticNudity = false
+    let adultContent = false
+    let suggestiveContent = false
 
     // Calculate scores based on keyword presence with enhanced context
     explicitKeywords.forEach(keyword => {
       if (lowerText.includes(keyword)) {
         explicitScore += 0.25
+        adultContent = true
+      }
+    })
+
+    nudeKeywords.forEach(keyword => {
+      if (lowerText.includes(keyword)) {
+        nudeScore += 0.3
+        adultContent = true
+      }
+    })
+
+    semiNudeKeywords.forEach(keyword => {
+      if (lowerText.includes(keyword)) {
+        semiNudeScore += 0.25
+        suggestiveContent = true
       }
     })
 
     suggestiveKeywords.forEach(keyword => {
       if (lowerText.includes(keyword)) {
         suggestiveScore += 0.15
+        suggestiveContent = true
       }
     })
+
+    // Check for artistic context
+    const artisticContext = artisticKeywords.some(keyword => lowerText.includes(keyword))
+    if (artisticContext && (nudeScore > 0 || semiNudeScore > 0)) {
+      artisticNudity = true
+      edgeCases.push('Artistic context detected')
+      // Reduce scores for artistic content
+      nudeScore *= 0.5
+      semiNudeScore *= 0.6
+      explicitScore *= 0.3
+    }
 
     // Enhanced edge case detection with context analysis
     edgeCaseKeywords.forEach(keyword => {
@@ -160,6 +240,8 @@ class ContentModerationService {
         edgeCases.push(`Contextual keyword detected: ${keyword}`)
         // Apply context-aware score reduction
         explicitScore *= this.getContextReductionFactor(keyword)
+        nudeScore *= this.getContextReductionFactor(keyword)
+        semiNudeScore *= this.getContextReductionFactor(keyword)
         suggestiveScore *= this.getContextReductionFactor(keyword)
       }
     })
@@ -178,6 +260,8 @@ class ContentModerationService {
       if (lowerText.includes(phrase.pattern)) {
         edgeCases.push(`${phrase.context} detected: ${phrase.pattern}`)
         explicitScore *= phrase.reduction
+        nudeScore *= phrase.reduction
+        semiNudeScore *= phrase.reduction
         suggestiveScore *= phrase.reduction
       }
     })
@@ -195,37 +279,30 @@ class ContentModerationService {
       if (lowerText.includes(modifier.pattern)) {
         edgeCases.push(`Contextual modifier: ${modifier.pattern}`)
         explicitScore *= modifier.reduction
+        nudeScore *= modifier.reduction
+        semiNudeScore *= modifier.reduction
         suggestiveScore *= modifier.reduction
-      }
-    })
-
-    // Detect negation patterns
-    const negationPatterns = [
-      { pattern: 'no nudity', reduction: 0.1 },
-      { pattern: 'not explicit', reduction: 0.15 },
-      { pattern: 'safe for work', reduction: 0.1 },
-      { pattern: 'sfw only', reduction: 0.1 }
-    ]
-
-    negationPatterns.forEach(pattern => {
-      if (lowerText.includes(pattern.pattern)) {
-        edgeCases.push(`Negation pattern: ${pattern.pattern}`)
-        explicitScore *= pattern.reduction
-        suggestiveScore *= pattern.reduction
       }
     })
 
     // Normalize scores with enhanced bounds checking
     explicitScore = Math.min(explicitScore, 1.0)
+    nudeScore = Math.min(nudeScore, 1.0)
+    semiNudeScore = Math.min(semiNudeScore, 1.0)
     suggestiveScore = Math.min(suggestiveScore, 1.0)
 
-    const confidence = Math.max(explicitScore, suggestiveScore)
+    const confidence = Math.max(explicitScore, nudeScore, semiNudeScore, suggestiveScore)
 
     return {
       confidence,
+      artisticNudity,
+      adultContent,
+      suggestiveContent,
       categories: {
         explicit: explicitScore,
         suggestive: suggestiveScore,
+        semiNude: semiNudeScore,
+        nude: nudeScore,
         violent: 0,
         hate: 0,
         other: 0
@@ -411,40 +488,160 @@ class ContentModerationService {
   }
 
   /**
-   * Determine NSFW status based on analysis and config
+   * Determine content level based on analysis
+   */
+  private determineContentLevel(analysis: any): 'SAFE' | 'SUGGESTIVE' | 'SEMI_NUDE' | 'NUDE' | 'EXPLICIT' {
+    const { explicit, suggestive, semiNude, nude } = analysis.categories
+    
+    if (explicit > 0.7) return 'EXPLICIT'
+    if (explicit > 0.4 || nude > 0.6) return 'NUDE'
+    if (semiNude > 0.5 || nude > 0.3) return 'SEMI_NUDE'
+    if (suggestive > 0.4 || semiNude > 0.2) return 'SUGGESTIVE'
+    return 'SAFE'
+  }
+
+  /**
+   * Determine nudity level based on analysis
+   */
+  private determineNudityLevel(analysis: any): 'NONE' | 'IMPLIED' | 'PARTIAL' | 'FULL' | 'SEXUAL' {
+    const { explicit, suggestive, semiNude, nude } = analysis.categories
+    
+    if (explicit > 0.7) return 'SEXUAL'
+    if (explicit > 0.4 || nude > 0.6) return 'FULL'
+    if (semiNude > 0.5 || nude > 0.3) return 'PARTIAL'
+    if (suggestive > 0.4 || semiNude > 0.2) return 'IMPLIED'
+    return 'NONE'
+  }
+
+  /**
+   * Determine moderation status based on analysis and config
+   */
+  private determineModerationStatus(analysis: any): 'APPROVED' | 'PENDING' | 'FLAGGED' | 'REJECTED' {
+    const contentLevel = this.determineContentLevel(analysis)
+    const { explicit } = analysis.categories
+    
+    // Check if content is allowed based on configuration
+    if (contentLevel === 'EXPLICIT' && !this.config.allowAdultContent) {
+      return 'REJECTED'
+    }
+    
+    if (contentLevel === 'NUDE' && !this.config.allowNude && !analysis.artisticNudity) {
+      return 'REJECTED'
+    }
+    
+    if (contentLevel === 'SEMI_NUDE' && !this.config.allowSemiNude) {
+      return 'REJECTED'
+    }
+    
+    // Flag for review if high explicit content even if allowed
+    if (explicit > 0.8) {
+      return 'FLAGGED'
+    }
+    
+    // Flag for review if edge cases detected
+    if (analysis.edgeCases.length > 2) {
+      return 'PENDING'
+    }
+    
+    return 'APPROVED'
+  }
+
+  /**
+   * Determine NSFW status based on analysis and config with new guidelines
    */
   private determineNSFWStatus(analysis: any): boolean {
+    const contentLevel = this.determineContentLevel(analysis)
     const thresholds = this.config.customThresholds || {
       explicit: this.config.strictness === 'strict' ? 0.3 : 
                 this.config.strictness === 'high' ? 0.5 : 
                 this.config.strictness === 'medium' ? 0.7 : 0.8,
       suggestive: this.config.strictness === 'strict' ? 0.5 : 
                    this.config.strictness === 'high' ? 0.6 : 
-                   this.config.strictness === 'medium' ? 0.7 : 0.8
+                   this.config.strictness === 'medium' ? 0.7 : 0.8,
+      semiNude: this.config.strictness === 'strict' ? 0.4 : 
+                this.config.strictness === 'high' ? 0.6 : 
+                this.config.strictness === 'medium' ? 0.8 : 0.9,
+      nude: this.config.strictness === 'strict' ? 0.3 : 
+            this.config.strictness === 'high' ? 0.5 : 
+            this.config.strictness === 'medium' ? 0.7 : 0.8,
+      violent: 0.8,
+      hate: 0.8
+    }
+
+    // Apply new content guidelines
+    if (this.config.allowArtisticNudity && analysis.artisticNudity) {
+      return analysis.categories.explicit > thresholds.explicit * 1.5
+    }
+
+    if (this.config.allowSemiNude && contentLevel === 'SEMI_NUDE') {
+      return analysis.categories.explicit > thresholds.explicit * 1.3
+    }
+
+    if (this.config.allowNude && contentLevel === 'NUDE') {
+      return analysis.categories.explicit > thresholds.explicit * 1.2
+    }
+
+    if (this.config.allowAdultContent && contentLevel === 'EXPLICIT') {
+      return analysis.categories.explicit > thresholds.explicit * 1.1
     }
 
     // If edge cases are detected and enabled, be more lenient
     if (this.config.enableEdgeCaseDetection && analysis.edgeCases.length > 0) {
       return analysis.categories.explicit > thresholds.explicit * 1.2 || 
-             analysis.categories.suggestive > thresholds.suggestive * 1.2
+             analysis.categories.suggestive > thresholds.suggestive * 1.2 ||
+             analysis.categories.semiNude > thresholds.semiNude * 1.2 ||
+             analysis.categories.nude > thresholds.nude * 1.2
     }
 
     return analysis.categories.explicit > thresholds.explicit || 
-           analysis.categories.suggestive > thresholds.suggestive
+           analysis.categories.suggestive > thresholds.suggestive ||
+           analysis.categories.semiNude > thresholds.semiNude ||
+           analysis.categories.nude > thresholds.nude
   }
 
   /**
-   * Generate recommendations based on analysis
+   * Generate recommendations based on analysis with new content guidelines
    */
   private generateRecommendations(analysis: any): string[] {
     const recommendations: string[] = []
+    const contentLevel = this.determineContentLevel(analysis)
 
-    if (analysis.categories.explicit > 0.7) {
-      recommendations.push('Content is highly explicit - consider strict filtering')
+    if (contentLevel === 'EXPLICIT') {
+      if (this.config.allowAdultContent) {
+        recommendations.push('Explicit content allowed - apply age restrictions')
+      } else {
+        recommendations.push('Explicit content not allowed - consider removal')
+      }
     }
 
-    if (analysis.categories.suggestive > 0.6) {
-      recommendations.push('Content is suggestive - apply age restrictions')
+    if (contentLevel === 'NUDE') {
+      if (this.config.allowNude) {
+        recommendations.push('Nude content allowed - ensure proper labeling')
+      } else if (analysis.artisticNudity && this.config.allowArtisticNudity) {
+        recommendations.push('Artistic nude content allowed - ensure cultural sensitivity')
+      } else {
+        recommendations.push('Nude content not allowed - consider removal')
+      }
+    }
+
+    if (contentLevel === 'SEMI_NUDE') {
+      if (this.config.allowSemiNude) {
+        recommendations.push('Semi-nude content allowed - generally acceptable')
+      } else {
+        recommendations.push('Semi-nude content not allowed - consider removal')
+      }
+    }
+
+    if (contentLevel === 'SUGGESTIVE') {
+      recommendations.push('Suggestive content - generally acceptable with proper context')
+    }
+
+    if (analysis.categories.explicit > 0.7) {
+      recommendations.push('High explicit content - requires careful review')
+    }
+
+    if (analysis.artisticNudity) {
+      recommendations.push('Artistic nudity detected - consider cultural and educational value')
     }
 
     if (analysis.edgeCases.includes('Artistic context detected')) {
@@ -465,6 +662,10 @@ class ContentModerationService {
       recommendations.push('Low confidence detection - consider manual review')
     }
 
+    if (analysis.edgeCases.length > 2) {
+      recommendations.push('Multiple contexts detected - enhanced review recommended')
+    }
+
     return recommendations
   }
 
@@ -483,13 +684,19 @@ class ContentModerationService {
   }
 }
 
-// Export singleton instance
+// Export singleton instance with new content guidelines
 export const contentModeration = new ContentModerationService({
   strictness: 'medium',
   enableEdgeCaseDetection: true,
+  allowSemiNude: true,      // Allow semi-nude content
+  allowNude: true,          // Allow nude content
+  allowArtisticNudity: true, // Allow artistic nudity
+  allowAdultContent: false,  // Don't allow explicit adult content by default
   customThresholds: {
     explicit: 0.6,
     suggestive: 0.7,
+    semiNude: 0.8,
+    nude: 0.7,
     violent: 0.8,
     hate: 0.8
   }

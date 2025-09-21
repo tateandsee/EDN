@@ -4,6 +4,7 @@ import { authOptions } from '@/lib/auth'
 import { db } from '@/lib/db'
 import { GamificationProgressService } from '@/lib/gamification-progress'
 import { generateTitleFromPrompt, extractTitleFromMarketplaceItem } from '@/lib/marketplace-title-extractor'
+import { contentModeration } from '@/lib/content-moderation'
 
 // Helper function to check if user is admin or if in development mode
 async function shouldBypassRestrictions(): Promise<boolean> {
@@ -126,6 +127,13 @@ export async function GET(request: NextRequest) {
           positivePrompt: true,
           negativePrompt: true,
           promptConfig: true,
+          // New content moderation fields
+          contentLevel: true,
+          nudityLevel: true,
+          adultContent: true,
+          suggestiveContent: true,
+          artisticNudity: true,
+          moderationStatus: true,
           user: {
             select: {
               id: true,
@@ -270,6 +278,13 @@ export async function POST(request: NextRequest) {
     const tags = formData.get('tags') as string
     const isNsfw = formData.get('isNsfw') === 'true'
     
+    // New content moderation fields
+    const contentLevel = formData.get('contentLevel') as string
+    const nudityLevel = formData.get('nudityLevel') as string
+    const adultContent = formData.get('adultContent') === 'true'
+    const suggestiveContent = formData.get('suggestiveContent') === 'true'
+    const artisticNudity = formData.get('artisticNudity') === 'true'
+    
     // Prompt-related fields
     const positivePrompt = formData.get('positivePrompt') as string
     const negativePrompt = formData.get('negativePrompt') as string
@@ -298,9 +313,13 @@ export async function POST(request: NextRequest) {
     // Parse and validate tags for content restrictions
     const parsedTags = tags ? tags.split(',').map(t => t.trim()) : []
     
+    // Perform content moderation analysis
+    const textToAnalyze = `${title} ${description || ''} ${tags || ''}`
+    const moderationResult = await contentModeration.moderateText(textToAnalyze)
+    
     // Apply content restrictions (bypass for admin/dev mode)
     if (!bypassRestrictions) {
-      const restrictedTags = ['animal', 'child', 'kid', 'baby', 'men', 'male', 'pain', 'death', 'violence', 'blood']
+      const restrictedTags = ['animal', 'child', 'kid', 'baby', 'pain', 'death', 'violence', 'blood']
       const hasRestrictedContent = restrictedTags.some(tag => 
         parsedTags.some(itemTag => 
           itemTag.toLowerCase().includes(tag.toLowerCase())
@@ -309,14 +328,13 @@ export async function POST(request: NextRequest) {
       
       if (hasRestrictedContent) {
         return NextResponse.json(
-          { error: 'Content violates restrictions. No animals, children, men, pain, death, or violent content allowed.' },
+          { error: 'Content violates restrictions. No animals, children, pain, death, or violent content allowed.' },
           { status: 400 }
         )
       }
       
-      // Check age range (18-40) and gender (women only for NSFW)
-      if (isNsfw) {
-        // For NSFW content, enforce stricter restrictions
+      // Check age range (18-40) 
+      if (isNsfw || adultContent || suggestiveContent) {
         const ageTags = parsedTags.filter(tag => 
           tag.includes('years') || tag.includes('age') || tag.includes('old')
         )
@@ -331,30 +349,18 @@ export async function POST(request: NextRequest) {
         
         if (!ageAppropriate) {
           return NextResponse.json(
-            { error: 'NSFW content must feature subjects aged 18-40 only.' },
+            { error: 'Content must feature subjects aged 18-40 only.' },
             { status: 400 }
           )
         }
-        
-        // Check gender restriction (women only for NSFW)
-        const genderTags = parsedTags.filter(tag => 
-          tag.toLowerCase().includes('woman') || 
-          tag.toLowerCase().includes('female') ||
-          tag.toLowerCase().includes('girl') ||
-          tag.toLowerCase().includes('man') ||
-          tag.toLowerCase().includes('male')
+      }
+      
+      // Check if content moderation status allows creation
+      if (moderationResult.moderationStatus === 'REJECTED') {
+        return NextResponse.json(
+          { error: 'Content rejected by moderation system', details: moderationResult.recommendations },
+          { status: 400 }
         )
-        
-        const genderAppropriate = genderTags.every(tag => 
-          !tag.toLowerCase().includes('man') && !tag.toLowerCase().includes('male')
-        )
-        
-        if (!genderAppropriate) {
-          return NextResponse.json(
-            { error: 'NSFW content must feature women only.' },
-            { status: 400 }
-          )
-        }
       }
     }
 
@@ -426,6 +432,15 @@ export async function POST(request: NextRequest) {
         pdfFileSize: pdfFileSize || undefined,
         tags: tags ? JSON.stringify(tags.split(',').map(t => t.trim())) : undefined,
         isNsfw,
+        // New content moderation fields
+        contentLevel: contentLevel as any || moderationResult.contentLevel,
+        nudityLevel: nudityLevel as any || moderationResult.nudityLevel,
+        adultContent: adultContent || moderationResult.adultContent,
+        suggestiveContent: suggestiveContent || moderationResult.suggestiveContent,
+        artisticNudity: artisticNudity || moderationResult.artisticNudity,
+        moderationStatus: moderationResult.moderationStatus,
+        moderationNotes: moderationResult.recommendations.join(', '),
+        moderatedAt: new Date(),
         userId,
         // Store prompt-related fields
         promptConfig: promptConfig || undefined,
@@ -455,9 +470,16 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ 
       item, 
+      moderation: moderationResult,
       metadata: {
         titleGenerated: isAutoGenerated,
-        titleSource: isAutoGenerated ? 'prompts' : 'user_input'
+        titleSource: isAutoGenerated ? 'prompts' : 'user_input',
+        contentModeration: {
+          status: moderationResult.moderationStatus,
+          contentLevel: moderationResult.contentLevel,
+          nudityLevel: moderationResult.nudityLevel,
+          recommendations: moderationResult.recommendations
+        }
       }
     }, { status: 201 })
   } catch (error) {

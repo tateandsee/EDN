@@ -106,6 +106,24 @@ export default function WhiteLabelPage() {
 
   const plans = [
     {
+      id: 'trial',
+      name: 'Free Trial',
+      price: '$0',
+      period: '/14 days',
+      description: 'Try before you buy',
+      features: [
+        'Full platform access',
+        'Basic customization options',
+        'Email support',
+        'Up to 100 users',
+        'Standard security features',
+        'Analytics dashboard preview'
+      ],
+      popular: false,
+      highlighted: false,
+      trial: true
+    },
+    {
       id: 'entry',
       name: 'Entry',
       price: '$499',
@@ -207,7 +225,7 @@ export default function WhiteLabelPage() {
                 Get Started Today
                 <Sparkles className="ml-2 h-4 w-4" />
               </Button>
-              <Button variant="outline" className="border-white text-white hover:bg-white hover:text-orange-600 px-8 py-3 text-lg font-semibold backdrop-blur-sm">
+              <Button variant="outline" className="border-white text-gray-900 hover:bg-white hover:text-orange-600 px-8 py-3 text-lg font-semibold backdrop-blur-sm">
                 Schedule Demo
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
@@ -310,7 +328,7 @@ export default function WhiteLabelPage() {
               </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
               {plans.map((plan, index) => (
                 <motion.div
                   key={plan.id}
@@ -327,6 +345,14 @@ export default function WhiteLabelPage() {
                     </div>
                   )}
                   
+                  {plan.trial && (
+                    <div className="absolute -top-6 left-1/2 transform -translate-x-1/2 z-20">
+                      <Badge className="bg-green-500 text-white font-bold px-4 py-2 text-sm shadow-lg">
+                        FREE TRIAL
+                      </Badge>
+                    </div>
+                  )}
+                  
                   {plan.id === 'enterprise' && (
                     <div className="absolute -top-6 left-1/2 transform -translate-x-1/2 z-20">
                       <Badge className="bg-gradient-to-r from-purple-500 to-pink-500 text-white font-bold px-4 py-2 text-sm shadow-lg">
@@ -336,18 +362,26 @@ export default function WhiteLabelPage() {
                   )}
 
                   <Card className={`backdrop-blur-sm border-2 h-full ${
-                    plan.highlighted 
+                    plan.trial
+                      ? 'bg-gradient-to-br from-green-500/20 to-emerald-500/20 border-green-500/50 shadow-lg shadow-green-500/20'
+                      : plan.highlighted 
                       ? 'bg-white/20 border-yellow-500/50 shadow-lg shadow-yellow-500/20' 
                       : plan.id === 'enterprise'
                       ? 'bg-gradient-to-br from-purple-500/20 to-pink-500/20 border-purple-500/50 shadow-lg shadow-purple-500/20'
                       : 'transition-all duration-300 hover:shadow-xl hover:scale-105'
                   }`}
                   style={{ 
-                    backgroundColor: plan.highlighted || plan.id === 'enterprise' ? undefined : colors.cardBg,
-                    borderColor: plan.highlighted ? undefined : plan.id === 'enterprise' ? undefined : colors.cardBorder
+                    backgroundColor: plan.trial || plan.highlighted || plan.id === 'enterprise' ? undefined : colors.cardBg,
+                    borderColor: plan.trial ? undefined : plan.highlighted ? undefined : plan.id === 'enterprise' ? undefined : colors.cardBorder
                   }}>
                     <CardHeader className="text-center">
-                      <CardTitle className={`text-2xl font-bold ${plan.id === 'enterprise' ? 'text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400' : ''}`} style={{ color: plan.id === 'enterprise' ? undefined : colors.primary }}>
+                      <CardTitle className={`text-2xl font-bold ${
+                        plan.trial 
+                          ? 'text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-emerald-400' 
+                          : plan.id === 'enterprise' 
+                          ? 'text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400' 
+                          : ''
+                      }`} style={{ color: plan.trial || plan.id === 'enterprise' ? undefined : colors.primary }}>
                         {plan.name}
                       </CardTitle>
                       <CardDescription className="font-bold" style={{ color: colors.textSecondary }}>
@@ -367,15 +401,17 @@ export default function WhiteLabelPage() {
                     <CardContent className="space-y-4">
                       <Button 
                         className={`w-full ${
-                          plan.highlighted 
+                          plan.trial
+                            ? 'bg-gradient-to-r from-green-500 to-emerald-500 text-white hover:from-green-400 hover:to-emerald-400'
+                            : plan.highlighted 
                             ? 'bg-yellow-500 text-black hover:bg-yellow-400' 
                             : plan.id === 'enterprise'
                             ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:from-purple-400 hover:to-pink-400'
                             : ''
                         }`}
-                        style={plan.highlighted || plan.id === 'enterprise' ? undefined : { backgroundColor: colors.primary }}
+                        style={plan.trial || plan.highlighted || plan.id === 'enterprise' ? undefined : { backgroundColor: colors.primary }}
                       >
-                        Get Started
+                        {plan.trial ? 'Start Free Trial' : 'Get Started'}
                       </Button>
                       
                       <div className="space-y-3">

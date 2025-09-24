@@ -300,7 +300,7 @@ export default function PricingPage() {
                   </div>
                 )}
 
-                <Card className={`backdrop-blur-sm border-2 h-full ${
+                <Card className={`backdrop-blur-sm border-2 ${
                   plan.isHighlighted 
                     ? 'bg-white/20 border-yellow-500/50 shadow-lg shadow-yellow-500/20' 
                     : plan.id === 'ULTIMATE'
@@ -454,6 +454,26 @@ export default function PricingPage() {
                       {featureComparison.socialPlatforms.map(item => (
                         <td key={item.planId} className="py-4 px-4 text-center font-semibold" style={{ color: colors.textSecondary }}>
                           {item.count}
+                        </td>
+                      ))}
+                    </tr>
+                    <tr className="border-b" style={{ borderColor: colors.cardBorder }}>
+                      <td className="py-4 px-4 font-bold" style={{ color: colors.textPrimary }}>
+                        Storage
+                      </td>
+                      {pricingPlans.map(plan => (
+                        <td key={plan.id} className="py-4 px-4 text-center font-semibold" style={{ color: colors.textSecondary }}>
+                          {plan.limits.storageMB >= 1000 ? `${plan.limits.storageMB / 1000}GB` : `${plan.limits.storageMB}MB`}
+                        </td>
+                      ))}
+                    </tr>
+                    <tr className="border-b" style={{ borderColor: colors.cardBorder }}>
+                      <td className="py-4 px-4 font-bold" style={{ color: colors.textPrimary }}>
+                        Max Content Size
+                      </td>
+                      {pricingPlans.map(plan => (
+                        <td key={plan.id} className="py-4 px-4 text-center font-semibold" style={{ color: colors.textSecondary }}>
+                          {plan.limits.maxContentSizeMB >= 1000 ? `${plan.limits.maxContentSizeMB / 1000}GB` : `${plan.limits.maxContentSizeMB}MB`}
                         </td>
                       ))}
                     </tr>

@@ -40,11 +40,12 @@ export function MobileNav({ children }: MobileNavProps) {
       )}>
         <div className="flex items-center justify-between px-4 py-3">
           {/* Logo */}
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-              <span className="text-primary-foreground font-bold text-sm">EDN</span>
-            </div>
-            <span className="font-semibold text-lg">EDN AI</span>
+          <div className="flex items-center">
+            <img 
+              src="/logo.png" 
+              alt="EDN Logo" 
+              className="h-10 w-auto object-contain"
+            />
           </div>
 
           {/* Action Buttons */}
@@ -72,11 +73,12 @@ export function MobileNav({ children }: MobileNavProps) {
             <div className="flex flex-col h-full">
               {/* Header */}
               <div className="flex items-center justify-between px-4 py-3 border-b border-border">
-                <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-                    <span className="text-primary-foreground font-bold text-sm">EDN</span>
-                  </div>
-                  <span className="font-semibold text-lg">EDN AI</span>
+                <div className="flex items-center">
+                  <img 
+                    src="/NEW_LOGO_FILE_HERE.png" 
+                    alt="EDN Logo" 
+                    className="h-10 w-auto object-contain"
+                  />
                 </div>
                 <Button
                   variant="ghost"
@@ -192,11 +194,12 @@ export function DesktopNav({ children }: DesktopNavProps) {
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-              <span className="text-primary-foreground font-bold text-sm">EDN</span>
-            </div>
-            <span className="font-semibold text-lg">EDN AI</span>
+          <div className="flex items-center">
+            <img 
+              src="/logo.png" 
+              alt="EDN Logo" 
+              className="h-10 w-auto object-contain"
+            />
           </div>
 
           {/* Navigation Items */}

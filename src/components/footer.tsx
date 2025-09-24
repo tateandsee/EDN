@@ -74,6 +74,11 @@ export default function Footer() {
                   Affiliate Program
                 </Link>
               </li>
+              <li>
+                <Link href="/white-label" className="text-muted-foreground hover:text-foreground transition-colors">
+                  White Label Solution
+                </Link>
+              </li>
             </ul>
           </div>
 

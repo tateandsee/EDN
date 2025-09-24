@@ -1,0 +1,986 @@
+
+> nextjs_tailwind_shadcn_ts@0.1.0 dev
+> nodemon --exec "npx tsx server.ts" --watch server.ts --watch src --ext ts,tsx,js,jsx 2>&1 | tee dev.log
+
+[33m[nodemon] 3.1.10[39m
+[33m[nodemon] to restart at any time, enter `rs`[39m
+[33m[nodemon] watching path(s): server.ts src/**/*[39m
+[33m[nodemon] watching extensions: ts,tsx,js,jsx[39m
+[32m[nodemon] starting `npx tsx server.ts`[39m
+> Ready on http://0.0.0.0:3000
+> Socket.IO server running at ws://0.0.0.0:3000/api/socketio
+ ○ Compiling /middleware ...
+ ✓ Compiled /middleware in 1513ms (245 modules)
+ ○ Compiling / ...
+<w> [webpack.cache.PackFileCacheStrategy] Serializing big strings (108kiB) impacts deserialization performance (consider using Buffer instead and decode when needed)
+ ✓ Compiled / in 9.3s (1925 modules)
+Supabase is not configured. Please set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY in your environment variables.[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `npx tsx server.ts`[39m
+ ⨯ uncaughtException: Error: listen EADDRINUSE: address already in use 0.0.0.0:3000
+    at <unknown> (Error: listen EADDRINUSE: address already in use 0.0.0.0:3000) {
+  code: 'EADDRINUSE',
+  errno: -98,
+  syscall: 'listen',
+  address: '0.0.0.0',
+  port: 3000
+}
+ ⨯ uncaughtException:  Error: listen EADDRINUSE: address already in use 0.0.0.0:3000
+    at <unknown> (Error: listen EADDRINUSE: address already in use 0.0.0.0:3000) {
+  code: 'EADDRINUSE',
+  errno: -98,
+  syscall: 'listen',
+  address: '0.0.0.0',
+  port: 3000
+}
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `npx tsx server.ts`[39m
+[32m[nodemon] restarting due to changes...[39m
+User defined signal 2
+[32m[nodemon] starting `npx tsx server.ts`[39m
+ ⨯ uncaughtException: Error: listen EADDRINUSE: address already in use 0.0.0.0:3000
+    at <unknown> (Error: listen EADDRINUSE: address already in use 0.0.0.0:3000) {
+  code: 'EADDRINUSE',
+  errno: -98,
+  syscall: 'listen',
+  address: '0.0.0.0',
+  port: 3000
+}
+ ⨯ uncaughtException:  Error: listen EADDRINUSE: address already in use 0.0.0.0:3000
+    at <unknown> (Error: listen EADDRINUSE: address already in use 0.0.0.0:3000) {
+  code: 'EADDRINUSE',
+  errno: -98,
+  syscall: 'listen',
+  address: '0.0.0.0',
+  port: 3000
+}
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `npx tsx server.ts`[39m
+ ⨯ uncaughtException: Error: listen EADDRINUSE: address already in use 0.0.0.0:3000
+    at <unknown> (Error: listen EADDRINUSE: address already in use 0.0.0.0:3000) {
+  code: 'EADDRINUSE',
+  errno: -98,
+  syscall: 'listen',
+  address: '0.0.0.0',
+  port: 3000
+}
+ ⨯ uncaughtException:  Error: listen EADDRINUSE: address already in use 0.0.0.0:3000
+    at <unknown> (Error: listen EADDRINUSE: address already in use 0.0.0.0:3000) {
+  code: 'EADDRINUSE',
+  errno: -98,
+  syscall: 'listen',
+  address: '0.0.0.0',
+  port: 3000
+}
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `npx tsx server.ts`[39m
+ ⨯ uncaughtException: Error: listen EADDRINUSE: address already in use 0.0.0.0:3000
+    at <unknown> (Error: listen EADDRINUSE: address already in use 0.0.0.0:3000) {
+  code: 'EADDRINUSE',
+  errno: -98,
+  syscall: 'listen',
+  address: '0.0.0.0',
+  port: 3000
+}
+ ⨯ uncaughtException:  Error: listen EADDRINUSE: address already in use 0.0.0.0:3000
+    at <unknown> (Error: listen EADDRINUSE: address already in use 0.0.0.0:3000) {
+  code: 'EADDRINUSE',
+  errno: -98,
+  syscall: 'listen',
+  address: '0.0.0.0',
+  port: 3000
+}
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `npx tsx server.ts`[39m
+> Ready on http://0.0.0.0:3000
+> Socket.IO server running at ws://0.0.0.0:3000/api/socketio
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `npx tsx server.ts`[39m
+ ⨯ uncaughtException: Error: listen EADDRINUSE: address already in use 0.0.0.0:3000
+    at <unknown> (Error: listen EADDRINUSE: address already in use 0.0.0.0:3000) {
+  code: 'EADDRINUSE',
+  errno: -98,
+  syscall: 'listen',
+  address: '0.0.0.0',
+  port: 3000
+}
+ ⨯ uncaughtException:  Error: listen EADDRINUSE: address already in use 0.0.0.0:3000
+    at <unknown> (Error: listen EADDRINUSE: address already in use 0.0.0.0:3000) {
+  code: 'EADDRINUSE',
+  errno: -98,
+  syscall: 'listen',
+  address: '0.0.0.0',
+  port: 3000
+}
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `npx tsx server.ts`[39m
+> Ready on http://0.0.0.0:3000
+> Socket.IO server running at ws://0.0.0.0:3000/api/socketio
+ ○ Compiling /middleware ...
+ ✓ Compiled /middleware in 1352ms (245 modules)
+ ○ Compiling /api/marketplace/items ...
+<w> [webpack.cache.PackFileCacheStrategy] Serializing big strings (108kiB) impacts deserialization performance (consider using Buffer instead and decode when needed)
+ ✓ Compiled /api/marketplace/items in 2.3s (367 modules)
+Error fetching marketplace items: Error [PrismaClientValidationError]: 
+Invalid `prisma.marketplaceItem.count()` invocation:
+
+{
+  select: {
+    _count: {
+      select: {
+        _all: true
+      }
+    }
+  },
+  where: {
+    tags: {
+      contains: "\"Caucasian\"",
+      mode: "insensitive",
+      ~~~~
+?     equals?: String | StringFieldRefInput | Null,
+?     in?: String[] | Null,
+?     notIn?: String[] | Null,
+?     lt?: String | StringFieldRefInput,
+?     lte?: String | StringFieldRefInput,
+?     gt?: String | StringFieldRefInput,
+?     gte?: String | StringFieldRefInput,
+?     startsWith?: String | StringFieldRefInput,
+?     endsWith?: String | StringFieldRefInput,
+?     not?: String | NestedStringNullableFilter | Null
+    }
+  }
+}
+
+Unknown argument `mode`. Did you mean `lte`? Available options are marked with ?.
+    at async GET (src/app/api/marketplace/items/route.ts:65:27)
+  63 |     const skip = (page - 1) * limit
+  64 |
+> 65 |     const [items, total] = await Promise.all([
+     |                           ^
+  66 |       db.marketplaceItem.findMany({
+  67 |         where,
+  68 |         include: { {
+  clientVersion: '6.13.0'
+}
+ GET /api/marketplace/items?ethnicity=Caucasian&limit=5 500 in 2837ms
+prisma:query SELECT COUNT(*) AS `_count._all` FROM (SELECT `main`.`marketplace_items`.`id` FROM `main`.`marketplace_items` WHERE 1=1 LIMIT ? OFFSET ?) AS `sub`
+prisma:query SELECT `main`.`marketplace_items`.`id`, `main`.`marketplace_items`.`listingNumber`, `main`.`marketplace_items`.`title`, `main`.`marketplace_items`.`description`, `main`.`marketplace_items`.`type`, `main`.`marketplace_items`.`category`, `main`.`marketplace_items`.`price`, `main`.`marketplace_items`.`currency`, `main`.`marketplace_items`.`status`, `main`.`marketplace_items`.`thumbnail`, `main`.`marketplace_items`.`images`, `main`.`marketplace_items`.`pdfFile`, `main`.`marketplace_items`.`pdfFileName`, `main`.`marketplace_items`.`pdfFileSize`, `main`.`marketplace_items`.`tags`, `main`.`marketplace_items`.`isNsfw`, `main`.`marketplace_items`.`promptConfig`, `main`.`marketplace_items`.`positivePrompt`, `main`.`marketplace_items`.`negativePrompt`, `main`.`marketplace_items`.`fullPrompt`, `main`.`marketplace_items`.`userId`, `main`.`marketplace_items`.`createdAt`, `main`.`marketplace_items`.`updatedAt`, COALESCE(`aggr_selection_0_MarketplaceReview`.`_aggr_count_reviews`, 0) AS `_aggr_count_reviews`, COALESCE(`aggr_selection_1_MarketplaceOrder`.`_aggr_count_orders`, 0) AS `_aggr_count_orders` FROM `main`.`marketplace_items` LEFT JOIN (SELECT `main`.`marketplace_reviews`.`itemId`, COUNT(*) AS `_aggr_count_reviews` FROM `main`.`marketplace_reviews` WHERE 1=1 GROUP BY `main`.`marketplace_reviews`.`itemId`) AS `aggr_selection_0_MarketplaceReview` ON (`main`.`marketplace_items`.`id` = `aggr_selection_0_MarketplaceReview`.`itemId`) LEFT JOIN (SELECT `main`.`marketplace_orders`.`itemId`, COUNT(*) AS `_aggr_count_orders` FROM `main`.`marketplace_orders` WHERE 1=1 GROUP BY `main`.`marketplace_orders`.`itemId`) AS `aggr_selection_1_MarketplaceOrder` ON (`main`.`marketplace_items`.`id` = `aggr_selection_1_MarketplaceOrder`.`itemId`) WHERE 1=1 ORDER BY `main`.`marketplace_items`.`createdAt` DESC LIMIT ? OFFSET ?
+prisma:query SELECT `main`.`users`.`id`, `main`.`users`.`name`, `main`.`users`.`avatar`, `main`.`users`.`verified` FROM `main`.`users` WHERE `main`.`users`.`id` IN (?) LIMIT ? OFFSET ?
+prisma:query SELECT `main`.`marketplace_reviews`.`id`, `main`.`marketplace_reviews`.`rating`, `main`.`marketplace_reviews`.`comment`, `main`.`marketplace_reviews`.`createdAt`, `main`.`marketplace_reviews`.`userId`, `main`.`marketplace_reviews`.`itemId` FROM `main`.`marketplace_reviews` WHERE `main`.`marketplace_reviews`.`itemId` IN (?,?) LIMIT ? OFFSET ?
+ GET /api/marketplace/items?limit=2 200 in 25ms
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `npx tsx server.ts`[39m
+> Ready on http://0.0.0.0:3000
+> Socket.IO server running at ws://0.0.0.0:3000/api/socketio
+ ○ Compiling /middleware ...
+ ✓ Compiled /middleware in 1372ms (245 modules)
+ ○ Compiling /api/marketplace/items ...
+<w> [webpack.cache.PackFileCacheStrategy] Serializing big strings (108kiB) impacts deserialization performance (consider using Buffer instead and decode when needed)
+ ✓ Compiled /api/marketplace/items in 2.5s (367 modules)
+Error fetching marketplace items: Error [PrismaClientValidationError]: 
+Invalid `prisma.marketplaceItem.count()` invocation:
+
+{
+  select: {
+    _count: {
+      select: {
+        _all: true
+      }
+    }
+  },
+  where: {
+    tags: {
+      contains: "\"Caucasian\"",
+      mode: "insensitive",
+      ~~~~
+?     equals?: String | StringFieldRefInput | Null,
+?     in?: String[] | Null,
+?     notIn?: String[] | Null,
+?     lt?: String | StringFieldRefInput,
+?     lte?: String | StringFieldRefInput,
+?     gt?: String | StringFieldRefInput,
+?     gte?: String | StringFieldRefInput,
+?     startsWith?: String | StringFieldRefInput,
+?     endsWith?: String | StringFieldRefInput,
+?     not?: String | NestedStringNullableFilter | Null
+    }
+  }
+}
+
+Unknown argument `mode`. Did you mean `lte`? Available options are marked with ?.
+    at async GET (src/app/api/marketplace/items/route.ts:67:27)
+  65 |     const skip = (page - 1) * limit
+  66 |
+> 67 |     const [items, total] = await Promise.all([
+     |                           ^
+  68 |       db.marketplaceItem.findMany({
+  69 |         where,
+  70 |         include: { {
+  clientVersion: '6.13.0'
+}
+ GET /api/marketplace/items?ethnicity=Caucasian&limit=5 500 in 3120ms
+prisma:query SELECT COUNT(*) AS `_count._all` FROM (SELECT `main`.`marketplace_items`.`id` FROM `main`.`marketplace_items` WHERE 1=1 LIMIT ? OFFSET ?) AS `sub`
+prisma:query SELECT `main`.`marketplace_items`.`id`, `main`.`marketplace_items`.`listingNumber`, `main`.`marketplace_items`.`title`, `main`.`marketplace_items`.`description`, `main`.`marketplace_items`.`type`, `main`.`marketplace_items`.`category`, `main`.`marketplace_items`.`price`, `main`.`marketplace_items`.`currency`, `main`.`marketplace_items`.`status`, `main`.`marketplace_items`.`thumbnail`, `main`.`marketplace_items`.`images`, `main`.`marketplace_items`.`pdfFile`, `main`.`marketplace_items`.`pdfFileName`, `main`.`marketplace_items`.`pdfFileSize`, `main`.`marketplace_items`.`tags`, `main`.`marketplace_items`.`isNsfw`, `main`.`marketplace_items`.`promptConfig`, `main`.`marketplace_items`.`positivePrompt`, `main`.`marketplace_items`.`negativePrompt`, `main`.`marketplace_items`.`fullPrompt`, `main`.`marketplace_items`.`userId`, `main`.`marketplace_items`.`createdAt`, `main`.`marketplace_items`.`updatedAt`, COALESCE(`aggr_selection_0_MarketplaceReview`.`_aggr_count_reviews`, 0) AS `_aggr_count_reviews`, COALESCE(`aggr_selection_1_MarketplaceOrder`.`_aggr_count_orders`, 0) AS `_aggr_count_orders` FROM `main`.`marketplace_items` LEFT JOIN (SELECT `main`.`marketplace_reviews`.`itemId`, COUNT(*) AS `_aggr_count_reviews` FROM `main`.`marketplace_reviews` WHERE 1=1 GROUP BY `main`.`marketplace_reviews`.`itemId`) AS `aggr_selection_0_MarketplaceReview` ON (`main`.`marketplace_items`.`id` = `aggr_selection_0_MarketplaceReview`.`itemId`) LEFT JOIN (SELECT `main`.`marketplace_orders`.`itemId`, COUNT(*) AS `_aggr_count_orders` FROM `main`.`marketplace_orders` WHERE 1=1 GROUP BY `main`.`marketplace_orders`.`itemId`) AS `aggr_selection_1_MarketplaceOrder` ON (`main`.`marketplace_items`.`id` = `aggr_selection_1_MarketplaceOrder`.`itemId`) WHERE 1=1 ORDER BY `main`.`marketplace_items`.`createdAt` DESC LIMIT ? OFFSET ?
+prisma:query SELECT `main`.`users`.`id`, `main`.`users`.`name`, `main`.`users`.`avatar`, `main`.`users`.`verified` FROM `main`.`users` WHERE `main`.`users`.`id` IN (?) LIMIT ? OFFSET ?
+prisma:query SELECT `main`.`marketplace_reviews`.`id`, `main`.`marketplace_reviews`.`rating`, `main`.`marketplace_reviews`.`comment`, `main`.`marketplace_reviews`.`createdAt`, `main`.`marketplace_reviews`.`userId`, `main`.`marketplace_reviews`.`itemId` FROM `main`.`marketplace_reviews` WHERE `main`.`marketplace_reviews`.`itemId` IN (?) LIMIT ? OFFSET ?
+ GET /api/marketplace/items?limit=1 200 in 18ms
+prisma:query SELECT COUNT(*) AS `_count._all` FROM (SELECT `main`.`marketplace_items`.`id` FROM `main`.`marketplace_items` WHERE 1=1 LIMIT ? OFFSET ?) AS `sub`
+prisma:query SELECT `main`.`marketplace_items`.`id`, `main`.`marketplace_items`.`listingNumber`, `main`.`marketplace_items`.`title`, `main`.`marketplace_items`.`description`, `main`.`marketplace_items`.`type`, `main`.`marketplace_items`.`category`, `main`.`marketplace_items`.`price`, `main`.`marketplace_items`.`currency`, `main`.`marketplace_items`.`status`, `main`.`marketplace_items`.`thumbnail`, `main`.`marketplace_items`.`images`, `main`.`marketplace_items`.`pdfFile`, `main`.`marketplace_items`.`pdfFileName`, `main`.`marketplace_items`.`pdfFileSize`, `main`.`marketplace_items`.`tags`, `main`.`marketplace_items`.`isNsfw`, `main`.`marketplace_items`.`promptConfig`, `main`.`marketplace_items`.`positivePrompt`, `main`.`marketplace_items`.`negativePrompt`, `main`.`marketplace_items`.`fullPrompt`, `main`.`marketplace_items`.`userId`, `main`.`marketplace_items`.`createdAt`, `main`.`marketplace_items`.`updatedAt`, COALESCE(`aggr_selection_0_MarketplaceReview`.`_aggr_count_reviews`, 0) AS `_aggr_count_reviews`, COALESCE(`aggr_selection_1_MarketplaceOrder`.`_aggr_count_orders`, 0) AS `_aggr_count_orders` FROM `main`.`marketplace_items` LEFT JOIN (SELECT `main`.`marketplace_reviews`.`itemId`, COUNT(*) AS `_aggr_count_reviews` FROM `main`.`marketplace_reviews` WHERE 1=1 GROUP BY `main`.`marketplace_reviews`.`itemId`) AS `aggr_selection_0_MarketplaceReview` ON (`main`.`marketplace_items`.`id` = `aggr_selection_0_MarketplaceReview`.`itemId`) LEFT JOIN (SELECT `main`.`marketplace_orders`.`itemId`, COUNT(*) AS `_aggr_count_orders` FROM `main`.`marketplace_orders` WHERE 1=1 GROUP BY `main`.`marketplace_orders`.`itemId`) AS `aggr_selection_1_MarketplaceOrder` ON (`main`.`marketplace_items`.`id` = `aggr_selection_1_MarketplaceOrder`.`itemId`) WHERE 1=1 ORDER BY `main`.`marketplace_items`.`createdAt` DESC LIMIT ? OFFSET ?
+prisma:query SELECT `main`.`users`.`id`, `main`.`users`.`name`, `main`.`users`.`avatar`, `main`.`users`.`verified` FROM `main`.`users` WHERE `main`.`users`.`id` IN (?) LIMIT ? OFFSET ?
+prisma:query SELECT `main`.`marketplace_reviews`.`id`, `main`.`marketplace_reviews`.`rating`, `main`.`marketplace_reviews`.`comment`, `main`.`marketplace_reviews`.`createdAt`, `main`.`marketplace_reviews`.`userId`, `main`.`marketplace_reviews`.`itemId` FROM `main`.`marketplace_reviews` WHERE `main`.`marketplace_reviews`.`itemId` IN (?,?,?) LIMIT ? OFFSET ?
+ GET /api/marketplace/items?limit=3 200 in 12ms
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `npx tsx server.ts`[39m
+ ⨯ uncaughtException: Error: listen EADDRINUSE: address already in use 0.0.0.0:3000
+    at <unknown> (Error: listen EADDRINUSE: address already in use 0.0.0.0:3000) {
+  code: 'EADDRINUSE',
+  errno: -98,
+  syscall: 'listen',
+  address: '0.0.0.0',
+  port: 3000
+}
+ ⨯ uncaughtException:  Error: listen EADDRINUSE: address already in use 0.0.0.0:3000
+    at <unknown> (Error: listen EADDRINUSE: address already in use 0.0.0.0:3000) {
+  code: 'EADDRINUSE',
+  errno: -98,
+  syscall: 'listen',
+  address: '0.0.0.0',
+  port: 3000
+}
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `npx tsx server.ts`[39m
+ ⨯ uncaughtException: Error: listen EADDRINUSE: address already in use 0.0.0.0:3000
+    at <unknown> (Error: listen EADDRINUSE: address already in use 0.0.0.0:3000) {
+  code: 'EADDRINUSE',
+  errno: -98,
+  syscall: 'listen',
+  address: '0.0.0.0',
+  port: 3000
+}
+ ⨯ uncaughtException:  Error: listen EADDRINUSE: address already in use 0.0.0.0:3000
+    at <unknown> (Error: listen EADDRINUSE: address already in use 0.0.0.0:3000) {
+  code: 'EADDRINUSE',
+  errno: -98,
+  syscall: 'listen',
+  address: '0.0.0.0',
+  port: 3000
+}
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `npx tsx server.ts`[39m
+ ⨯ uncaughtException: Error: listen EADDRINUSE: address already in use 0.0.0.0:3000
+    at <unknown> (Error: listen EADDRINUSE: address already in use 0.0.0.0:3000) {
+  code: 'EADDRINUSE',
+  errno: -98,
+  syscall: 'listen',
+  address: '0.0.0.0',
+  port: 3000
+}
+ ⨯ uncaughtException:  Error: listen EADDRINUSE: address already in use 0.0.0.0:3000
+    at <unknown> (Error: listen EADDRINUSE: address already in use 0.0.0.0:3000) {
+  code: 'EADDRINUSE',
+  errno: -98,
+  syscall: 'listen',
+  address: '0.0.0.0',
+  port: 3000
+}
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `npx tsx server.ts`[39m
+ ⨯ uncaughtException: Error: listen EADDRINUSE: address already in use 0.0.0.0:3000
+    at <unknown> (Error: listen EADDRINUSE: address already in use 0.0.0.0:3000) {
+  code: 'EADDRINUSE',
+  errno: -98,
+  syscall: 'listen',
+  address: '0.0.0.0',
+  port: 3000
+}
+ ⨯ uncaughtException:  Error: listen EADDRINUSE: address already in use 0.0.0.0:3000
+    at <unknown> (Error: listen EADDRINUSE: address already in use 0.0.0.0:3000) {
+  code: 'EADDRINUSE',
+  errno: -98,
+  syscall: 'listen',
+  address: '0.0.0.0',
+  port: 3000
+}
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `npx tsx server.ts`[39m
+ ⨯ uncaughtException: Error: listen EADDRINUSE: address already in use 0.0.0.0:3000
+    at <unknown> (Error: listen EADDRINUSE: address already in use 0.0.0.0:3000) {
+  code: 'EADDRINUSE',
+  errno: -98,
+  syscall: 'listen',
+  address: '0.0.0.0',
+  port: 3000
+}
+ ⨯ uncaughtException:  Error: listen EADDRINUSE: address already in use 0.0.0.0:3000
+    at <unknown> (Error: listen EADDRINUSE: address already in use 0.0.0.0:3000) {
+  code: 'EADDRINUSE',
+  errno: -98,
+  syscall: 'listen',
+  address: '0.0.0.0',
+  port: 3000
+}
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `npx tsx server.ts`[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `npx tsx server.ts`[39m
+> Ready on http://0.0.0.0:3000
+> Socket.IO server running at ws://0.0.0.0:3000/api/socketio
+etplace_items` WHERE `main`.`marketplace_items`.`category` = ? LIMIT ? OFFSET ?) AS `sub`
+ GET /api/marketplace/items?category=SFW 200 in 48ms
+prisma:query SELECT COUNT(*) AS `_count._all` FROM (SELECT `main`.`marketplace_items`.`id` FROM `main`.`marketplace_items` WHERE `main`.`marketplace_items`.`category` = ? LIMIT ? OFFSET ?) AS `sub`
+prisma:query SELECT `main`.`marketplace_items`.`id`, `main`.`marketplace_items`.`listingNumber`, `main`.`marketplace_items`.`title`, `main`.`marketplace_items`.`description`, `main`.`marketplace_items`.`type`, `main`.`marketplace_items`.`category`, `main`.`marketplace_items`.`price`, `main`.`marketplace_items`.`currency`, `main`.`marketplace_items`.`status`, `main`.`marketplace_items`.`thumbnail`, `main`.`marketplace_items`.`images`, `main`.`marketplace_items`.`pdfFile`, `main`.`marketplace_items`.`pdfFileName`, `main`.`marketplace_items`.`pdfFileSize`, `main`.`marketplace_items`.`tags`, `main`.`marketplace_items`.`isNsfw`, `main`.`marketplace_items`.`promptConfig`, `main`.`marketplace_items`.`positivePrompt`, `main`.`marketplace_items`.`negativePrompt`, `main`.`marketplace_items`.`fullPrompt`, `main`.`marketplace_items`.`userId`, `main`.`marketplace_items`.`createdAt`, `main`.`marketplace_items`.`updatedAt`, COALESCE(`aggr_selection_0_MarketplaceReview`.`_aggr_count_reviews`, 0) AS `_aggr_count_reviews`, COALESCE(`aggr_selection_1_MarketplaceOrder`.`_aggr_count_orders`, 0) AS `_aggr_count_orders` FROM `main`.`marketplace_items` LEFT JOIN (SELECT `main`.`marketplace_reviews`.`itemId`, COUNT(*) AS `_aggr_count_reviews` FROM `main`.`marketplace_reviews` WHERE 1=1 GROUP BY `main`.`marketplace_reviews`.`itemId`) AS `aggr_selection_0_MarketplaceReview` ON (`main`.`marketplace_items`.`id` = `aggr_selection_0_MarketplaceReview`.`itemId`) LEFT JOIN (SELECT `main`.`marketplace_orders`.`itemId`, COUNT(*) AS `_aggr_count_orders` FROM `main`.`marketplace_orders` WHERE 1=1 GROUP BY `main`.`marketplace_orders`.`itemId`) AS `aggr_selection_1_MarketplaceOrder` ON (`main`.`marketplace_items`.`id` = `aggr_selection_1_MarketplaceOrder`.`itemId`) WHERE `main`.`marketplace_items`.`category` = ? ORDER BY `main`.`marketplace_items`.`createdAt` DESC LIMIT ? OFFSET ?
+prisma:query SELECT `main`.`users`.`id`, `main`.`users`.`name`, `main`.`users`.`avatar`, `main`.`users`.`verified` FROM `main`.`users` WHERE `main`.`users`.`id` IN (?) LIMIT ? OFFSET ?
+prisma:query SELECT `main`.`marketplace_reviews`.`id`, `main`.`marketplace_reviews`.`rating`, `main`.`marketplace_reviews`.`comment`, `main`.`marketplace_reviews`.`createdAt`, `main`.`marketplace_reviews`.`userId`, `main`.`marketplace_reviews`.`itemId` FROM `main`.`marketplace_reviews` WHERE `main`.`marketplace_reviews`.`itemId` IN (?,?,?,?,?,?,?,?,?,?,?,?) LIMIT ? OFFSET ?
+ GET /api/marketplace/items?category=NSFW 200 in 13ms
+Supabase is not configured. Please set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY in your environment variables.
+ GET / 200 in 341ms
+ GET /api/notifications?unreadOnly=false&limit=50 401 in 11ms
+Supabase is not configured. Please set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY in your environment variables.
+ GET / 200 in 307ms
+ GET /api/notifications?unreadOnly=false&limit=50 401 in 12ms
+Supabase is not configured. Please set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY in your environment variables.
+ GET / 200 in 242ms
+ GET /api/notifications?unreadOnly=false&limit=50 401 in 21ms
+Supabase is not configured. Please set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY in your environment variables.
+ GET / 200 in 227ms
+ GET /api/notifications?unreadOnly=false&limit=50 401 in 24ms
+Supabase is not configured. Please set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY in your environment variables.
+ GET / 200 in 251ms
+ GET /api/notifications?unreadOnly=false&limit=50 401 in 10ms
+Supabase is not configured. Please set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY in your environment variables.
+ GET / 200 in 272ms
+ GET /api/notifications?unreadOnly=false&limit=50 401 in 9ms
+Supabase is not configured. Please set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY in your environment variables.
+ GET /marketplace 200 in 126ms
+ GET /api/notifications?unreadOnly=false&limit=50 401 in 17ms
+prisma:query SELECT 1
+prisma:query SELECT COUNT(*) AS `_count._all` FROM (SELECT `main`.`marketplace_items`.`id` FROM `main`.`marketplace_items` WHERE `main`.`marketplace_items`.`status` = ? LIMIT ? OFFSET ?) AS `sub`
+prisma:query SELECT COUNT(*) AS `_count._all`, `main`.`marketplace_items`.`userId` FROM `main`.`marketplace_items` WHERE `main`.`marketplace_items`.`status` = ? GROUP BY `main`.`marketplace_items`.`userId` LIMIT ? OFFSET ?
+prisma:query SELECT SUM(`amount`) FROM (SELECT `main`.`marketplace_orders`.`amount` FROM `main`.`marketplace_orders` WHERE `main`.`marketplace_orders`.`status` = ? LIMIT ? OFFSET ?) AS `sub`
+prisma:query SELECT `main`.`marketplace_items`.`id`, `main`.`marketplace_items`.`listingNumber`, `main`.`marketplace_items`.`title`, `main`.`marketplace_items`.`description`, `main`.`marketplace_items`.`type`, `main`.`marketplace_items`.`category`, `main`.`marketplace_items`.`price`, `main`.`marketplace_items`.`currency`, `main`.`marketplace_items`.`status`, `main`.`marketplace_items`.`thumbnail`, `main`.`marketplace_items`.`images`, `main`.`marketplace_items`.`pdfFile`, `main`.`marketplace_items`.`pdfFileName`, `main`.`marketplace_items`.`pdfFileSize`, `main`.`marketplace_items`.`tags`, `main`.`marketplace_items`.`isNsfw`, `main`.`marketplace_items`.`promptConfig`, `main`.`marketplace_items`.`positivePrompt`, `main`.`marketplace_items`.`negativePrompt`, `main`.`marketplace_items`.`fullPrompt`, `main`.`marketplace_items`.`userId`, `main`.`marketplace_items`.`createdAt`, `main`.`marketplace_items`.`updatedAt`, COALESCE(`aggr_selection_0_MarketplaceReview`.`_aggr_count_reviews`, 0) AS `_aggr_count_reviews`, COALESCE(`aggr_selection_1_MarketplaceOrder`.`_aggr_count_orders`, 0) AS `_aggr_count_orders` FROM `main`.`marketplace_items` LEFT JOIN (SELECT `main`.`marketplace_reviews`.`itemId`, COUNT(*) AS `_aggr_count_reviews` FROM `main`.`marketplace_reviews` WHERE 1=1 GROUP BY `main`.`marketplace_reviews`.`itemId`) AS `aggr_selection_0_MarketplaceReview` ON (`main`.`marketplace_items`.`id` = `aggr_selection_0_MarketplaceReview`.`itemId`) LEFT JOIN (SELECT `main`.`marketplace_orders`.`itemId`, COUNT(*) AS `_aggr_count_orders` FROM `main`.`marketplace_orders` WHERE 1=1 GROUP BY `main`.`marketplace_orders`.`itemId`) AS `aggr_selection_1_MarketplaceOrder` ON (`main`.`marketplace_items`.`id` = `aggr_selection_1_MarketplaceOrder`.`itemId`) WHERE `main`.`marketplace_items`.`category` = ? ORDER BY `main`.`marketplace_items`.`createdAt` DESC LIMIT ? OFFSET ?
+prisma:query SELECT COUNT(*) AS `_count._all` FROM (SELECT `main`.`marketplace_items`.`id` FROM `main`.`marketplace_items` WHERE `main`.`marketplace_items`.`category` = ? LIMIT ? OFFSET ?) AS `sub`
+ GET /api/marketplace/items?category=SFW 200 in 18ms
+prisma:query SELECT AVG(`rating`) FROM (SELECT `main`.`marketplace_reviews`.`rating` FROM `main`.`marketplace_reviews` WHERE 1=1 LIMIT ? OFFSET ?) AS `sub`
+prisma:query SELECT COUNT(*) AS `_count._all` FROM (SELECT `main`.`marketplace_items`.`id` FROM `main`.`marketplace_items` WHERE (`main`.`marketplace_items`.`status` = ? AND `main`.`marketplace_items`.`isNsfw` = ?) LIMIT ? OFFSET ?) AS `sub`
+prisma:query SELECT COUNT(*) AS `_count._all` FROM (SELECT `main`.`marketplace_items`.`id` FROM `main`.`marketplace_items` WHERE (`main`.`marketplace_items`.`status` = ? AND `main`.`marketplace_items`.`isNsfw` = ?) LIMIT ? OFFSET ?) AS `sub`
+ GET /api/marketplace/stats 200 in 25ms
+prisma:query SELECT `main`.`marketplace_items`.`id`, `main`.`marketplace_items`.`listingNumber`, `main`.`marketplace_items`.`title`, `main`.`marketplace_items`.`description`, `main`.`marketplace_items`.`type`, `main`.`marketplace_items`.`category`, `main`.`marketplace_items`.`price`, `main`.`marketplace_items`.`currency`, `main`.`marketplace_items`.`status`, `main`.`marketplace_items`.`thumbnail`, `main`.`marketplace_items`.`images`, `main`.`marketplace_items`.`pdfFile`, `main`.`marketplace_items`.`pdfFileName`, `main`.`marketplace_items`.`pdfFileSize`, `main`.`marketplace_items`.`tags`, `main`.`marketplace_items`.`isNsfw`, `main`.`marketplace_items`.`promptConfig`, `main`.`marketplace_items`.`positivePrompt`, `main`.`marketplace_items`.`negativePrompt`, `main`.`marketplace_items`.`fullPrompt`, `main`.`marketplace_items`.`userId`, `main`.`marketplace_items`.`createdAt`, `main`.`marketplace_items`.`updatedAt`, COALESCE(`aggr_selection_0_MarketplaceReview`.`_aggr_count_reviews`, 0) AS `_aggr_count_reviews`, COALESCE(`aggr_selection_1_MarketplaceOrder`.`_aggr_count_orders`, 0) AS `_aggr_count_orders` FROM `main`.`marketplace_items` LEFT JOIN (SELECT `main`.`marketplace_reviews`.`itemId`, COUNT(*) AS `_aggr_count_reviews` FROM `main`.`marketplace_reviews` WHERE 1=1 GROUP BY `main`.`marketplace_reviews`.`itemId`) AS `aggr_selection_0_MarketplaceReview` ON (`main`.`marketplace_items`.`id` = `aggr_selection_0_MarketplaceReview`.`itemId`) LEFT JOIN (SELECT `main`.`marketplace_orders`.`itemId`, COUNT(*) AS `_aggr_count_orders` FROM `main`.`marketplace_orders` WHERE 1=1 GROUP BY `main`.`marketplace_orders`.`itemId`) AS `aggr_selection_1_MarketplaceOrder` ON (`main`.`marketplace_items`.`id` = `aggr_selection_1_MarketplaceOrder`.`itemId`) WHERE `main`.`marketplace_items`.`category` = ? ORDER BY `main`.`marketplace_items`.`createdAt` DESC LIMIT ? OFFSET ?
+prisma:query SELECT COUNT(*) AS `_count._all` FROM (SELECT `main`.`marketplace_items`.`id` FROM `main`.`marketplace_items` WHERE `main`.`marketplace_items`.`category` = ? LIMIT ? OFFSET ?) AS `sub`
+ GET /api/marketplace/items?category=NSFW 200 in 11ms
+Supabase is not configured. Please set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY in your environment variables.
+ GET / 200 in 268ms
+ GET /api/notifications?unreadOnly=false&limit=50 401 in 10ms
+Supabase is not configured. Please set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY in your environment variables.
+ GET / 200 in 265ms
+ GET /api/notifications?unreadOnly=false&limit=50 401 in 11ms
+Supabase is not configured. Please set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY in your environment variables.
+ GET /models/EDN_COMMERCIAL_NSFW_31.jpg 404 in 77ms
+Supabase is not configured. Please set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY in your environment variables.
+ GET /models/EDN_COMMERCIAL_NSFW_32.jpg 404 in 70ms
+Supabase is not configured. Please set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY in your environment variables.
+ GET / 200 in 305ms
+Supabase is not configured. Please set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY in your environment variables.
+ GET / 200 in 256ms
+ GET /api/notifications?unreadOnly=false&limit=50 401 in 8ms
+Supabase is not configured. Please set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY in your environment variables.
+ GET / 200 in 269ms
+ GET /api/notifications?unreadOnly=false&limit=50 401 in 18ms
+Supabase is not configured. Please set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY in your environment variables.
+ GET /marketplace 200 in 148ms
+prisma:query SELECT 1
+prisma:query SELECT COUNT(*) AS `_count._all` FROM (SELECT `main`.`marketplace_items`.`id` FROM `main`.`marketplace_items` WHERE `main`.`marketplace_items`.`status` = ? LIMIT ? OFFSET ?) AS `sub`
+prisma:query SELECT COUNT(*) AS `_count._all`, `main`.`marketplace_items`.`userId` FROM `main`.`marketplace_items` WHERE `main`.`marketplace_items`.`status` = ? GROUP BY `main`.`marketplace_items`.`userId` LIMIT ? OFFSET ?
+prisma:query SELECT SUM(`amount`) FROM (SELECT `main`.`marketplace_orders`.`amount` FROM `main`.`marketplace_orders` WHERE `main`.`marketplace_orders`.`status` = ? LIMIT ? OFFSET ?) AS `sub`
+prisma:query SELECT AVG(`rating`) FROM (SELECT `main`.`marketplace_reviews`.`rating` FROM `main`.`marketplace_reviews` WHERE 1=1 LIMIT ? OFFSET ?) AS `sub`
+prisma:query SELECT COUNT(*) AS `_count._all` FROM (SELECT `main`.`marketplace_items`.`id` FROM `main`.`marketplace_items` WHERE (`main`.`marketplace_items`.`status` = ? AND `main`.`marketplace_items`.`isNsfw` = ?) LIMIT ? OFFSET ?) AS `sub`
+ GET /api/notifications?unreadOnly=false&limit=50 401 in 25ms
+ GET /api/marketplace/stats 200 in 37ms
+prisma:query SELECT COUNT(*) AS `_count._all` FROM (SELECT `main`.`marketplace_items`.`id` FROM `main`.`marketplace_items` WHERE (`main`.`marketplace_items`.`status` = ? AND `main`.`marketplace_items`.`isNsfw` = ?) LIMIT ? OFFSET ?) AS `sub`
+prisma:query SELECT 1
+prisma:query SELECT COUNT(*) AS `_count._all` FROM (SELECT `main`.`marketplace_items`.`id` FROM `main`.`marketplace_items` WHERE `main`.`marketplace_items`.`category` = ? LIMIT ? OFFSET ?) AS `sub`
+prisma:query SELECT `main`.`marketplace_items`.`id`, `main`.`marketplace_items`.`listingNumber`, `main`.`marketplace_items`.`title`, `main`.`marketplace_items`.`description`, `main`.`marketplace_items`.`type`, `main`.`marketplace_items`.`category`, `main`.`marketplace_items`.`price`, `main`.`marketplace_items`.`currency`, `main`.`marketplace_items`.`status`, `main`.`marketplace_items`.`thumbnail`, `main`.`marketplace_items`.`images`, `main`.`marketplace_items`.`pdfFile`, `main`.`marketplace_items`.`pdfFileName`, `main`.`marketplace_items`.`pdfFileSize`, `main`.`marketplace_items`.`tags`, `main`.`marketplace_items`.`isNsfw`, `main`.`marketplace_items`.`promptConfig`, `main`.`marketplace_items`.`positivePrompt`, `main`.`marketplace_items`.`negativePrompt`, `main`.`marketplace_items`.`fullPrompt`, `main`.`marketplace_items`.`userId`, `main`.`marketplace_items`.`createdAt`, `main`.`marketplace_items`.`updatedAt`, COALESCE(`aggr_selection_0_MarketplaceReview`.`_aggr_count_reviews`, 0) AS `_aggr_count_reviews`, COALESCE(`aggr_selection_1_MarketplaceOrder`.`_aggr_count_orders`, 0) AS `_aggr_count_orders` FROM `main`.`marketplace_items` LEFT JOIN (SELECT `main`.`marketplace_reviews`.`itemId`, COUNT(*) AS `_aggr_count_reviews` FROM `main`.`marketplace_reviews` WHERE 1=1 GROUP BY `main`.`marketplace_reviews`.`itemId`) AS `aggr_selection_0_MarketplaceReview` ON (`main`.`marketplace_items`.`id` = `aggr_selection_0_MarketplaceReview`.`itemId`) LEFT JOIN (SELECT `main`.`marketplace_orders`.`itemId`, COUNT(*) AS `_aggr_count_orders` FROM `main`.`marketplace_orders` WHERE 1=1 GROUP BY `main`.`marketplace_orders`.`itemId`) AS `aggr_selection_1_MarketplaceOrder` ON (`main`.`marketplace_items`.`id` = `aggr_selection_1_MarketplaceOrder`.`itemId`) WHERE `main`.`marketplace_items`.`category` = ? ORDER BY `main`.`marketplace_items`.`createdAt` DESC LIMIT ? OFFSET ?
+prisma:query SELECT `main`.`users`.`id`, `main`.`users`.`name`, `main`.`users`.`avatar`, `main`.`users`.`verified` FROM `main`.`users` WHERE `main`.`users`.`id` IN (?) LIMIT ? OFFSET ?
+prisma:query SELECT `main`.`marketplace_reviews`.`id`, `main`.`marketplace_reviews`.`rating`, `main`.`marketplace_reviews`.`comment`, `main`.`marketplace_reviews`.`createdAt`, `main`.`marketplace_reviews`.`userId`, `main`.`marketplace_reviews`.`itemId` FROM `main`.`marketplace_reviews` WHERE `main`.`marketplace_reviews`.`itemId` IN (?,?,?,?,?) LIMIT ? OFFSET ?
+ GET /api/marketplace/items?category=SFW 200 in 29ms
+prisma:query SELECT COUNT(*) AS `_count._all` FROM (SELECT `main`.`marketplace_items`.`id` FROM `main`.`marketplace_items` WHERE `main`.`marketplace_items`.`category` = ? LIMIT ? OFFSET ?) AS `sub`
+prisma:query SELECT `main`.`marketplace_items`.`id`, `main`.`marketplace_items`.`listingNumber`, `main`.`marketplace_items`.`title`, `main`.`marketplace_items`.`description`, `main`.`marketplace_items`.`type`, `main`.`marketplace_items`.`category`, `main`.`marketplace_items`.`price`, `main`.`marketplace_items`.`currency`, `main`.`marketplace_items`.`status`, `main`.`marketplace_items`.`thumbnail`, `main`.`marketplace_items`.`images`, `main`.`marketplace_items`.`pdfFile`, `main`.`marketplace_items`.`pdfFileName`, `main`.`marketplace_items`.`pdfFileSize`, `main`.`marketplace_items`.`tags`, `main`.`marketplace_items`.`isNsfw`, `main`.`marketplace_items`.`promptConfig`, `main`.`marketplace_items`.`positivePrompt`, `main`.`marketplace_items`.`negativePrompt`, `main`.`marketplace_items`.`fullPrompt`, `main`.`marketplace_items`.`userId`, `main`.`marketplace_items`.`createdAt`, `main`.`marketplace_items`.`updatedAt`, COALESCE(`aggr_selection_0_MarketplaceReview`.`_aggr_count_reviews`, 0) AS `_aggr_count_reviews`, COALESCE(`aggr_selection_1_MarketplaceOrder`.`_aggr_count_orders`, 0) AS `_aggr_count_orders` FROM `main`.`marketplace_items` LEFT JOIN (SELECT `main`.`marketplace_reviews`.`itemId`, COUNT(*) AS `_aggr_count_reviews` FROM `main`.`marketplace_reviews` WHERE 1=1 GROUP BY `main`.`marketplace_reviews`.`itemId`) AS `aggr_selection_0_MarketplaceReview` ON (`main`.`marketplace_items`.`id` = `aggr_selection_0_MarketplaceReview`.`itemId`) LEFT JOIN (SELECT `main`.`marketplace_orders`.`itemId`, COUNT(*) AS `_aggr_count_orders` FROM `main`.`marketplace_orders` WHERE 1=1 GROUP BY `main`.`marketplace_orders`.`itemId`) AS `aggr_selection_1_MarketplaceOrder` ON (`main`.`marketplace_items`.`id` = `aggr_selection_1_MarketplaceOrder`.`itemId`) WHERE `main`.`marketplace_items`.`category` = ? ORDER BY `main`.`marketplace_items`.`createdAt` DESC LIMIT ? OFFSET ?
+prisma:query SELECT `main`.`users`.`id`, `main`.`users`.`name`, `main`.`users`.`avatar`, `main`.`users`.`verified` FROM `main`.`users` WHERE `main`.`users`.`id` IN (?) LIMIT ? OFFSET ?
+prisma:query SELECT `main`.`marketplace_reviews`.`id`, `main`.`marketplace_reviews`.`rating`, `main`.`marketplace_reviews`.`comment`, `main`.`marketplace_reviews`.`createdAt`, `main`.`marketplace_reviews`.`userId`, `main`.`marketplace_reviews`.`itemId` FROM `main`.`marketplace_reviews` WHERE `main`.`marketplace_reviews`.`itemId` IN (?,?,?,?,?) LIMIT ? OFFSET ?
+ GET /api/marketplace/items?category=NSFW 200 in 16ms
+Supabase is not configured. Please set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY in your environment variables.
+ GET /models/ai-goddess-avatar.jpg 404 in 69ms
+Supabase is not configured. Please set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY in your environment variables.
+ GET /api/marketplace 404 in 72ms
+Supabase is not configured. Please set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY in your environment variables.
+ GET / 200 in 274ms
+Supabase is not configured. Please set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY in your environment variables.
+ GET /api/marketplace 404 in 61ms
+ GET /api/notifications?unreadOnly=false&limit=50 401 in 13ms
+Supabase is not configured. Please set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY in your environment variables.
+ GET / 200 in 276ms
+ GET /api/notifications?unreadOnly=false&limit=50 401 in 13ms
+Supabase is not configured. Please set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY in your environment variables.
+ GET / 200 in 248ms
+ GET /api/notifications?unreadOnly=false&limit=50 401 in 10ms
+Supabase is not configured. Please set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY in your environment variables.
+ GET / 200 in 279ms
+ GET /api/notifications?unreadOnly=false&limit=50 401 in 12ms
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `npx tsx server.ts`[39m
+> Ready on http://0.0.0.0:3000
+> Socket.IO server running at ws://0.0.0.0:3000/api/socketio
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `npx tsx server.ts`[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `npx tsx server.ts`[39m
+ ⨯ uncaughtException: Error: listen EADDRINUSE: address already in use 0.0.0.0:3000
+    at <unknown> (Error: listen EADDRINUSE: address already in use 0.0.0.0:3000) {
+  code: 'EADDRINUSE',
+  errno: -98,
+  syscall: 'listen',
+  address: '0.0.0.0',
+  port: 3000
+}
+ ⨯ uncaughtException:  Error: listen EADDRINUSE: address already in use 0.0.0.0:3000
+    at <unknown> (Error: listen EADDRINUSE: address already in use 0.0.0.0:3000) {
+  code: 'EADDRINUSE',
+  errno: -98,
+  syscall: 'listen',
+  address: '0.0.0.0',
+  port: 3000
+}
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `npx tsx server.ts`[39m
+ ⨯ uncaughtException: Error: listen EADDRINUSE: address already in use 0.0.0.0:3000
+    at <unknown> (Error: listen EADDRINUSE: address already in use 0.0.0.0:3000) {
+  code: 'EADDRINUSE',
+  errno: -98,
+  syscall: 'listen',
+  address: '0.0.0.0',
+  port: 3000
+}
+ ⨯ uncaughtException:  Error: listen EADDRINUSE: address already in use 0.0.0.0:3000
+    at <unknown> (Error: listen EADDRINUSE: address already in use 0.0.0.0:3000) {
+  code: 'EADDRINUSE',
+  errno: -98,
+  syscall: 'listen',
+  address: '0.0.0.0',
+  port: 3000
+}
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `npx tsx server.ts`[39m
+ ⨯ uncaughtException: Error: listen EADDRINUSE: address already in use 0.0.0.0:3000
+    at <unknown> (Error: listen EADDRINUSE: address already in use 0.0.0.0:3000) {
+  code: 'EADDRINUSE',
+  errno: -98,
+  syscall: 'listen',
+  address: '0.0.0.0',
+  port: 3000
+}
+ ⨯ uncaughtException:  Error: listen EADDRINUSE: address already in use 0.0.0.0:3000
+    at <unknown> (Error: listen EADDRINUSE: address already in use 0.0.0.0:3000) {
+  code: 'EADDRINUSE',
+  errno: -98,
+  syscall: 'listen',
+  address: '0.0.0.0',
+  port: 3000
+}
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `npx tsx server.ts`[39m
+ ⨯ uncaughtException: Error: listen EADDRINUSE: address already in use 0.0.0.0:3000
+    at <unknown> (Error: listen EADDRINUSE: address already in use 0.0.0.0:3000) {
+  code: 'EADDRINUSE',
+  errno: -98,
+  syscall: 'listen',
+  address: '0.0.0.0',
+  port: 3000
+}
+ ⨯ uncaughtException:  Error: listen EADDRINUSE: address already in use 0.0.0.0:3000
+    at <unknown> (Error: listen EADDRINUSE: address already in use 0.0.0.0:3000) {
+  code: 'EADDRINUSE',
+  errno: -98,
+  syscall: 'listen',
+  address: '0.0.0.0',
+  port: 3000
+}
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: ENOENT: no such file or directory, rename '/home/z/my-project/.next/cache/webpack/client-development/0.pack.gz_' -> '/home/z/my-project/.next/cache/webpack/client-development/0.pack.gz'
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `npx tsx server.ts`[39m
+ ⨯ uncaughtException: Error: listen EADDRINUSE: address already in use 0.0.0.0:3000
+    at <unknown> (Error: listen EADDRINUSE: address already in use 0.0.0.0:3000) {
+  code: 'EADDRINUSE',
+  errno: -98,
+  syscall: 'listen',
+  address: '0.0.0.0',
+  port: 3000
+}
+ ⨯ uncaughtException:  Error: listen EADDRINUSE: address already in use 0.0.0.0:3000
+    at <unknown> (Error: listen EADDRINUSE: address already in use 0.0.0.0:3000) {
+  code: 'EADDRINUSE',
+  errno: -98,
+  syscall: 'listen',
+  address: '0.0.0.0',
+  port: 3000
+}
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `npx tsx server.ts`[39m
+ ⨯ uncaughtException: Error: listen EADDRINUSE: address already in use 0.0.0.0:3000
+    at <unknown> (Error: listen EADDRINUSE: address already in use 0.0.0.0:3000) {
+  code: 'EADDRINUSE',
+  errno: -98,
+  syscall: 'listen',
+  address: '0.0.0.0',
+  port: 3000
+}
+ ⨯ uncaughtException:  Error: listen EADDRINUSE: address already in use 0.0.0.0:3000
+    at <unknown> (Error: listen EADDRINUSE: address already in use 0.0.0.0:3000) {
+  code: 'EADDRINUSE',
+  errno: -98,
+  syscall: 'listen',
+  address: '0.0.0.0',
+  port: 3000
+}
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `npx tsx server.ts`[39m
+ ⨯ uncaughtException: Error: listen EADDRINUSE: address already in use 0.0.0.0:3000
+    at <unknown> (Error: listen EADDRINUSE: address already in use 0.0.0.0:3000) {
+  code: 'EADDRINUSE',
+  errno: -98,
+  syscall: 'listen',
+  address: '0.0.0.0',
+  port: 3000
+}
+ ⨯ uncaughtException:  Error: listen EADDRINUSE: address already in use 0.0.0.0:3000
+    at <unknown> (Error: listen EADDRINUSE: address already in use 0.0.0.0:3000) {
+  code: 'EADDRINUSE',
+  errno: -98,
+  syscall: 'listen',
+  address: '0.0.0.0',
+  port: 3000
+}
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `npx tsx server.ts`[39m
+ ⨯ uncaughtException: Error: listen EADDRINUSE: address already in use 0.0.0.0:3000
+    at <unknown> (Error: listen EADDRINUSE: address already in use 0.0.0.0:3000) {
+  code: 'EADDRINUSE',
+  errno: -98,
+  syscall: 'listen',
+  address: '0.0.0.0',
+  port: 3000
+}
+ ⨯ uncaughtException:  Error: listen EADDRINUSE: address already in use 0.0.0.0:3000
+    at <unknown> (Error: listen EADDRINUSE: address already in use 0.0.0.0:3000) {
+  code: 'EADDRINUSE',
+  errno: -98,
+  syscall: 'listen',
+  address: '0.0.0.0',
+  port: 3000
+}
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `npx tsx server.ts`[39m
+ ⨯ uncaughtException: Error: listen EADDRINUSE: address already in use 0.0.0.0:3000
+    at <unknown> (Error: listen EADDRINUSE: address already in use 0.0.0.0:3000) {
+  code: 'EADDRINUSE',
+  errno: -98,
+  syscall: 'listen',
+  address: '0.0.0.0',
+  port: 3000
+}
+ ⨯ uncaughtException:  Error: listen EADDRINUSE: address already in use 0.0.0.0:3000
+    at <unknown> (Error: listen EADDRINUSE: address already in use 0.0.0.0:3000) {
+  code: 'EADDRINUSE',
+  errno: -98,
+  syscall: 'listen',
+  address: '0.0.0.0',
+  port: 3000
+}
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `npx tsx server.ts`[39m
+ ⨯ uncaughtException: Error: listen EADDRINUSE: address already in use 0.0.0.0:3000
+    at <unknown> (Error: listen EADDRINUSE: address already in use 0.0.0.0:3000) {
+  code: 'EADDRINUSE',
+  errno: -98,
+  syscall: 'listen',
+  address: '0.0.0.0',
+  port: 3000
+}
+ ⨯ uncaughtException:  Error: listen EADDRINUSE: address already in use 0.0.0.0:3000
+    at <unknown> (Error: listen EADDRINUSE: address already in use 0.0.0.0:3000) {
+  code: 'EADDRINUSE',
+  errno: -98,
+  syscall: 'listen',
+  address: '0.0.0.0',
+  port: 3000
+}
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `npx tsx server.ts`[39m
+> Ready on http://0.0.0.0:3000
+> Socket.IO server running at ws://0.0.0.0:3000/api/socketio
+ ○ Compiling /middleware ...
+ ✓ Compiled /middleware in 1439ms (245 modules)
+ ○ Compiling /api/marketplace/items ...
+<w> [webpack.cache.PackFileCacheStrategy] Serializing big strings (108kiB) impacts deserialization performance (consider using Buffer instead and decode when needed)
+ ✓ Compiled /api/marketplace/items in 2.4s (367 modules)
+prisma:query SELECT COUNT(*) AS `_count._all` FROM (SELECT `main`.`marketplace_items`.`id` FROM `main`.`marketplace_items` WHERE 1=1 LIMIT ? OFFSET ?) AS `sub`
+prisma:query SELECT `main`.`marketplace_items`.`id`, `main`.`marketplace_items`.`listingNumber`, `main`.`marketplace_items`.`title`, `main`.`marketplace_items`.`description`, `main`.`marketplace_items`.`type`, `main`.`marketplace_items`.`category`, `main`.`marketplace_items`.`price`, `main`.`marketplace_items`.`currency`, `main`.`marketplace_items`.`status`, `main`.`marketplace_items`.`thumbnail`, `main`.`marketplace_items`.`images`, `main`.`marketplace_items`.`pdfFile`, `main`.`marketplace_items`.`pdfFileName`, `main`.`marketplace_items`.`pdfFileSize`, `main`.`marketplace_items`.`tags`, `main`.`marketplace_items`.`isNsfw`, `main`.`marketplace_items`.`promptConfig`, `main`.`marketplace_items`.`positivePrompt`, `main`.`marketplace_items`.`negativePrompt`, `main`.`marketplace_items`.`fullPrompt`, `main`.`marketplace_items`.`userId`, `main`.`marketplace_items`.`createdAt`, `main`.`marketplace_items`.`updatedAt`, COALESCE(`aggr_selection_0_MarketplaceReview`.`_aggr_count_reviews`, 0) AS `_aggr_count_reviews`, COALESCE(`aggr_selection_1_MarketplaceOrder`.`_aggr_count_orders`, 0) AS `_aggr_count_orders` FROM `main`.`marketplace_items` LEFT JOIN (SELECT `main`.`marketplace_reviews`.`itemId`, COUNT(*) AS `_aggr_count_reviews` FROM `main`.`marketplace_reviews` WHERE 1=1 GROUP BY `main`.`marketplace_reviews`.`itemId`) AS `aggr_selection_0_MarketplaceReview` ON (`main`.`marketplace_items`.`id` = `aggr_selection_0_MarketplaceReview`.`itemId`) LEFT JOIN (SELECT `main`.`marketplace_orders`.`itemId`, COUNT(*) AS `_aggr_count_orders` FROM `main`.`marketplace_orders` WHERE 1=1 GROUP BY `main`.`marketplace_orders`.`itemId`) AS `aggr_selection_1_MarketplaceOrder` ON (`main`.`marketplace_items`.`id` = `aggr_selection_1_MarketplaceOrder`.`itemId`) WHERE 1=1 ORDER BY `main`.`marketplace_items`.`createdAt` DESC LIMIT ? OFFSET ?
+prisma:query SELECT `main`.`users`.`id`, `main`.`users`.`name`, `main`.`users`.`avatar`, `main`.`users`.`verified` FROM `main`.`users` WHERE `main`.`users`.`id` IN (?) LIMIT ? OFFSET ?
+prisma:query SELECT `main`.`marketplace_reviews`.`id`, `main`.`marketplace_reviews`.`rating`, `main`.`marketplace_reviews`.`comment`, `main`.`marketplace_reviews`.`createdAt`, `main`.`marketplace_reviews`.`userId`, `main`.`marketplace_reviews`.`itemId` FROM `main`.`marketplace_reviews` WHERE `main`.`marketplace_reviews`.`itemId` IN (?) LIMIT ? OFFSET ?
+ GET /api/marketplace/items?limit=1 200 in 2673ms
+Error fetching marketplace items: Error [PrismaClientValidationError]: 
+Invalid `prisma.marketplaceItem.findMany()` invocation:
+
+{
+  where: {
+    OR: [
+      {
+        title: {
+          contains: "Caucasian",
+          mode: "insensitive"
+        }
+      },
+      {
+        description: {
+          contains: "Caucasian",
+          mode: "insensitive"
+        }
+      },
+      {
+        tags: {
+          contains: "Caucasian",
+          mode: "insensitive"
+        }
+      }
+    ]
+  },
+  include: {
+    user: {
+      select: {
+        id: true,
+        name: true,
+        avatar: true,
+        verified: true
+      }
+    },
+    reviews: {
+      select: {
+        rating: true,
+        comment: true,
+        createdAt: true,
+        user: {
+          select: {
+            name: true,
+            avatar: true
+          }
+        }
+      }
+    },
+    _count: {
+      select: {
+        reviews: true,
+        orders: true
+      }
+    }
+  },
+  orderBy: {
+    createdAt: "desc"
+  },
+  skip: 0,
+  take: 5
+}
+
+Unknown argument `mode`. Did you mean `lte`? Available options are marked with ?.
+    at async GET (src/app/api/marketplace/items/route.ts:81:27)
+  79 |     const skip = (page - 1) * limit
+  80 |
+> 81 |     const [items, total] = await Promise.all([
+     |                           ^
+  82 |       db.marketplaceItem.findMany({
+  83 |         where,
+  84 |         include: { {
+  clientVersion: '6.13.0'
+}
+ GET /api/marketplace/items?search=Caucasian&limit=5 500 in 245ms
+Error fetching marketplace items: Error [PrismaClientValidationError]: 
+Invalid `prisma.marketplaceItem.findMany()` invocation:
+
+{
+  where: {
+    OR: [
+      {
+        title: {
+          contains: "\"Caucasian\"",
+          mode: "insensitive"
+        }
+      },
+      {
+        description: {
+          contains: "\"Caucasian\"",
+          mode: "insensitive"
+        }
+      },
+      {
+        tags: {
+          contains: "\"Caucasian\"",
+          mode: "insensitive"
+        }
+      }
+    ]
+  },
+  include: {
+    user: {
+      select: {
+        id: true,
+        name: true,
+        avatar: true,
+        verified: true
+      }
+    },
+    reviews: {
+      select: {
+        rating: true,
+        comment: true,
+        createdAt: true,
+        user: {
+          select: {
+            name: true,
+            avatar: true
+          }
+        }
+      }
+    },
+    _count: {
+      select: {
+        reviews: true,
+        orders: true
+      }
+    }
+  },
+  orderBy: {
+    createdAt: "desc"
+  },
+  skip: 0,
+  take: 5
+}
+
+Unknown argument `mode`. Did you mean `lte`? Available options are marked with ?.
+    at async GET (src/app/api/marketplace/items/route.ts:81:27)
+  79 |     const skip = (page - 1) * limit
+  80 |
+> 81 |     const [items, total] = await Promise.all([
+     |                           ^
+  82 |       db.marketplaceItem.findMany({
+  83 |         where,
+  84 |         include: { {
+  clientVersion: '6.13.0'
+}
+ GET /api/marketplace/items?search=%22Caucasian%22&limit=5 500 in 133ms
+Error fetching marketplace items: Error [PrismaClientValidationError]: 
+Invalid `prisma.marketplaceItem.findMany()` invocation:
+
+{
+  where: {
+    OR: [
+      {
+        title: {
+          contains: "Nude",
+          mode: "insensitive"
+        }
+      },
+      {
+        description: {
+          contains: "Nude",
+          mode: "insensitive"
+        }
+      },
+      {
+        tags: {
+          contains: "Nude",
+          mode: "insensitive"
+        }
+      }
+    ]
+  },
+  include: {
+    user: {
+      select: {
+        id: true,
+        name: true,
+        avatar: true,
+        verified: true
+      }
+    },
+    reviews: {
+      select: {
+        rating: true,
+        comment: true,
+        createdAt: true,
+        user: {
+          select: {
+            name: true,
+            avatar: true
+          }
+        }
+      }
+    },
+    _count: {
+      select: {
+        reviews: true,
+        orders: true
+      }
+    }
+  },
+  orderBy: {
+    createdAt: "desc"
+  },
+  skip: 0,
+  take: 5
+}
+
+Unknown argument `mode`. Did you mean `lte`? Available options are marked with ?.
+    at async GET (src/app/api/marketplace/items/route.ts:81:27)
+  79 |     const skip = (page - 1) * limit
+  80 |
+> 81 |     const [items, total] = await Promise.all([
+     |                           ^
+  82 |       db.marketplaceItem.findMany({
+  83 |         where,
+  84 |         include: { {
+  clientVersion: '6.13.0'
+}
+ GET /api/marketplace/items?search=Nude&limit=5 500 in 128ms
+prisma:query SELECT 1
+prisma:query SELECT `main`.`marketplace_items`.`id`, `main`.`marketplace_items`.`listingNumber`, `main`.`marketplace_items`.`title`, `main`.`marketplace_items`.`description`, `main`.`marketplace_items`.`type`, `main`.`marketplace_items`.`category`, `main`.`marketplace_items`.`price`, `main`.`marketplace_items`.`currency`, `main`.`marketplace_items`.`status`, `main`.`marketplace_items`.`thumbnail`, `main`.`marketplace_items`.`images`, `main`.`marketplace_items`.`pdfFile`, `main`.`marketplace_items`.`pdfFileName`, `main`.`marketplace_items`.`pdfFileSize`, `main`.`marketplace_items`.`tags`, `main`.`marketplace_items`.`isNsfw`, `main`.`marketplace_items`.`promptConfig`, `main`.`marketplace_items`.`positivePrompt`, `main`.`marketplace_items`.`negativePrompt`, `main`.`marketplace_items`.`fullPrompt`, `main`.`marketplace_items`.`userId`, `main`.`marketplace_items`.`createdAt`, `main`.`marketplace_items`.`updatedAt`, COALESCE(`aggr_selection_0_MarketplaceReview`.`_aggr_count_reviews`, 0) AS `_aggr_count_reviews`, COALESCE(`aggr_selection_1_MarketplaceOrder`.`_aggr_count_orders`, 0) AS `_aggr_count_orders` FROM `main`.`marketplace_items` LEFT JOIN (SELECT `main`.`marketplace_reviews`.`itemId`, COUNT(*) AS `_aggr_count_reviews` FROM `main`.`marketplace_reviews` WHERE 1=1 GROUP BY `main`.`marketplace_reviews`.`itemId`) AS `aggr_selection_0_MarketplaceReview` ON (`main`.`marketplace_items`.`id` = `aggr_selection_0_MarketplaceReview`.`itemId`) LEFT JOIN (SELECT `main`.`marketplace_orders`.`itemId`, COUNT(*) AS `_aggr_count_orders` FROM `main`.`marketplace_orders` WHERE 1=1 GROUP BY `main`.`marketplace_orders`.`itemId`) AS `aggr_selection_1_MarketplaceOrder` ON (`main`.`marketplace_items`.`id` = `aggr_selection_1_MarketplaceOrder`.`itemId`) WHERE 1=1 ORDER BY `main`.`marketplace_items`.`createdAt` DESC LIMIT ? OFFSET ?
+prisma:query SELECT `main`.`users`.`id`, `main`.`users`.`name`, `main`.`users`.`avatar`, `main`.`users`.`verified` FROM `main`.`users` WHERE `main`.`users`.`id` IN (?) LIMIT ? OFFSET ?
+prisma:query SELECT `main`.`marketplace_reviews`.`id`, `main`.`marketplace_reviews`.`rating`, `main`.`marketplace_reviews`.`comment`, `main`.`marketplace_reviews`.`createdAt`, `main`.`marketplace_reviews`.`userId`, `main`.`marketplace_reviews`.`itemId` FROM `main`.`marketplace_reviews` WHERE `main`.`marketplace_reviews`.`itemId` IN (?,?,?,?,?) LIMIT ? OFFSET ?
+ GET /api/marketplace/items?limit=5 200 in 14ms
+prisma:query SELECT COUNT(*) AS `_count._all` FROM (SELECT `main`.`marketplace_items`.`id` FROM `main`.`marketplace_items` WHERE 1=1 LIMIT ? OFFSET ?) AS `sub`
+ ○ Compiling / ...
+ ✓ Compiled / in 8.3s (1948 modules)
+Supabase is not configured. Please set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY in your environment variables.
+ GET / 200 in 9961ms
+ ⨯ upstream image response failed for https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/OnlyFans_logo.svg/1200px-OnlyFans_logo.svg.png 404
+Error fetching marketplace items: Error [PrismaClientValidationError]: 
+Invalid `prisma.marketplaceItem.findMany()` invocation:
+
+{
+  where: {
+    OR: [
+      {
+        title: {
+          contains: "Fantasy",
+          mode: "insensitive"
+        }
+      },
+      {
+        description: {
+          contains: "Fantasy",
+          mode: "insensitive"
+        }
+      },
+      {
+        tags: {
+          contains: "Fantasy",
+          mode: "insensitive"
+        }
+      }
+    ]
+  },
+  include: {
+    user: {
+      select: {
+        id: true,
+        name: true,
+        avatar: true,
+        verified: true
+      }
+    },
+    reviews: {
+      select: {
+        rating: true,
+        comment: true,
+        createdAt: true,
+        user: {
+          select: {
+            name: true,
+            avatar: true
+          }
+        }
+      }
+    },
+    _count: {
+      select: {
+        reviews: true,
+        orders: true
+      }
+    }
+  },
+  orderBy: {
+    createdAt: "desc"
+  },
+  skip: 0,
+  take: 5
+}
+
+Unknown argument `mode`. Did you mean `lte`? Available options are marked with ?.
+    at async GET (src/app/api/marketplace/items/route.ts:81:27)
+  79 |     const skip = (page - 1) * limit
+  80 |
+> 81 |     const [items, total] = await Promise.all([
+     |                           ^
+  82 |       db.marketplaceItem.findMany({
+  83 |         where,
+  84 |         include: { {
+  clientVersion: '6.13.0'
+}
+ GET /api/marketplace/items?search=Fantasy&limit=5 500 in 170ms
+prisma:query SELECT 1
+ ⨯ upstream image response failed for https://upload.wikimedia.org/wikipedia/commons/thumb/8/87/Fansly_logo.svg/1200px-Fansly_logo.svg.png 404
+ ⨯ upstream image response failed for https://upload.wikimedia.org/wikipedia/commons/thumb/5/5a/JustForFans_logo.svg/1200px-JustForFans_logo.svg.png 404
+ ⨯ upstream image response failed for https://upload.wikimedia.org/wikipedia/commons/thumb/7/7a/AdmireMe_logo.svg/1200px-AdmireMe_logo.svg.png 404
+ ○ Compiling /api/notifications ...
+ ⨯ upstream image response failed for https://upload.wikimedia.org/wikipedia/commons/thumb/6/6a/FanCentro_logo.svg/1200px-FanCentro_logo.svg.png 404
+ ⨯ upstream image response failed for https://upload.wikimedia.org/wikipedia/commons/thumb/4/4a/ManyVids_logo.svg/1200px-ManyVids_logo.svg.png 404
+ ✓ Compiled /api/notifications in 2.1s (2223 modules)
+Supabase is not configured. Please set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY in your environment variables.
+[next-auth][warn][NEXTAUTH_URL] 
+https://next-auth.js.org/warnings#nextauth_url
+ GET /api/notifications?unreadOnly=false&limit=50 401 in 2397ms
+ ⨯ upstream image response failed for https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/OnlyFans_logo.svg/1200px-OnlyFans_logo.svg.png 404
+ ⨯ upstream image response failed for https://upload.wikimedia.org/wikipedia/commons/thumb/8/87/Fansly_logo.svg/1200px-Fansly_logo.svg.png 404
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `npx tsx server.ts`[39m
+ ⨯ uncaughtException: Error: listen EADDRINUSE: address already in use 0.0.0.0:3000
+    at <unknown> (Error: listen EADDRINUSE: address already in use 0.0.0.0:3000) {
+  code: 'EADDRINUSE',
+  errno: -98,
+  syscall: 'listen',
+  address: '0.0.0.0',
+  port: 3000
+}
+ ⨯ uncaughtException:  Error: listen EADDRINUSE: address already in use 0.0.0.0:3000
+    at <unknown> (Error: listen EADDRINUSE: address already in use 0.0.0.0:3000) {
+  code: 'EADDRINUSE',
+  errno: -98,
+  syscall: 'listen',
+  address: '0.0.0.0',
+  port: 3000
+}
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `npx tsx server.ts`[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `npx tsx server.ts`[39m
+ ⨯ uncaughtException: Error: listen EADDRINUSE: address already in use 0.0.0.0:3000
+    at <unknown> (Error: listen EADDRINUSE: address already in use 0.0.0.0:3000) {
+  code: 'EADDRINUSE',
+  errno: -98,
+  syscall: 'listen',
+  address: '0.0.0.0',
+  port: 3000
+}
+ ⨯ uncaughtException:  Error: listen EADDRINUSE: address already in use 0.0.0.0:3000
+    at <unknown> (Error: listen EADDRINUSE: address already in use 0.0.0.0:3000) {
+  code: 'EADDRINUSE',
+  errno: -98,
+  syscall: 'listen',
+  address: '0.0.0.0',
+  port: 3000
+}

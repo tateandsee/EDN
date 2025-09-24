@@ -1,0 +1,1146 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  avatar    String?
+  bio       String?
+  role      UserRole @default(CREATOR)
+  verified  Boolean  @default(false)
+  isPaidMember Boolean @default(false) // Added for paid user detection
+  points    Int      @default(0) // Gamification points
+  currentLevelId String? // Foreign key to levels
+  onboardingCompleted Boolean @default(false) // Onboarding completion status
+  paymentDetails Json? // Payment details for payouts (bank account, Coinbase, PayPal)
+  referredBy String? // Affiliate code used when signing up
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  posts       Post[]
+  contents    Content[]
+  platforms   PlatformConnection[]
+  orders      Order[]
+  affiliate   Affiliate?
+  payouts     Payout[]
+  earnings    Earning[]
+  subscriptions Subscription[]
+  reviews     Review[]
+  marketplaceItems  MarketplaceItem[]
+  marketplaceReviews MarketplaceReview[]
+  marketplaceOrders MarketplaceOrder[]
+  
+  // New onboarding relations
+  onboardingProgress UserOnboardingProgress[]
+  userBadges        UserBadge[]
+  userRewards       UserReward[]
+  currentLevel      Level? @relation(fields: [currentLevelId], references: [id])
+  activities        OnboardingActivity[]
+  
+  // Referral relations
+  membershipReferrals MembershipReferral[]
+  
+  // API Integration relations
+  apiIntegrations ApiIntegration[]
+  githubIntegrations GithubIntegration[]
+  
+  // AI Generation relations
+  aiGenerations AiGeneration[]
+  aiModelConfigs AiModelConfig[]
+  
+  // Download and notification relations
+  aiModelDownloads AiModelDownload[]
+  notifications Notification[]
+  
+  // Admin relations
+  adminProfile Admin?
+  adminActions AdminAction[]
+  
+  // Refund relations
+  refunds Refund[]
+  
+  // Usage tracking relations
+  membershipUsage MembershipUsage[]
+  
+  @@map("users")
+}
+
+model Post {
+  id        String   @id @default(cuid())
+  title     String
+  content   String?
+  published Boolean  @default(false)
+  authorId  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  author User @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  @@map("posts")
+}
+
+model Content {
+  id          String       @id @default(cuid())
+  title       String
+  description String?
+  type        ContentType
+  status      ContentStatus @default(DRAFT)
+  url         String?
+  thumbnail   String?
+  duration    Int?         // in seconds for videos
+  resolution  String?      // e.g., "4K", "1080p"
+  tags        String?      // JSON string of tags
+  prompt      String?      // AI generation prompt
+  loraModel   String?      // LoRA model used
+  userId      String
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("contents")
+}
+
+model Platform {
+  id          String       @id @default(cuid())
+  name        String
+  description String?
+  icon        String?
+  category    PlatformCategory
+  isActive    Boolean      @default(true)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  connections PlatformConnection[]
+
+  @@map("platforms")
+}
+
+model PlatformConnection {
+  id         String            @id @default(cuid())
+  platformId String
+  userId     String
+  username   String?
+  isConnected Boolean           @default(false)
+  authData   String?           // JSON string for auth credentials
+  stats      Json?             // Platform statistics
+  createdAt  DateTime          @default(now())
+  updatedAt  DateTime          @updatedAt
+
+  platform Platform @relation(fields: [platformId], references: [id], onDelete: Cascade)
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([platformId, userId])
+  @@map("platform_connections")
+}
+
+model Subscription {
+  id          String           @id @default(cuid())
+  userId      String
+  plan        SubscriptionPlan
+  status      SubscriptionStatus @default(ACTIVE)
+  startedAt   DateTime         @default(now())
+  expiresAt   DateTime
+  autoRenew   Boolean          @default(true)
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("subscriptions")
+}
+
+model Order {
+  id            String      @id @default(cuid())
+  userId        String
+  amount        Float
+  currency      String      @default("USD")
+  status        OrderStatus @default(PENDING)
+  plan          SubscriptionPlan
+  paymentId     String?     // External payment processor ID
+  promotionalCodeId String?  // Applied promotional code
+  discountAmount Float?      // Discount applied
+  finalAmount   Float?      // Final amount after discount
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  user            User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  promotionalCode PromotionalCode? @relation(fields: [promotionalCodeId], references: [id])
+
+  @@map("orders")
+}
+
+model Affiliate {
+  id          String   @id @default(cuid())
+  userId      String   @unique
+  code        String   @unique
+  commission  Float    @default(0.10) // 10% default commission for memberships
+  earnings    Float    @default(0)
+  referrals   Int      @default(0)
+  tier        AffiliateTier @default(BRONZE)
+  points      Int      @default(0) // Gamification points
+  level       Int      @default(1) // Affiliate level
+  payoutMethod Json?    // Payment method details for automated payouts (Coinbase, PayPal, etc.)
+  minimumPayoutThreshold Float @default(50.0) // Minimum earnings before payout
+  autoPayoutEnabled Boolean @default(true) // Enable automatic payouts
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user         User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  achievements AffiliateAchievement[]
+  leaderboardEntries LeaderboardEntry[]
+  challenges   ChallengeProgress[]
+  affiliatePayouts AffiliatePayout[]
+  membershipReferrals MembershipReferral[] // Track membership referrals specifically
+
+  @@map("affiliates")
+}
+
+model Earning {
+  id          String      @id @default(cuid())
+  userId      String
+  amount      Float
+  type        EarningType
+  description String?
+  createdAt   DateTime    @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("earnings")
+}
+
+model Payout {
+  id          String      @id @default(cuid())
+  userId      String
+  amount      Float
+  status      PayoutStatus @default(PENDING)
+  method      String      // e.g., "paypal", "bank_transfer", "coinbase"
+  details     Json?       // Payment method details
+  processedAt DateTime?
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("payouts")
+}
+
+model AffiliatePayout {
+  id          String      @id @default(cuid())
+  affiliateId String
+  amount      Float
+  commissionRate Float   // Commission rate applied
+  referralUserId String? // User who was referred
+  status      PayoutStatus @default(PENDING)
+  method      String      // e.g., "coinbase", "paypal", "bank_transfer"
+  providerResponse Json? // API response from payment provider
+  processedAt DateTime?
+  scheduledFor DateTime? // When payout is scheduled
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  affiliate Affiliate @relation(fields: [affiliateId], references: [id], onDelete: Cascade)
+
+  @@map("affiliate_payouts")
+}
+
+model MembershipReferral {
+  id          String   @id @default(cuid())
+  affiliateId String
+  referredUserId String @unique // One commission per referred user
+  membershipPlan SubscriptionPlan // The plan the referred user purchased
+  membershipAmount Float  // The amount of the membership
+  commissionAmount Float  // The commission earned
+  commissionRate Float    // The commission rate applied
+  status      ReferralStatus @default(PENDING) // Track if commission has been paid
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  affiliate   Affiliate @relation(fields: [affiliateId], references: [id], onDelete: Cascade)
+  referredUser User     @relation(fields: [referredUserId], references: [id])
+
+  @@map("membership_referrals")
+}
+
+model Review {
+  id        String   @id @default(cuid())
+  userId    String
+  rating    Int      // 1-5 stars
+  comment   String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("reviews")
+}
+
+model MarketplaceItem {
+  id          String           @id @default(cuid())
+  listingNumber Int             @default(0) // Sequential listing number starting from 1
+  title       String
+  description String?
+  type        MarketplaceType
+  category    MarketplaceCategory
+  price       Float
+  currency    String           @default("USD")
+  status      MarketplaceStatus @default(ACTIVE)
+  thumbnail   String?
+  images      String?          // JSON string of image URLs
+  pdfFile     String?          // PDF file URL for mentorship/ebooks
+  pdfFileName String?          // Original PDF file name
+  pdfFileSize Int?             // PDF file size in bytes
+  tags        String?          // JSON string of tags
+  isNsfw      Boolean          @default(false) // NSFW content flag
+  promptConfig Json?           // AI model prompt configuration
+  positivePrompt String?        // Enhanced positive prompt
+  negativePrompt String?        // Enhanced negative prompt
+  fullPrompt   String?          // Complete prompt
+  userId      String
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  user     User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  reviews  MarketplaceReview[]
+  orders   MarketplaceOrder[]
+
+  @@map("marketplace_items")
+}
+
+model MarketplaceReview {
+  id        String   @id @default(cuid())
+  userId    String
+  itemId    String
+  rating    Int      // 1-5 stars
+  comment   String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  item MarketplaceItem @relation(fields: [itemId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, itemId])
+  @@map("marketplace_reviews")
+}
+
+model MarketplaceOrder {
+  id          String           @id @default(cuid())
+  userId      String
+  itemId      String
+  amount      Float
+  currency    String           @default("USD")
+  status      OrderStatus      @default(PENDING)
+  paymentId   String?          // External payment processor ID
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  user User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  item MarketplaceItem @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  promptAccess MarketplacePromptAccess?
+
+  @@map("marketplace_orders")
+}
+
+model MarketplacePromptAccess {
+  id          String   @id @default(cuid())
+  orderId     String   @unique
+  userId      String
+  itemId      String
+  isUnlocked  Boolean  @default(false)
+  unlockedAt  DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  order MarketplaceOrder @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@map("marketplace_prompt_access")
+}
+
+// Gamification Models
+model Achievement {
+  id            String           @id @default(cuid())
+  name          String
+  description   String
+  icon          String?
+  category      AchievementCategory
+  points        Int
+  tier          AchievementTier
+  isActive      Boolean          @default(true)
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+
+  achievements AffiliateAchievement[]
+
+  @@map("achievements")
+}
+
+model AffiliateAchievement {
+  id            String   @id @default(cuid())
+  affiliateId   String
+  achievementId String
+  unlockedAt    DateTime @default(now())
+  progress      Int      @default(0) // For progressive achievements
+  maxProgress   Int      @default(100)
+
+  affiliate    Affiliate    @relation(fields: [affiliateId], references: [id], onDelete: Cascade)
+  achievement  Achievement  @relation(fields: [achievementId], references: [id], onDelete: Cascade)
+
+  @@unique([affiliateId, achievementId])
+  @@map("affiliate_achievements")
+}
+
+model Leaderboard {
+  id          String           @id @default(cuid())
+  name        String
+  description String?
+  type        LeaderboardType
+  timeframe   LeaderboardTimeframe
+  isActive    Boolean          @default(true)
+  startDate   DateTime?
+  endDate     DateTime?
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  entries LeaderboardEntry[]
+
+  @@map("leaderboards")
+}
+
+model LeaderboardEntry {
+  id           String     @id @default(cuid())
+  leaderboardId String
+  affiliateId  String
+  rank         Int
+  score        Int
+  period       String     // e.g., "2024-01" for monthly
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  leaderboard Leaderboard @relation(fields: [leaderboardId], references: [id], onDelete: Cascade)
+  affiliate   Affiliate  @relation(fields: [affiliateId], references: [id], onDelete: Cascade)
+
+  @@unique([leaderboardId, affiliateId, period])
+  @@map("leaderboard_entries")
+}
+
+model Challenge {
+  id          String        @id @default(cuid())
+  name        String
+  description String
+  type        ChallengeType
+  requirements Json          // Challenge requirements as JSON
+  rewards     Json          // Rewards as JSON
+  startDate   DateTime
+  endDate     DateTime
+  isActive    Boolean       @default(true)
+  maxParticipants Int?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  progress ChallengeProgress[]
+
+  @@map("challenges")
+}
+
+model ChallengeProgress {
+  id          String    @id @default(cuid())
+  challengeId String
+  affiliateId String
+  progress    Int       @default(0)
+  maxProgress Int       @default(100)
+  completed   Boolean   @default(false)
+  completedAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  challenge Challenge @relation(fields: [challengeId], references: [id], onDelete: Cascade)
+  affiliate Affiliate  @relation(fields: [affiliateId], references: [id], onDelete: Cascade)
+
+  @@unique([challengeId, affiliateId])
+  @@map("challenge_progress")
+}
+
+model GamificationSettings {
+  id                  String   @id @default(cuid())
+  gamificationEnabled Boolean  @default(true)
+  leaderboardEnabled  Boolean  @default(true)
+  achievementsEnabled Boolean  @default(true)
+  challengesEnabled  Boolean  @default(true)
+  pointsPerReferral  Int      @default(100)
+  pointsPerSale      Int      @default(50)
+  levelUpMultiplier  Float    @default(1.5)
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  @@map("gamification_settings")
+}
+
+// Onboarding Journey Models
+model OnboardingStep {
+  id            String   @id @default(cuid())
+  name          String   @unique
+  description   String
+  order         Int      // Sequence for journey
+  pointsReward  Int      @default(100)
+  isRequired    Boolean  @default(true)
+  criteria      Json     // Conditions for auto-completion
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  progress      UserOnboardingProgress[]
+  
+  @@map("onboarding_steps")
+}
+
+model UserOnboardingProgress {
+  id                 String                    @id @default(cuid())
+  userId             String
+  stepId             String
+  status             OnboardingProgressStatus  @default(PENDING)
+  completedAt        DateTime?
+  progressPercentage Float                     @default(0)
+  createdAt          DateTime                  @default(now())
+  updatedAt          DateTime                  @updatedAt
+
+  user               User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  step               OnboardingStep     @relation(fields: [stepId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, stepId])
+  @@map("user_onboarding_progress")
+}
+
+model Badge {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  description String
+  iconUrl     String?
+  criteria    Json     // Award criteria
+  pointsRequired Int   @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  userBadges  UserBadge[]
+  
+  @@map("badges")
+}
+
+model UserBadge {
+  id         String   @id @default(cuid())
+  userId     String
+  badgeId    String
+  awardedAt  DateTime @default(now())
+
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  badge      Badge    @relation(fields: [badgeId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, badgeId])
+  @@map("user_badges")
+}
+
+model Level {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  minPoints Int      // Minimum points required
+  maxPoints Int?     // Maximum points for this level
+  benefits  Json     // Level benefits
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  users     User[]
+  
+  @@map("levels")
+}
+
+model Reward {
+  id          String       @id @default(cuid())
+  name        String       @unique
+  description String
+  pointsCost  Int
+  type        RewardType
+  value       Json         // Reward value details
+  stock       Int?         // Limited availability
+  isNsfw      Boolean      @default(true)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  userRewards UserReward[]
+  
+  @@map("rewards")
+}
+
+model UserReward {
+  id          String        @id @default(cuid())
+  userId      String
+  rewardId    String
+  redeemedAt  DateTime      @default(now())
+  status      RewardStatus  @default(PENDING)
+
+  user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  reward      Reward        @relation(fields: [rewardId], references: [id], onDelete: Cascade)
+
+  @@map("user_rewards")
+}
+
+// Onboarding Activity Log
+model OnboardingActivity {
+  id          String                @id @default(cuid())
+  userId      String
+  action      OnboardingActionType
+  details     Json?                 // Action details
+  createdAt   DateTime              @default(now())
+
+  user        User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("onboarding_activities")
+}
+
+// Promotional Code Model
+model PromotionalCode {
+  id          String            @id @default(cuid())
+  code        String            @unique
+  description String?
+  type        PromotionalCodeType
+  value       Float             // Discount value (percentage or fixed amount)
+  maxUses     Int?              // Maximum number of uses
+  usedCount   Int               @default(0)
+  validFrom   DateTime          @default(now())
+  validUntil  DateTime?
+  isActive    Boolean           @default(true)
+  minAmount   Float?            // Minimum order amount
+  applicablePlans Json?         // JSON array of applicable subscription plans
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+
+  orders      Order[]           // Track which orders used this code
+  
+  @@map("promotional_codes")
+}
+
+// Enums
+enum UserRole {
+  CREATOR
+  ADMIN
+  AFFILIATE
+}
+
+enum ContentType {
+  IMAGE
+  VIDEO
+  AUDIO
+  TEXT
+}
+
+enum ContentStatus {
+  DRAFT
+  PROCESSING
+  COMPLETED
+  FAILED
+  PUBLISHED
+}
+
+enum PlatformCategory {
+  SOCIAL_MEDIA
+  ADULT_PLATFORM
+  VIDEO_PLATFORM
+  BLOGGING
+  ECOMMERCE
+}
+
+enum SubscriptionPlan {
+  FREE
+  BASIC
+  PRO
+  ELITE
+  MASTER
+  ULTIMATE
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  EXPIRED
+  CANCELLED
+  SUSPENDED
+}
+
+enum OrderStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  REFUNDED
+}
+
+enum EarningType {
+  CONTENT_SALE
+  AFFILIATE_COMMISSION
+  PLATFORM_REVENUE
+  BONUS
+}
+
+enum PayoutStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+}
+
+enum ReferralStatus {
+  PENDING
+  PAID
+  CANCELLED
+}
+
+enum MarketplaceType {
+  AI_MODEL
+  MENTORSHIP
+  TEMPLATE
+  SERVICE
+  DIGITAL_GOOD
+}
+
+enum MarketplaceCategory {
+  SFW
+  NSFW
+  EDUCATION
+  PROMPTS
+}
+
+enum MarketplaceStatus {
+  ACTIVE
+  INACTIVE
+  PENDING
+  SUSPENDED
+  SOLD
+}
+
+// Affiliate and Gamification Enums
+enum AffiliateTier {
+  BRONZE
+  SILVER
+  GOLD
+  PLATINUM
+  DIAMOND
+}
+
+enum AchievementCategory {
+  REFERRALS
+  SALES
+  ENGAGEMENT
+  MILESTONES
+  SPECIAL
+}
+
+enum AchievementTier {
+  BRONZE
+  SILVER
+  GOLD
+  PLATINUM
+  DIAMOND
+}
+
+enum LeaderboardType {
+  REFERRALS
+  EARNINGS
+  POINTS
+  CONVERSIONS
+}
+
+enum LeaderboardTimeframe {
+  DAILY
+  WEEKLY
+  MONTHLY
+  QUARTERLY
+  YEARLY
+  ALL_TIME
+}
+
+enum ChallengeType {
+  REFERRAL_TARGET
+  SALES_TARGET
+  ENGAGEMENT_TARGET
+  TIME_BASED
+  SPECIAL
+}
+
+// Onboarding Journey Enums
+enum OnboardingProgressStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+  SKIPPED
+}
+
+enum RewardType {
+  AI_CREDITS
+  AFFILIATE_BONUS
+  CONTENT_UNLOCK
+  CUSTOM
+}
+
+enum RewardStatus {
+  PENDING
+  CLAIMED
+  EXPIRED
+}
+
+enum OnboardingActionType {
+  STEP_STARTED
+  STEP_COMPLETED
+  BADGE_EARNED
+  REWARD_REDEEMED
+  LEVEL_UP
+  ONBOARDING_COMPLETED
+  POINTS_EARNED
+}
+
+// Promotional Code Enums
+enum PromotionalCodeType {
+  PERCENTAGE
+  FIXED_AMOUNT
+  FREE_TRIAL
+}
+
+// Additional models for comprehensive platform
+
+model Admin {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  role      AdminRole @default(MODERATOR)
+  permissions Json    // Array of permissions
+  isActive  Boolean  @default(true)
+  lastLogin DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  actions     AdminAction[]
+  
+  @@map("admins")
+}
+
+model AdminAction {
+  id          String   @id @default(cuid())
+  adminId     String
+  userId      String?  // Associated user if any
+  action      String   // Action performed
+  targetId    String?  // ID of target entity
+  targetType  String?  // Type of target entity
+  details     Json?    // Additional details
+  ipAddress   String?  // Admin IP address
+  userAgent   String?  // Admin user agent
+  createdAt   DateTime @default(now())
+
+  admin Admin @relation(fields: [adminId], references: [id], onDelete: Cascade)
+  user  User?  @relation(fields: [userId], references: [id], onDelete: SetNull)
+  
+  @@map("admin_actions")
+}
+
+model ApiIntegration {
+  id          String   @id @default(cuid())
+  userId      String
+  provider    String   // e.g., "z.ai", "openai", "huggingface"
+  serviceName String   // e.g., "chat", "image_generation"
+  apiKey      String   // Encrypted API key
+  config      Json?    // Additional configuration
+  quotas      Json?    // Usage quotas and limits
+  isActive    Boolean  @default(true)
+  lastUsed    DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@map("api_integrations")
+}
+
+model GithubIntegration {
+  id            String   @id @default(cuid())
+  userId        String   @unique
+  githubId      String   // GitHub user ID
+  username      String   // GitHub username
+  accessToken   String   // Encrypted access token
+  refreshToken  String?  // Encrypted refresh token
+  scopes        String?  // OAuth scopes
+  webhookSecret String?  // Webhook secret for auto-deploys
+  repos         Json?    // Connected repositories
+  isActive      Boolean  @default(true)
+  lastSync      DateTime?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@map("github_integrations")
+}
+
+model AiModel {
+  id            String           @id @default(cuid())
+  name          String
+  description   String?
+  provider      String           // e.g., "z.ai", "openai", "stability"
+  modelType     AiModelType      // e.g., "chat", "image", "code"
+  version       String?
+  capabilities  Json             // Model capabilities
+  parameters    Json             // Model parameters
+  quotas        Json             // Usage quotas
+  pricing       Json             // Pricing information
+  isActive      Boolean          @default(true)
+  isNsfw        Boolean          @default(false)
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+
+  configs AiModelConfig[]
+  generations AiGeneration[]
+  
+  @@map("ai_models")
+}
+
+model AiModelConfig {
+  id          String   @id @default(cuid())
+  userId      String
+  modelId     String
+  name        String
+  config      Json     // Model configuration
+  isDefault   Boolean  @default(false)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user  User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  model AiModel @relation(fields: [modelId], references: [id], onDelete: Cascade)
+  generations AiGeneration[]
+  
+  @@unique([userId, name])
+  @@map("ai_model_configs")
+}
+
+model AiGeneration {
+  id          String        @id @default(cuid())
+  userId      String
+  modelId     String
+  configId    String?
+  type        GenerationType
+  prompt      String
+  parameters  Json?         // Generation parameters
+  result      Json?         // Generation result
+  status      GenerationStatus @default(PENDING)
+  creditsUsed Int           @default(0)
+  isNsfw      Boolean       @default(false)
+  error       String?
+  startedAt   DateTime?
+  completedAt DateTime?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  user   User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  model  AiModel  @relation(fields: [modelId], references: [id], onDelete: Cascade)
+  config AiModelConfig? @relation(fields: [configId], references: [id], onDelete: SetNull)
+  downloads AiModelDownload[]
+  
+  @@map("ai_generations")
+}
+
+model AiModelDownload {
+  id              String            @id @default(cuid())
+  generationId    String
+  userId          String
+  fileName        String
+  filePath        String
+  fileSize        Int               // File size in bytes
+  mimeType        String
+  downloadUrl     String            // Temporary download URL
+  expiresAt       DateTime          // 48 hours from creation
+  isExpired       Boolean           @default(false)
+  isDeleted       Boolean           @default(false)
+  downloadCount   Int               @default(0)
+  maxDownloads    Int               @default(5) // Max download attempts
+  lastDownloadedAt DateTime?
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+
+  generation AiGeneration @relation(fields: [generationId], references: [id], onDelete: Cascade)
+  user       User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  notifications Notification[]
+
+  @@map("ai_model_downloads")
+}
+
+model Notification {
+  id          String           @id @default(cuid())
+  userId      String
+  type        NotificationType
+  title       String
+  message     String
+  metadata    Json?            // Additional notification data
+  isRead      Boolean          @default(false)
+  isDismissed Boolean          @default(false)
+  expiresAt   DateTime?        // For time-sensitive notifications
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  user     User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  download AiModelDownload? @relation(fields: [downloadId], references: [id], onDelete: SetNull)
+  downloadId String?         // Associated download if any
+
+  @@map("notifications")
+}
+
+model Refund {
+  id          String      @id @default(cuid())
+  userId      String
+  orderId     String?     // Associated order if any
+  amount      Float
+  currency    String      @default("USD")
+  reason      String
+  status      RefundStatus @default(PENDING)
+  approvedBy  String?     // Admin ID who approved
+  approvedAt  DateTime?
+  processedAt DateTime?
+  metadata    Json?       // Additional refund metadata
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@map("refunds")
+}
+
+model SystemLog {
+  id          String   @id @default(cuid())
+  level       LogLevel // INFO, WARN, ERROR, etc.
+  category    String   // Log category
+  message     String
+  metadata    Json?    // Additional log data
+  userId      String?  // Associated user if any
+  ipAddress   String?  // IP address
+  userAgent   String?  // User agent
+  createdAt   DateTime @default(now())
+
+  @@map("system_logs")
+}
+
+// Analytics model for tracking user events
+model AnalyticsEvent {
+  id          String   @id @default(cuid())
+  event       String   // Event name/type
+  properties  Json?    // Event properties as JSON
+  timestamp   DateTime // Event timestamp
+  sessionId   String?  // Session identifier
+  userId      String?  // User identifier
+  userAgent   String?  // Browser user agent
+  url         String?  // Page URL
+  ip          String?  // Client IP address
+  receivedAt  DateTime @default(now()) // When the event was received
+  createdAt   DateTime @default(now())
+
+  @@map("analytics_events")
+  @@index([event])
+  @@index([timestamp])
+  @@index([userId])
+  @@index([sessionId])
+}
+
+// Additional enums for new models
+
+enum NotificationType {
+  DOWNLOAD_EXPIRING_24H
+  DOWNLOAD_EXPIRING_12H
+  DOWNLOAD_EXPIRING_3H
+  DOWNLOAD_EXPIRED
+  DOWNLOAD_DELETED
+  SYSTEM_ALERT
+  PAYMENT_SUCCESS
+  PAYMENT_FAILED
+  AFFILIATE_COMMISSION
+  ACHIEVEMENT_UNLOCKED
+}
+
+enum AdminRole {
+  SUPER_ADMIN
+  ADMIN
+  MODERATOR
+  SUPPORT
+}
+
+enum AiModelType {
+  CHAT
+  IMAGE_GENERATION
+  CODE_GENERATION
+  TEXT_GENERATION
+  AUDIO_GENERATION
+  VIDEO_GENERATION
+}
+
+enum GenerationType {
+  CHAT_COMPLETION
+  IMAGE_GENERATION
+  CODE_GENERATION
+  TEXT_GENERATION
+  AUDIO_GENERATION
+  VIDEO_GENERATION
+}
+
+enum GenerationStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+  CANCELLED
+}
+
+enum RefundStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  PROCESSED
+  CANCELLED
+}
+
+enum LogLevel {
+  DEBUG
+  INFO
+  WARN
+  ERROR
+  FATAL
+}
+
+// Membership Usage Tracking Model
+model MembershipUsage {
+  id        String   @id @default(cuid())
+  userId    String
+  month     String   // Format: "YYYY-MM" for monthly tracking
+  year      Int      // Year for easier queries
+  
+  // Usage counters - matching membership configuration limits
+  aiGenerationsUsed    Int @default(0)
+  distributionsUsed    Int @default(0)
+  apiCallsUsed         Int @default(0)
+  storageUsedMB       Int @default(0)
+  socialPlatformsUsed Int @default(0)
+  maxContentSizeUsedMB Int @default(0)
+  concurrentGenerationsUsed Int @default(0)
+  
+  // Current membership plan
+  currentPlan        SubscriptionPlan
+  
+  // Reset tracking
+  lastResetAt        DateTime @default(now())
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, month, year])
+  @@map("membership_usage")
+}

@@ -1,0 +1,97 @@
+# Supabase Configuration
+[project]
+ref = "your-project-ref"
+[api]
+port = 54321
+schemas = ["public", "storage", "graphql_public"]
+extra_search_path = ["extensions"]
+max_rows = 1000
+
+[db]
+port = 54322
+shadow_port = 54320
+major_version = 15
+
+[studio]
+port = 54323
+
+[inbucket]
+port = 54324
+
+[storage]
+file_size_limit = "5MiB"
+
+[auth]
+site_url = "http://localhost:3000"
+additional_redirect_urls = ["https://localhost:3000"]
+jwt_expiry = 3600
+enable_signup = true
+
+[auth.email]
+enable_signup = true
+double_confirm_changes = true
+enable_confirmations = false
+
+[analytics]
+enabled = false
+port = 54327
+vector_port = 54328
+backend_port = 54329
+logflare_enabled = false
+
+# Edge Functions Configuration
+[functions]
+# Onboarding Functions
+[functions.onboarding-init]
+verify_jwt = true
+[functions.redeem-reward]
+verify_jwt = true
+[functions.onboarding-progress]
+verify_jwt = true
+[functions.admin-onboarding]
+verify_jwt = true
+
+# Realtime Configuration
+[realtime]
+enabled = true
+[realtime.buckets]
+onboarding = {
+  enabled = true,
+  broadcast = true,
+  read = true,
+  write = true
+}
+
+# Storage Configuration
+[storage.buckets]
+onboarding-assets = {
+  public = false,
+  fileSizeLimit = "52428800", # 50MB
+  allowedMimeTypes = ["image/png", "image/jpeg", "image/gif", "image/webp"]
+}
+
+# Webhook Configuration
+[webhooks]
+events = ["*"]
+endpoint = "http://localhost:3000/api/webhooks/supabase"
+
+# CORS Configuration
+[functions.onboarding-init.cors]
+allow_origins = ["*"]
+allow_headers = ["authorization", "x-client-info", "apikey", "content-type"]
+allow_methods = ["POST", "OPTIONS"]
+
+[functions.redeem-reward.cors]
+allow_origins = ["*"]
+allow_headers = ["authorization", "x-client-info", "apikey", "content-type"]
+allow_methods = ["POST", "OPTIONS"]
+
+[functions.onboarding-progress.cors]
+allow_origins = ["*"]
+allow_headers = ["authorization", "x-client-info", "apikey", "content-type"]
+allow_methods = ["GET", "OPTIONS"]
+
+[functions.admin-onboarding.cors]
+allow_origins = ["*"]
+allow_headers = ["authorization", "x-client-info", "apikey", "content-type"]
+allow_methods = ["GET", "POST", "PUT", "DELETE", "OPTIONS"]

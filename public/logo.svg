@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" viewBox="0 0 800 400">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: url(#gradient1);
+      }
+
+      .cls-2 {
+        fill: url(#gradient2);
+      }
+
+      .cls-3 {
+        fill: url(#gradient3);
+      }
+      
+      .glow {
+        filter: url(#glow-filter);
+      }
+      
+      .pulse {
+        animation: pulse 2s ease-in-out infinite;
+      }
+      
+      @keyframes pulse {
+        0%, 100% { opacity: 0.6; }
+        50% { opacity: 1; }
+      }
+      
+      @keyframes shimmer {
+        0% { transform: translateX(-100%); }
+        100% { transform: translateX(100%); }
+      }
+      
+      .shimmer {
+        animation: shimmer 3s ease-in-out infinite;
+      }
+    </style>
+    
+    <!-- 发光滤镜 -->
+    <filter id="glow-filter" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="6" result="coloredBlur"/>
+      <feMerge> 
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    
+    <!-- EDN品牌渐变 -->
+    <linearGradient id="gradient1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#6366f1">
+        <animate attributeName="stop-color" values="#6366f1;#8b5cf6;#6366f1" dur="2s" repeatCount="indefinite"/>
+      </stop>
+      <stop offset="50%" stop-color="#8b5cf6">
+        <animate attributeName="stop-color" values="#8b5cf6;#a855f7;#8b5cf6" dur="2s" repeatCount="indefinite"/>
+      </stop>
+      <stop offset="100%" stop-color="#a855f7">
+        <animate attributeName="stop-color" values="#a855f7;#c084fc;#a855f7" dur="2s" repeatCount="indefinite"/>
+      </stop>
+    </linearGradient>
+    
+    <linearGradient id="gradient2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#3b82f6">
+        <animate attributeName="stop-color" values="#3b82f6;#6366f1;#3b82f6" dur="2s" repeatCount="indefinite" begin="0.7s"/>
+      </stop>
+      <stop offset="50%" stop-color="#6366f1">
+        <animate attributeName="stop-color" values="#6366f1;#8b5cf6;#6366f1" dur="2s" repeatCount="indefinite" begin="0.7s"/>
+      </stop>
+      <stop offset="100%" stop-color="#8b5cf6">
+        <animate attributeName="stop-color" values="#8b5cf6;#a855f7;#8b5cf6" dur="2s" repeatCount="indefinite" begin="0.7s"/>
+      </stop>
+    </linearGradient>
+    
+    <linearGradient id="gradient3" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1e40af">
+        <animate attributeName="stop-color" values="#1e40af;#3b82f6;#1e40af" dur="2s" repeatCount="indefinite" begin="1.4s"/>
+      </stop>
+      <stop offset="50%" stop-color="#3b82f6">
+        <animate attributeName="stop-color" values="#3b82f6;#6366f1;#3b82f6" dur="2s" repeatCount="indefinite" begin="1.4s"/>
+      </stop>
+      <stop offset="100%" stop-color="#6366f1">
+        <animate attributeName="stop-color" values="#6366f1;#8b5cf6;#6366f1" dur="2s" repeatCount="indefinite" begin="1.4s"/>
+      </stop>
+    </linearGradient>
+    
+    <!-- 背景渐变 -->
+    <radialGradient id="bg-gradient" cx="50%" cy="50%" r="70%">
+      <stop offset="0%" stop-color="#6366f1" stop-opacity="0.1"/>
+      <stop offset="100%" stop-color="#1e40af" stop-opacity="0.05"/>
+    </radialGradient>
+    
+    <!-- 闪光效果 -->
+    <linearGradient id="shine-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0"/>
+      <stop offset="50%" stop-color="#ffffff" stop-opacity="0.3"/>
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+  
+  <!-- 背景 -->
+  <rect width="800" height="400" fill="url(#bg-gradient)"/>
+  
+  <!-- 主要EDN字母 -->
+  <g transform="translate(150, 100)" class="glow pulse">
+    <!-- E -->
+    <path d="M 0 0 L 0 200 L 80 200 L 80 160 L 40 160 L 40 120 L 73 120 L 73 80 L 40 80 L 40 40 L 80 40 L 80 0 Z" 
+          fill="url(#gradient1)" opacity="0.9"/>
+    
+    <!-- D -->
+    <path d="M 120 0 L 120 200 L 160 200 C 187 200 207 193 220 180 C 233 167 240 147 240 120 L 240 80 C 240 53 233 33 220 20 C 207 7 187 0 160 0 Z M 160 40 L 160 160 C 173 160 180 153 180 140 L 180 60 C 180 47 173 40 160 40 Z" 
+          fill="url(#gradient2)" opacity="0.9"/>
+    
+    <!-- N -->
+    <path d="M 280 0 L 280 200 L 320 200 L 360 80 L 360 200 L 400 200 L 400 0 L 360 0 L 320 120 L 320 0 Z" 
+          fill="url(#gradient3)" opacity="0.9"/>
+  </g>
+  
+  <!-- 装饰性几何元素 -->
+  <g class="glow" opacity="0.6">
+    <polygon points="50,50 80,80 50,110 20,80" fill="url(#gradient1)">
+      <animateTransform attributeName="transform" type="rotate" values="0 50 80;360 50 80" dur="8s" repeatCount="indefinite"/>
+    </polygon>
+    
+    <polygon points="750,50 780,80 750,110 720,80" fill="url(#gradient3)">
+      <animateTransform attributeName="transform" type="rotate" values="0 750 80;-360 750 80" dur="8s" repeatCount="indefinite"/>
+    </polygon>
+    
+    <polygon points="50,290 80,320 50,350 20,320" fill="url(#gradient2)">
+      <animateTransform attributeName="transform" type="rotate" values="0 50 320;360 50 320" dur="10s" repeatCount="indefinite"/>
+    </polygon>
+    
+    <polygon points="750,290 780,320 750,350 720,320" fill="url(#gradient1)">
+      <animateTransform attributeName="transform" type="rotate" values="0 750 320;-360 750 320" dur="10s" repeatCount="indefinite"/>
+    </polygon>
+  </g>
+  
+  <!-- 闪光覆盖层 -->
+  <rect width="800" height="400" fill="url(#shine-gradient)" opacity="0.2" class="shimmer"/>
+</svg>

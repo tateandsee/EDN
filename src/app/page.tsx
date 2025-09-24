@@ -9,7 +9,7 @@ import { CheckCircle, Zap, Shield, Users, ArrowRight, Star, Palette, Video, Musi
 import PlatformLogo from "@/components/platform-logo"
 import { useNSFW } from "@/contexts/nsfw-context"
 import { ResponsiveContainer, ResponsiveGrid, ResponsiveText, ResponsiveButton, ResponsiveCard } from "@/components/ui/responsive"
-import { ResponsiveNavigation } from "@/components/ui/responsive-nav"
+
 
 export default function Home() {
   const { isNSFW, setIsNSFW } = useNSFW()
@@ -124,10 +124,9 @@ export default function Home() {
   return (
     <ErrorBoundary>
       <div className={`flex flex-col min-h-screen ${colors.background}`}>
-        <ResponsiveNavigation />
         
         {/* Hero Section - Mobile Optimized */}
-        <section className="relative pt-20 pb-12 md:pt-24 md:pb-20 overflow-hidden">
+        <section className="relative pt-16 pb-12 md:pt-20 md:pb-16 overflow-hidden">
           {/* Hero Background Image */}
           <div className="absolute inset-0 z-0">
             <img 

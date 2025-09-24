@@ -5,8 +5,8 @@ import { db } from '@/lib/db'
 let createClient: any;
 try {
   if (process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
-    const supabaseModule = require('@/lib/supabase');
-    createClient = supabaseModule.createClient;
+    const { createClient: createSupabaseClient } = await import('@/lib/supabase');
+    createClient = createSupabaseClient;
   }
 } catch (error) {
   console.warn('Supabase not configured, platforms will work without authentication');

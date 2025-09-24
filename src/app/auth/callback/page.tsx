@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase-client'
-import { enhancedAuth } from '@/lib/enhanced-auth'
+import { authService } from '@/lib/auth'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
@@ -35,11 +35,11 @@ export default function AuthCallback() {
 
       if (data.session?.user) {
         // Check if user exists in database
-        const dbUser = await enhancedAuth.getCurrentUser()
+        const dbUser = await authService.getCurrentUser()
         
         if (!dbUser) {
           // Create user in database if not exists
-          const { error: createError } = await fetch('/api/auth/sync-user', {
+          const response = await fetch('/api/auth/sync-user', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json'
@@ -49,7 +49,7 @@ export default function AuthCallback() {
             })
           })
 
-          if (createError) {
+          if (!response.ok) {
             setStatus('error')
             setMessage('Failed to create user account')
             return
@@ -79,11 +79,20 @@ export default function AuthCallback() {
     if (!user?.email) return
     
     try {
-      const result = await enhancedAuth.resendVerificationEmail(user.email)
-      if (result.success) {
-        setMessage('Verification email resent successfully')
+      // For now, we'll use Supabase directly since authService doesn't have resend method yet
+      const { supabase } = await import('@/lib/supabase-client')
+      const { error } = await supabase.auth.resend({
+        type: 'signup',
+        email: user.email,
+        options: {
+          emailRedirectTo: `${window.location.origin}/auth/callback`
+        }
+      })
+      
+      if (error) {
+        setMessage(error.message || 'Failed to resend verification email')
       } else {
-        setMessage(result.error || 'Failed to resend verification email')
+        setMessage('Verification email resent successfully')
       }
     } catch (error) {
       setMessage('Failed to resend verification email')

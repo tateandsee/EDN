@@ -1,27 +1,9 @@
 import { NextResponse } from 'next/server'
 import { db } from '@/lib/db'
-
-// Only import Supabase if it's configured
-let supabase: any;
-try {
-  if (process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
-    const { supabase: supabaseClient } = await import('@/lib/supabase');
-    supabase = supabaseClient;
-  }
-} catch (error) {
-  console.warn('Supabase not configured, auth will work without authentication');
-}
+import { createClient as createSupabaseServerClient } from '@/lib/supabase-server'
 
 export async function POST(request: Request) {
   try {
-    // Check if database is configured
-    if (!process.env.DATABASE_URL) {
-      return NextResponse.json(
-        { error: 'Database not configured' },
-        { status: 503 }
-      )
-    }
-
     const { id, email, name, avatar } = await request.json()
     
     if (!id || !email) {
@@ -29,6 +11,24 @@ export async function POST(request: Request) {
         { error: 'Missing required fields' },
         { status: 400 }
       )
+    }
+
+    // Check if database is available
+    if (!process.env.DATABASE_URL) {
+      // Return a basic user object without database
+      return NextResponse.json({ 
+        success: true, 
+        user: {
+          id,
+          email,
+          name: name || email.split('@')[0],
+          avatar,
+          role: 'CREATOR',
+          verified: false,
+          subscriptions: [],
+          affiliate: null
+        }
+      })
     }
 
     // Check if user exists
@@ -62,22 +62,27 @@ export async function POST(request: Request) {
     return NextResponse.json({ success: true, user })
   } catch (error) {
     console.error('Error creating/updating user:', error)
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    )
+    // Return a basic user object even if database fails
+    const { id, email, name, avatar } = await request.json()
+    return NextResponse.json({ 
+      success: true, 
+      user: {
+        id,
+        email,
+        name: name || email.split('@')[0],
+        avatar,
+        role: 'CREATOR',
+        verified: false,
+        subscriptions: [],
+        affiliate: null
+      }
+    })
   }
 }
 
 export async function GET(request: Request) {
   try {
-    // Check if Supabase is configured
-    if (!supabase) {
-      return NextResponse.json(
-        { error: 'Authentication service not configured' },
-        { status: 503 }
-      )
-    }
+    const supabase = await createSupabaseServerClient()
 
     const { data: { user }, error } = await supabase.auth.getUser()
 
@@ -88,12 +93,21 @@ export async function GET(request: Request) {
       )
     }
 
-    // Check if database is configured
+    // Check if database is available
     if (!process.env.DATABASE_URL) {
-      return NextResponse.json(
-        { error: 'Database not configured' },
-        { status: 503 }
-      )
+      // Return a basic user object without database
+      return NextResponse.json({ 
+        user: {
+          id: user.id,
+          email: user.email || '',
+          name: user.user_metadata?.name || user.email?.split('@')[0],
+          avatar: user.user_metadata?.avatar_url,
+          role: 'CREATOR',
+          verified: false,
+          subscriptions: [],
+          affiliate: null
+        }
+      })
     }
 
     const dbUser = await db.user.findUnique({
@@ -115,6 +129,29 @@ export async function GET(request: Request) {
     return NextResponse.json({ user: dbUser })
   } catch (error) {
     console.error('Error fetching user:', error)
+    
+    // Try to get user from Supabase session even if database fails
+    try {
+      const supabase = await createSupabaseServerClient()
+      const { data: { user } } = await supabase.auth.getUser()
+      if (user) {
+        return NextResponse.json({ 
+          user: {
+            id: user.id,
+            email: user.email || '',
+            name: user.user_metadata?.name || user.email?.split('@')[0],
+            avatar: user.user_metadata?.avatar_url,
+            role: 'CREATOR',
+            verified: false,
+            subscriptions: [],
+            affiliate: null
+          }
+        })
+      }
+    } catch (sessionError) {
+      console.error('Error getting session:', sessionError)
+    }
+
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

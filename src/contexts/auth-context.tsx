@@ -1,28 +1,9 @@
 'use client'
 
 import { createContext, useContext, useEffect, useState } from 'react'
-import { createClient } from '@/lib/supabase-client'
 import { User } from '@supabase/supabase-js'
 import { useRouter } from 'next/navigation'
-
-interface AuthUser {
-  id: string
-  email: string
-  name?: string
-  avatar?: string
-  role?: string
-  subscriptions?: Array<{
-    plan: string
-    status: string
-    expiresAt: string
-  }>
-  affiliate?: {
-    code: string
-    commission: number
-    earnings: number
-    referrals: number
-  }
-}
+import { authService, AuthUser } from '@/lib/auth'
 
 interface AuthContextType {
   user: AuthUser | null
@@ -37,22 +18,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(null)
   const [loading, setLoading] = useState(true)
   const router = useRouter()
-  const supabase = createClient()
 
   useEffect(() => {
     const getUser = async () => {
       try {
-        const { data: { session } } = await supabase.auth.getSession()
-        
-        if (session?.user) {
-          const response = await fetch('/api/auth/user')
-          if (response.ok) {
-            const { user: dbUser } = await response.json()
-            setUser(dbUser)
-          }
-        }
+        const currentUser = await authService.getCurrentUser()
+        setUser(currentUser)
       } catch (error) {
         console.error('Error getting user:', error)
+        // Set loading to false even if there's an error
+        setLoading(false)
       } finally {
         setLoading(false)
       }
@@ -60,15 +35,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     getUser()
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+    const { data: { subscription } } = authService.onAuthStateChange(
       async (event, session) => {
         try {
           if (event === 'SIGNED_IN' && session?.user) {
-            const response = await fetch('/api/auth/user')
-            if (response.ok) {
-              const { user: dbUser } = await response.json()
-              setUser(dbUser)
-            }
+            const currentUser = await authService.getCurrentUser()
+            setUser(currentUser)
           } else if (event === 'SIGNED_OUT') {
             setUser(null)
             router.push('/')
@@ -80,11 +52,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     )
 
     return () => subscription.unsubscribe()
-  }, [supabase, router])
+  }, [router])
 
   const signOut = async () => {
     try {
-      await supabase.auth.signOut()
+      await authService.signOut()
       setUser(null)
       router.push('/')
     } catch (error) {
@@ -94,11 +66,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const refreshUser = async () => {
     try {
-      const response = await fetch('/api/auth/user')
-      if (response.ok) {
-        const { user: dbUser } = await response.json()
-        setUser(dbUser)
-      }
+      const currentUser = await authService.getCurrentUser()
+      setUser(currentUser)
     } catch (error) {
       console.error('Error refreshing user:', error)
     }

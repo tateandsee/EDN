@@ -44,7 +44,7 @@ export function MobileNav({ children }: MobileNavProps) {
             <img 
               src="/logo.png" 
               alt="EDN Logo" 
-              className="h-10 w-auto object-contain"
+              className="h-20 w-auto object-contain"
             />
           </div>
 
@@ -77,7 +77,7 @@ export function MobileNav({ children }: MobileNavProps) {
                   <img 
                     src="/logo.png" 
                     alt="EDN Logo" 
-                    className="h-10 w-auto object-contain"
+                    className="h-20 w-auto object-contain"
                   />
                 </div>
                 <Button
@@ -192,13 +192,13 @@ export function DesktopNav({ children }: DesktopNavProps) {
       isScrolled && 'shadow-sm'
     )}>
       <div className="container mx-auto px-4">
-        <div className="flex items-center justify-between h-16">
+        <div className="flex items-center justify-between h-20">
           {/* Logo */}
           <div className="flex items-center">
             <img 
               src="/logo.png" 
               alt="EDN Logo" 
-              className="h-10 w-auto object-contain"
+              className="h-20 w-auto object-contain"
             />
           </div>
 

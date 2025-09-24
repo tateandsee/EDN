@@ -47,18 +47,18 @@ export default function Navigation() {
   return (
     <nav className={`fixed top-0 left-0 right-0 z-50 ${scheme.bg} backdrop-blur-md border-b ${scheme.border} transition-all duration-300`}>
       <div className="container mx-auto px-4">
-        <div className="flex items-center justify-between h-16">
+        <div className="flex items-center justify-between h-24">
           {/* Logo */}
           <div className="flex items-center">
             <img 
               src="/logo.png" 
               alt="EDN Logo" 
-              className="h-12 w-auto object-contain"
+              className="h-24 w-auto object-contain"
             />
           </div>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-3">
+          <div className="hidden md:flex items-center space-x-1">
             {[
               { href: '/', icon: Home, label: 'Home' },
               { href: '/marketplace', icon: ShoppingBag, label: 'Marketplace' },

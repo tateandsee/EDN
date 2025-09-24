@@ -75,7 +75,7 @@ export function MobileNav({ children }: MobileNavProps) {
               <div className="flex items-center justify-between px-4 py-3 border-b border-border">
                 <div className="flex items-center">
                   <img 
-                    src="/NEW_LOGO_FILE_HERE.png" 
+                    src="/logo.png" 
                     alt="EDN Logo" 
                     className="h-10 w-auto object-contain"
                   />

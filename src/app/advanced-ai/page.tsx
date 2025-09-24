@@ -14,7 +14,7 @@ import {
   Settings, 
   Play, 
   Pause, 
-  Stop, 
+  Square, 
   Download, 
   BarChart3, 
   TrendingUp, 
@@ -344,7 +344,7 @@ export default function AdvancedAIPage() {
                               variant="destructive"
                               onClick={() => handleModelAction(model.id, 'stop')}
                             >
-                              <Stop className="h-4 w-4 mr-1" />
+                              <Square className="h-4 w-4 mr-1" />
                               Stop
                             </Button>
                           </>

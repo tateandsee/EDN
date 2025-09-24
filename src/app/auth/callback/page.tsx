@@ -3,69 +3,92 @@
 import { useEffect, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase-client'
+import { enhancedAuth } from '@/lib/enhanced-auth'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Loader2, CheckCircle, XCircle } from 'lucide-react'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { Button } from '@/components/ui/button'
+import { Loader2, CheckCircle, XCircle, Mail } from 'lucide-react'
 
 export default function AuthCallback() {
   const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading')
-  const [message, setMessage] = useState('Processing your authentication...')
+  const [message, setMessage] = useState('')
+  const [user, setUser] = useState<any>(null)
+  
   const router = useRouter()
   const searchParams = useSearchParams()
-  
   const supabase = createClient()
 
   useEffect(() => {
-    const handleCallback = async () => {
-      try {
-        const { data, error } = await supabase.auth.getSession()
-        
-        if (error) {
-          throw error
-        }
-
-        if (data.session) {
-          setStatus('success')
-          setMessage('Authentication successful! Redirecting...')
-          
-          // Create user profile in database if it doesn't exist
-          const { data: { user } } = await supabase.auth.getUser()
-          if (user) {
-            const response = await fetch('/api/auth/user', {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-              },
-              body: JSON.stringify({
-                id: user.id,
-                email: user.email,
-                name: user.user_metadata.full_name || user.email?.split('@')[0],
-                avatar: user.user_metadata.avatar_url,
-              }),
-            })
-            
-            if (!response.ok) {
-              console.error('Failed to create user profile')
-            }
-          }
-          
-          // Redirect after a short delay
-          setTimeout(() => {
-            const redirectTo = searchParams.get('redirectTo') || '/dashboard'
-            router.push(redirectTo)
-          }, 2000)
-        } else {
-          setStatus('error')
-          setMessage('No session found. Please try again.')
-        }
-      } catch (error) {
-        setStatus('error')
-        setMessage('Authentication failed. Please try again.')
-        console.error('Auth callback error:', error)
-      }
-    }
-
     handleCallback()
-  }, [router, searchParams, supabase])
+  }, [])
+
+  const handleCallback = async () => {
+    try {
+      // Handle the OAuth callback
+      const { data, error } = await supabase.auth.getSession()
+      
+      if (error) {
+        setStatus('error')
+        setMessage(error.message)
+        return
+      }
+
+      if (data.session?.user) {
+        // Check if user exists in database
+        const dbUser = await enhancedAuth.getCurrentUser()
+        
+        if (!dbUser) {
+          // Create user in database if not exists
+          const { error: createError } = await fetch('/api/auth/sync-user', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              user: data.session.user
+            })
+          })
+
+          if (createError) {
+            setStatus('error')
+            setMessage('Failed to create user account')
+            return
+          }
+        }
+
+        setUser(data.session.user)
+        setStatus('success')
+        setMessage('Authentication successful!')
+        
+        // Redirect to dashboard after a short delay
+        setTimeout(() => {
+          router.push('/dashboard')
+        }, 2000)
+      } else {
+        setStatus('error')
+        setMessage('No session found')
+      }
+    } catch (error) {
+      console.error('Auth callback error:', error)
+      setStatus('error')
+      setMessage('An unexpected error occurred')
+    }
+  }
+
+  const handleResendVerification = async () => {
+    if (!user?.email) return
+    
+    try {
+      const result = await enhancedAuth.resendVerificationEmail(user.email)
+      if (result.success) {
+        setMessage('Verification email resent successfully')
+      } else {
+        setMessage(result.error || 'Failed to resend verification email')
+      }
+    } catch (error) {
+      setMessage('Failed to resend verification email')
+    }
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-900 via-pink-900 to-red-900 p-4">
@@ -75,33 +98,58 @@ export default function AuthCallback() {
         <Card className="bg-white/10 backdrop-blur-lg border-white/20">
           <CardHeader className="text-center">
             <CardTitle className="text-2xl font-bold text-white">
-              Authentication
+              Authentication Status
             </CardTitle>
             <CardDescription className="text-white/70">
-              {message}
+              Processing your authentication...
             </CardDescription>
           </CardHeader>
           
-          <CardContent className="text-center">
-            <div className="flex justify-center mb-4">
+          <CardContent className="space-y-4">
+            <div className="flex justify-center">
               {status === 'loading' && (
-                <Loader2 className="h-12 w-12 animate-spin text-purple-400" />
+                <Loader2 className="h-8 w-8 animate-spin text-white" />
               )}
               {status === 'success' && (
-                <CheckCircle className="h-12 w-12 text-green-400" />
+                <CheckCircle className="h-8 w-8 text-green-400" />
               )}
               {status === 'error' && (
-                <XCircle className="h-12 w-12 text-red-400" />
+                <XCircle className="h-8 w-8 text-red-400" />
               )}
             </div>
             
+            <Alert className={status === 'error' ? 'border-red-400 bg-red-400/10' : 'border-green-400 bg-green-400/10'}>
+              <AlertDescription className="text-white">
+                {message}
+              </AlertDescription>
+            </Alert>
+            
+            {status === 'success' && user && !user.email_confirmed_at && (
+              <div className="space-y-3">
+                <p className="text-white/70 text-sm text-center">
+                  Please verify your email address to access all features.
+                </p>
+                <Button
+                  onClick={handleResendVerification}
+                  variant="outline"
+                  className="w-full bg-white/10 border-white/20 text-white hover:bg-white/20"
+                >
+                  <Mail className="mr-2 h-4 w-4" />
+                  Resend Verification Email
+                </Button>
+              </div>
+            )}
+            
             {status === 'error' && (
-              <button
-                onClick={() => router.push('/auth/signin')}
-                className="text-purple-400 hover:text-purple-300 underline"
-              >
-                Return to Sign In
-              </button>
+              <div className="space-y-3">
+                <Button
+                  onClick={() => router.push('/auth/signin')}
+                  variant="outline"
+                  className="w-full bg-white/10 border-white/20 text-white hover:bg-white/20"
+                >
+                  Back to Sign In
+                </Button>
+              </div>
             )}
           </CardContent>
         </Card>

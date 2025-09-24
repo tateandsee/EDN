@@ -1,8 +1,21 @@
-import { createClient } from '@/lib/supabase-client'
+import { getSupabaseConfig } from '@/lib/config'
 import { NextResponse } from 'next/server'
 
 export async function GET() {
   try {
+    const supabaseConfig = getSupabaseConfig()
+    
+    // Check if Supabase is configured
+    if (!supabaseConfig.url || !supabaseConfig.anonKey) {
+      return NextResponse.json({ 
+        success: false, 
+        error: 'Supabase not configured',
+        details: 'Please set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY'
+      }, { status: 503 })
+    }
+
+    // Import dynamically only if configured
+    const { createClient } = await import('@/lib/supabase-client')
     const supabase = createClient()
     
     // Test basic connection

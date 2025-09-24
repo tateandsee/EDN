@@ -1,8 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase'
 import { db } from '@/lib/db'
 import { apiRateLimit } from '@/lib/rate-limit'
 import { logError } from '@/lib/error-handling'
+
+// Only import Supabase if it's configured
+let createClient: any;
+try {
+  if (process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+    const supabaseModule = require('@/lib/supabase');
+    createClient = supabaseModule.createClient;
+  }
+} catch (error) {
+  console.warn('Supabase not configured, analytics will work without authentication');
+}
 
 interface AnalyticsEvent {
   event: string
@@ -186,6 +196,11 @@ export async function GET(request: NextRequest) {
     const rateLimitResult = await apiRateLimit(request)
     if (!rateLimitResult || rateLimitResult.status !== 200) {
       return rateLimitResult || NextResponse.json({ error: 'Rate limit exceeded' }, { status: 429 })
+    }
+
+    // Check if Supabase is configured
+    if (!createClient || !process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+      return NextResponse.json({ error: 'Analytics service not configured' }, { status: 503 })
     }
 
     const supabase = await createClient()

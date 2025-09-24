@@ -1,9 +1,34 @@
 import { NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase'
 import { db } from '@/lib/db'
+
+// Only import Supabase if it's configured
+let createClient: any;
+try {
+  if (process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+    const supabaseModule = require('@/lib/supabase');
+    createClient = supabaseModule.createClient;
+  }
+} catch (error) {
+  console.warn('Supabase not configured, platforms will work without authentication');
+}
 
 export async function GET(request: Request) {
   try {
+    // Check if Supabase is configured
+    if (!createClient) {
+      // Return mock platforms if authentication is not configured
+      const mockPlatforms = [
+        { id: '1', name: 'OnlyFans', description: 'Premium content platform', icon: 'onlyfans', category: 'ADULT_PLATFORM', isActive: true },
+        { id: '2', name: 'Instagram', description: 'Social media platform', icon: 'instagram', category: 'SOCIAL_MEDIA', isActive: true },
+        { id: '3', name: 'TikTok', description: 'Short video platform', icon: 'tiktok', category: 'VIDEO_PLATFORM', isActive: true }
+      ]
+      
+      return NextResponse.json({
+        platforms: mockPlatforms,
+        connections: []
+      })
+    }
+
     const supabase = await createClient()
     const { data: { user }, error } = await supabase.auth.getUser()
 
@@ -54,6 +79,14 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   try {
+    // Check if Supabase is configured
+    if (!createClient) {
+      return NextResponse.json(
+        { error: 'Authentication service not configured' },
+        { status: 503 }
+      )
+    }
+
     const supabase = await createClient()
     const { data: { user }, error } = await supabase.auth.getUser()
 

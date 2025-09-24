@@ -1,6 +1,16 @@
 import { NextResponse } from 'next/server'
-import { supabase } from '@/lib/supabase'
 import { db } from '@/lib/db'
+
+// Only import Supabase if it's configured
+let supabase: any;
+try {
+  if (process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+    const supabaseModule = require('@/lib/supabase');
+    supabase = supabaseModule.supabase;
+  }
+} catch (error) {
+  console.warn('Supabase not configured, auth will work without authentication');
+}
 
 export async function POST(request: Request) {
   try {
@@ -61,6 +71,14 @@ export async function POST(request: Request) {
 
 export async function GET(request: Request) {
   try {
+    // Check if Supabase is configured
+    if (!supabase) {
+      return NextResponse.json(
+        { error: 'Authentication service not configured' },
+        { status: 503 }
+      )
+    }
+
     const { data: { user }, error } = await supabase.auth.getUser()
 
     if (error || !user) {

@@ -1,13 +1,31 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { supabase } from '@/lib/supabase'
 import { db } from '@/lib/db'
 import { GamificationProgressService } from '@/lib/gamification-progress'
+
+// Only import Supabase if it's configured
+let supabase: any;
+try {
+  if (process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+    const supabaseModule = require('@/lib/supabase');
+    supabase = supabaseModule.supabase;
+  }
+} catch (error) {
+  console.warn('Supabase not configured, gamification will work without authentication');
+}
 
 export async function POST(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
+    // Check if Supabase is configured
+    if (!supabase) {
+      return NextResponse.json(
+        { error: 'Authentication service not configured' },
+        { status: 503 }
+      )
+    }
+
     // Get the current user from Supabase
     const { data: { user }, error: authError } = await supabase.auth.getUser()
     

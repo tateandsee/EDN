@@ -5,7 +5,7 @@ import { db } from '@/lib/db'
 let createClient: any;
 try {
   if (process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
-    const supabaseModule = await import('@supabase/supabase-js');
+    const supabaseModule = require('@/lib/supabase');
     createClient = supabaseModule.createClient;
   }
 } catch (error) {

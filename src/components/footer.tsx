@@ -74,11 +74,6 @@ export default function Footer() {
                   Affiliate Program
                 </Link>
               </li>
-              <li>
-                <Link href="/advanced" className="text-muted-foreground hover:text-foreground transition-colors">
-                  Advanced
-                </Link>
-              </li>
             </ul>
           </div>
 

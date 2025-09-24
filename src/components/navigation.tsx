@@ -3,14 +3,13 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { Button } from '@/components/ui/button'
-import { Sparkles, Menu, X, Home, ShoppingBag, Plus, Star, Zap, LogIn, LogOut, User, LayoutDashboard, Settings, Bell, ChevronDown, FileText, BarChart3, Users, CreditCard, Shield } from 'lucide-react'
+import { Sparkles, Menu, X, Home, ShoppingBag, Plus, Star, Zap, LogIn, LogOut, User } from 'lucide-react'
 import { useNSFW } from '@/contexts/nsfw-context'
 import { useAuth } from '@/contexts/auth-context'
 import Link from 'next/link'
 
 export default function Navigation() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
-  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false)
   const { isNSFW, setIsNSFW } = useNSFW()
   const { user, loading, signOut } = useAuth()
 
@@ -72,7 +71,8 @@ export default function Navigation() {
             {[
               { href: '/', icon: Home, label: 'Home' },
               { href: '/marketplace', icon: ShoppingBag, label: 'Marketplace' },
-              { href: '/showcase', icon: Star, label: 'Showcase' }
+              { href: '/showcase', icon: Star, label: 'Showcase' },
+              { href: '/create', icon: Plus, label: 'Create' }
             ].map((item, index) => (
               <motion.a
                 key={item.href}
@@ -89,24 +89,6 @@ export default function Navigation() {
                 <div className="absolute inset-0 bg-gradient-to-r from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
               </motion.a>
             ))}
-            
-            {/* Create button for logged-in users */}
-            {user && (
-              <motion.a
-                key="/create"
-                href="/create"
-                className={`px-4 py-2 rounded-xl transition-all duration-200 flex items-center gap-2 ${scheme.text} ${scheme.hoverBg} ${scheme.hoverText} hover:scale-105 hover:shadow-lg relative overflow-hidden group`}
-                whileHover={{ y: -2 }}
-                whileTap={{ scale: 0.95 }}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.3 }}
-              >
-                <Plus className="h-4 w-4 relative z-10" />
-                <span className="relative z-10">Create</span>
-                <div className="absolute inset-0 bg-gradient-to-r from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-              </motion.a>
-            )}
             
             {/* Enhanced Mode Toggle */}
             <div className="flex items-center space-x-2 ml-4">
@@ -162,160 +144,31 @@ export default function Navigation() {
                 <div className="w-10 h-10 rounded-full bg-gray-200 animate-pulse" />
               ) : user ? (
                 <div className="flex items-center space-x-2">
-                  <div className="relative">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
-                      className={`flex items-center space-x-2 !rounded-xl ${scheme.text} hover:bg-white/10`}
-                    >
-                      {user.avatar ? (
-                        <img 
-                          src={user.avatar} 
-                          alt={user.name || user.email} 
-                          className="w-8 h-8 rounded-full object-cover"
-                        />
-                      ) : (
-                        <div className="w-8 h-8 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center">
-                          <User className="h-4 w-4 text-white" />
-                        </div>
-                      )}
-                      <span className="text-sm font-medium">
-                        {user.name || user.email.split('@')[0]}
-                      </span>
-                      <ChevronDown className="h-4 w-4" />
-                    </Button>
-                    
-                    {/* User Dropdown Menu */}
-                    {isUserMenuOpen && (
-                      <motion.div
-                        initial={{ opacity: 0, y: -10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className={`absolute right-0 mt-2 w-56 ${scheme.bg} border ${scheme.border} rounded-xl shadow-lg z-50`}
-                      >
-                        <div className="py-2">
-                          {/* Account Section */}
-                          <div className="px-4 py-2 border-b border-white/10">
-                            <p className="text-sm font-medium text-white">Account</p>
-                          </div>
-                          
-                          <Link
-                            href="/dashboard"
-                            className={`flex items-center px-4 py-2 text-sm ${scheme.text} ${scheme.hoverBg} ${scheme.hoverText}`}
-                            onClick={() => setIsUserMenuOpen(false)}
-                          >
-                            <LayoutDashboard className="h-4 w-4 mr-2" />
-                            Dashboard
-                          </Link>
-                          
-                          <Link
-                            href="/profile"
-                            className={`flex items-center px-4 py-2 text-sm ${scheme.text} ${scheme.hoverBg} ${scheme.hoverText}`}
-                            onClick={() => setIsUserMenuOpen(false)}
-                          >
-                            <Settings className="h-4 w-4 mr-2" />
-                            Profile Settings
-                          </Link>
-                          
-                          <Link
-                            href="/notifications"
-                            className={`flex items-center px-4 py-2 text-sm ${scheme.text} ${scheme.hoverBg} ${scheme.hoverText}`}
-                            onClick={() => setIsUserMenuOpen(false)}
-                          >
-                            <Bell className="h-4 w-4 mr-2" />
-                            Notifications
-                          </Link>
-
-                          {/* Tools & Features Section */}
-                          <div className="px-4 py-2 border-b border-white/10 mt-2">
-                            <p className="text-sm font-medium text-white">Tools & Features</p>
-                          </div>
-                          
-                          <Link
-                            href="/create"
-                            className={`flex items-center px-4 py-2 text-sm ${scheme.text} ${scheme.hoverBg} ${scheme.hoverText}`}
-                            onClick={() => setIsUserMenuOpen(false)}
-                          >
-                            <Plus className="h-4 w-4 mr-2" />
-                            Create Content
-                          </Link>
-                          
-                          <Link
-                            href="/analytics"
-                            className={`flex items-center px-4 py-2 text-sm ${scheme.text} ${scheme.hoverBg} ${scheme.hoverText}`}
-                            onClick={() => setIsUserMenuOpen(false)}
-                          >
-                            <BarChart3 className="h-4 w-4 mr-2" />
-                            Analytics
-                          </Link>
-                          
-                          <Link
-                            href="/marketing"
-                            className={`flex items-center px-4 py-2 text-sm ${scheme.text} ${scheme.hoverBg} ${scheme.hoverText}`}
-                            onClick={() => setIsUserMenuOpen(false)}
-                          >
-                            <FileText className="h-4 w-4 mr-2" />
-                            Marketing
-                          </Link>
-                          
-                          <Link
-                            href="/gamification"
-                            className={`flex items-center px-4 py-2 text-sm ${scheme.text} ${scheme.hoverBg} ${scheme.hoverText}`}
-                            onClick={() => setIsUserMenuOpen(false)}
-                          >
-                            <Zap className="h-4 w-4 mr-2" />
-                            Gamification
-                          </Link>
-
-                          {/* Business Section */}
-                          <div className="px-4 py-2 border-b border-white/10 mt-2">
-                            <p className="text-sm font-medium text-white">Business</p>
-                          </div>
-                          
-                          <Link
-                            href="/affiliate"
-                            className={`flex items-center px-4 py-2 text-sm ${scheme.text} ${scheme.hoverBg} ${scheme.hoverText}`}
-                            onClick={() => setIsUserMenuOpen(false)}
-                          >
-                            <Users className="h-4 w-4 mr-2" />
-                            Affiliate Program
-                          </Link>
-                          
-                          <Link
-                            href="/dashboard/subscription"
-                            className={`flex items-center px-4 py-2 text-sm ${scheme.text} ${scheme.hoverBg} ${scheme.hoverText}`}
-                            onClick={() => setIsUserMenuOpen(false)}
-                          >
-                            <CreditCard className="h-4 w-4 mr-2" />
-                            Subscription
-                          </Link>
-                          
-                          <Link
-                            href="/security"
-                            className={`flex items-center px-4 py-2 text-sm ${scheme.text} ${scheme.hoverBg} ${scheme.hoverText}`}
-                            onClick={() => setIsUserMenuOpen(false)}
-                          >
-                            <Shield className="h-4 w-4 mr-2" />
-                            Security
-                          </Link>
-                          
-                          <div className={`border-t ${scheme.border} my-2`}></div>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => {
-                              signOut()
-                              setIsUserMenuOpen(false)
-                            }}
-                            className={`w-full flex items-center px-4 py-2 text-sm ${scheme.text} ${scheme.hoverBg} ${scheme.hoverText} justify-start`}
-                          >
-                            <LogOut className="h-4 w-4 mr-2" />
-                            Logout
-                          </Button>
-                        </div>
-                      </motion.div>
+                  <div className="flex items-center space-x-2">
+                    {user.avatar ? (
+                      <img 
+                        src={user.avatar} 
+                        alt={user.name || user.email} 
+                        className="w-8 h-8 rounded-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-8 h-8 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center">
+                        <User className="h-4 w-4 text-white" />
+                      </div>
                     )}
+                    <span className={`text-sm font-medium ${scheme.text}`}>
+                      {user.name || user.email.split('@')[0]}
+                    </span>
                   </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={signOut}
+                    className={`!rounded-xl ${scheme.logoutButton} font-semibold`}
+                  >
+                    <LogOut className="h-4 w-4 mr-1" />
+                    Logout
+                  </Button>
                 </div>
               ) : (
                 <Button
@@ -357,7 +210,8 @@ export default function Navigation() {
               {[
                 { href: '/', icon: Home, label: 'Home' },
                 { href: '/marketplace', icon: ShoppingBag, label: 'Marketplace' },
-                { href: '/showcase', icon: Star, label: 'Showcase' }
+                { href: '/showcase', icon: Star, label: 'Showcase' },
+                { href: '/create', icon: Plus, label: 'Create' }
               ].map((item, index) => (
                 <motion.a
                   key={item.href}
@@ -371,21 +225,6 @@ export default function Navigation() {
                   {item.label}
                 </motion.a>
               ))}
-              
-              {/* Create button for logged-in users */}
-              {user && (
-                <motion.a
-                  key="/create"
-                  href="/create"
-                  className={`px-4 py-3 rounded-xl transition-all duration-200 flex items-center gap-2 ${scheme.text} ${scheme.hoverBg} ${scheme.hoverText} hover:scale-105`}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.3 }}
-                >
-                  <Plus className="h-4 w-4" />
-                  Create
-                </motion.a>
-              )}
               
               {/* Mobile Mode Toggle */}
               <div className="flex items-center space-x-2 py-2">
@@ -440,39 +279,10 @@ export default function Navigation() {
                       {user.name || user.email.split('@')[0]}
                     </span>
                   </div>
-                  <div className="space-y-1">
-                    <Link
-                      href="/dashboard"
-                      className={`flex items-center px-4 py-2 text-sm ${scheme.text} ${scheme.hoverBg} ${scheme.hoverText} rounded-xl`}
-                      onClick={() => setIsMenuOpen(false)}
-                    >
-                      <LayoutDashboard className="h-4 w-4 mr-2" />
-                      Dashboard
-                    </Link>
-                    <Link
-                      href="/profile"
-                      className={`flex items-center px-4 py-2 text-sm ${scheme.text} ${scheme.hoverBg} ${scheme.hoverText} rounded-xl`}
-                      onClick={() => setIsMenuOpen(false)}
-                    >
-                      <Settings className="h-4 w-4 mr-2" />
-                      Profile Settings
-                    </Link>
-                    <Link
-                      href="/notifications"
-                      className={`flex items-center px-4 py-2 text-sm ${scheme.text} ${scheme.hoverBg} ${scheme.hoverText} rounded-xl`}
-                      onClick={() => setIsMenuOpen(false)}
-                    >
-                      <Bell className="h-4 w-4 mr-2" />
-                      Notifications
-                    </Link>
-                  </div>
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => {
-                      signOut()
-                      setIsMenuOpen(false)
-                    }}
+                    onClick={signOut}
                     className={`w-full !rounded-xl ${scheme.logoutButton} font-semibold`}
                   >
                     <LogOut className="h-4 w-4 mr-1" />

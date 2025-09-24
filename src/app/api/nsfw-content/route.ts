@@ -7,9 +7,9 @@ let supabase: any;
 let createClient: any;
 try {
   if (process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
-    const supabaseModule = await import('@supabase/supabase-js');
+    const supabaseModule = require('@/lib/supabase');
+    supabase = supabaseModule.supabase;
     createClient = supabaseModule.createClient;
-    supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
   }
 } catch (error) {
   console.warn('Supabase not configured, NSFW content will work without authentication');

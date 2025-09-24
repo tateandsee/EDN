@@ -520,7 +520,7 @@ class EnhancedContentModerationService {
         result.recommendations.push(
           'Content may be inappropriate for some audiences',
           'Consider adding content warnings or age restrictions',
-          'Review user\'s content history for patterns'
+          'Review user's content history for patterns'
         )
         result.actions.push('flag_content', 'add_warning', 'review_context')
         break

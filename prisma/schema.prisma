@@ -61,6 +61,10 @@ model User {
   
   // Download and notification relations
   aiModelDownloads AiModelDownload[]
+<<<<<<< HEAD
+=======
+  marketplaceDownloads MarketplaceDownload[]
+>>>>>>> 5f0a3f67cc9176021538ab562209642046544539
   notifications Notification[]
   
   // Admin relations
@@ -303,6 +307,30 @@ model MarketplaceItem {
   pdfFileSize Int?             // PDF file size in bytes
   tags        String?          // JSON string of tags
   isNsfw      Boolean          @default(false) // NSFW content flag
+<<<<<<< HEAD
+=======
+  
+  // Enhanced content categorization fields
+  race        ModelRace?       // Race category
+  hairColor   ModelHairColor?  // Hair color category
+  attire      ModelAttire?     // Attire/clothing category
+  age         ModelAge?        // Age range category
+  product     ModelProduct?    // Product type category
+  style       ModelStyle?      // Style category
+  bodyType    ModelBodyType?   // Body type category
+  
+  // New content moderation fields
+  contentLevel      ContentLevel?     // Content sensitivity level
+  nudityLevel       NudityLevel?      // Nudity classification level
+  adultContent      Boolean           @default(false) // Explicit adult content flag
+  suggestiveContent Boolean           @default(false) // Suggestive content flag
+  artisticNudity    Boolean           @default(false) // Artistic nudity flag
+  moderationStatus  ModerationStatus  @default(APPROVED) // Content moderation status
+  moderationNotes   String?           // Moderator notes
+  moderatedAt       DateTime?         // When content was last moderated
+  moderatedBy       String?           // Moderator who approved/rejected
+  
+>>>>>>> 5f0a3f67cc9176021538ab562209642046544539
   promptConfig Json?           // AI model prompt configuration
   positivePrompt String?        // Enhanced positive prompt
   negativePrompt String?        // Enhanced negative prompt
@@ -314,6 +342,10 @@ model MarketplaceItem {
   user     User             @relation(fields: [userId], references: [id], onDelete: Cascade)
   reviews  MarketplaceReview[]
   orders   MarketplaceOrder[]
+<<<<<<< HEAD
+=======
+  downloads MarketplaceDownload[]
+>>>>>>> 5f0a3f67cc9176021538ab562209642046544539
 
   @@map("marketplace_items")
 }
@@ -348,6 +380,10 @@ model MarketplaceOrder {
   user User            @relation(fields: [userId], references: [id], onDelete: Cascade)
   item MarketplaceItem @relation(fields: [itemId], references: [id], onDelete: Cascade)
   promptAccess MarketplacePromptAccess?
+<<<<<<< HEAD
+=======
+  downloads     MarketplaceDownload[]
+>>>>>>> 5f0a3f67cc9176021538ab562209642046544539
 
   @@map("marketplace_orders")
 }
@@ -367,6 +403,38 @@ model MarketplacePromptAccess {
   @@map("marketplace_prompt_access")
 }
 
+<<<<<<< HEAD
+=======
+model MarketplaceDownload {
+  id            String   @id @default(cuid())
+  orderId       String
+  userId        String
+  itemId        String
+  fileName      String
+  filePath      String
+  fileSize      Int?
+  mimeType      String?
+  downloadUrl   String
+  expiresAt     DateTime
+  maxDownloads  Int      @default(5)
+  downloadCount Int      @default(0)
+  isHighDef     Boolean  @default(false)
+  isExpired     Boolean  @default(false)
+  isDeleted     Boolean  @default(false)
+  lastDownloadedAt DateTime?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // Relations
+  order MarketplaceOrder @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  user  User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  item  MarketplaceItem @relation(fields: [itemId], references: [id], onDelete: Cascade)
+
+  @@unique([orderId, userId])
+  @@map("marketplace_downloads")
+}
+
+>>>>>>> 5f0a3f67cc9176021538ab562209642046544539
 // Gamification Models
 model Achievement {
   id            String           @id @default(cuid())
@@ -723,6 +791,61 @@ enum MarketplaceStatus {
   SOLD
 }
 
+<<<<<<< HEAD
+=======
+// Model categorization enums
+enum ModelRace {
+  ASIAN
+  CAUCASIAN
+  MIXED_RACE
+  PERSIAN
+}
+
+enum ModelHairColor {
+  DARK
+  RED
+  BLONDE
+  GREY
+}
+
+enum ModelAttire {
+  LINGERIE
+  BIKINI
+  COSPLAY
+  VIXEN
+  S_AND_M
+  SEXY
+  SEMI_NUDE
+  NUDE
+}
+
+enum ModelAge {
+  AGE_18_TO_21
+  AGE_22_TO_25
+  AGE_26_TO_29
+  AGE_30_TO_40
+}
+
+enum ModelProduct {
+  MODELS
+  PROMPTS
+  EDUCATION
+}
+
+enum ModelStyle {
+  FULL_BODY
+  HALF_BODY
+  PORTRAIT
+}
+
+enum ModelBodyType {
+  SKINNY
+  ATHLETIC
+  CHUBBY
+  VOLUPTUOUS
+}
+
+>>>>>>> 5f0a3f67cc9176021538ab562209642046544539
 // Affiliate and Gamification Enums
 enum AffiliateTier {
   BRONZE
@@ -1115,6 +1238,34 @@ enum LogLevel {
   FATAL
 }
 
+<<<<<<< HEAD
+=======
+// Content Moderation Enums
+enum ContentLevel {
+  SAFE
+  SUGGESTIVE
+  SEMI_NUDE
+  NUDE
+  EXPLICIT
+}
+
+enum NudityLevel {
+  NONE
+  IMPLIED
+  PARTIAL
+  FULL
+  SEXUAL
+}
+
+enum ModerationStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  FLAGGED
+  UNDER_REVIEW
+}
+
+>>>>>>> 5f0a3f67cc9176021538ab562209642046544539
 // Membership Usage Tracking Model
 model MembershipUsage {
   id        String   @id @default(cuid())

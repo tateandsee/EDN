@@ -1,9 +1,25 @@
 import { NextResponse } from 'next/server'
+<<<<<<< HEAD
 import { db } from '@/lib/db'
 import { createClient as createSupabaseServerClient } from '@/lib/supabase-server'
 
 export async function POST(request: Request) {
   try {
+=======
+import { supabase } from '@/lib/supabase'
+import { db } from '@/lib/db'
+
+export async function POST(request: Request) {
+  try {
+    // Check if database is configured
+    if (!process.env.DATABASE_URL) {
+      return NextResponse.json(
+        { error: 'Database not configured' },
+        { status: 503 }
+      )
+    }
+
+>>>>>>> 5f0a3f67cc9176021538ab562209642046544539
     const { id, email, name, avatar } = await request.json()
     
     if (!id || !email) {
@@ -13,6 +29,7 @@ export async function POST(request: Request) {
       )
     }
 
+<<<<<<< HEAD
     // Check if database is available
     if (!process.env.DATABASE_URL) {
       // Return a basic user object without database
@@ -31,6 +48,8 @@ export async function POST(request: Request) {
       })
     }
 
+=======
+>>>>>>> 5f0a3f67cc9176021538ab562209642046544539
     // Check if user exists
     let user = await db.user.findUnique({
       where: { id }
@@ -62,6 +81,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ success: true, user })
   } catch (error) {
     console.error('Error creating/updating user:', error)
+<<<<<<< HEAD
     // Return a basic user object even if database fails
     const { id, email, name, avatar } = await request.json()
     return NextResponse.json({ 
@@ -77,13 +97,22 @@ export async function POST(request: Request) {
         affiliate: null
       }
     })
+=======
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    )
+>>>>>>> 5f0a3f67cc9176021538ab562209642046544539
   }
 }
 
 export async function GET(request: Request) {
   try {
+<<<<<<< HEAD
     const supabase = await createSupabaseServerClient()
 
+=======
+>>>>>>> 5f0a3f67cc9176021538ab562209642046544539
     const { data: { user }, error } = await supabase.auth.getUser()
 
     if (error || !user) {
@@ -93,6 +122,7 @@ export async function GET(request: Request) {
       )
     }
 
+<<<<<<< HEAD
     // Check if database is available
     if (!process.env.DATABASE_URL) {
       // Return a basic user object without database
@@ -108,6 +138,14 @@ export async function GET(request: Request) {
           affiliate: null
         }
       })
+=======
+    // Check if database is configured
+    if (!process.env.DATABASE_URL) {
+      return NextResponse.json(
+        { error: 'Database not configured' },
+        { status: 503 }
+      )
+>>>>>>> 5f0a3f67cc9176021538ab562209642046544539
     }
 
     const dbUser = await db.user.findUnique({
@@ -129,6 +167,7 @@ export async function GET(request: Request) {
     return NextResponse.json({ user: dbUser })
   } catch (error) {
     console.error('Error fetching user:', error)
+<<<<<<< HEAD
     
     // Try to get user from Supabase session even if database fails
     try {
@@ -152,6 +191,8 @@ export async function GET(request: Request) {
       console.error('Error getting session:', sessionError)
     }
 
+=======
+>>>>>>> 5f0a3f67cc9176021538ab562209642046544539
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

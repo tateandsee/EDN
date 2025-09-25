@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+<<<<<<< HEAD
 import { db } from '@/lib/db'
 import ZAI from 'z-ai-web-dev-sdk'
 
@@ -23,6 +24,14 @@ export async function POST(request: Request) {
       )
     }
 
+=======
+import { supabase } from '@/lib/supabase'
+import { db } from '@/lib/db'
+import ZAI from 'z-ai-web-dev-sdk'
+
+export async function POST(request: Request) {
+  try {
+>>>>>>> 5f0a3f67cc9176021538ab562209642046544539
     const { data: { user }, error } = await supabase.auth.getUser()
 
     if (error || !user) {
@@ -214,6 +223,7 @@ export async function POST(request: Request) {
 
 export async function GET(request: Request) {
   try {
+<<<<<<< HEAD
     // Check if Supabase is configured
     if (!supabase) {
       return NextResponse.json(
@@ -222,6 +232,8 @@ export async function GET(request: Request) {
       )
     }
 
+=======
+>>>>>>> 5f0a3f67cc9176021538ab562209642046544539
     const { data: { user }, error } = await supabase.auth.getUser()
 
     if (error || !user) {

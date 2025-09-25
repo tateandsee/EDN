@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+<<<<<<< HEAD
 import { db } from '@/lib/db'
 
 // Only import Supabase if it's configured
@@ -29,6 +30,13 @@ export async function GET(request: Request) {
       })
     }
 
+=======
+import { createClient } from '@/lib/supabase'
+import { db } from '@/lib/db'
+
+export async function GET(request: Request) {
+  try {
+>>>>>>> 5f0a3f67cc9176021538ab562209642046544539
     const supabase = await createClient()
     const { data: { user }, error } = await supabase.auth.getUser()
 
@@ -79,6 +87,7 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   try {
+<<<<<<< HEAD
     // Check if Supabase is configured
     if (!createClient) {
       return NextResponse.json(
@@ -87,6 +96,8 @@ export async function POST(request: Request) {
       )
     }
 
+=======
+>>>>>>> 5f0a3f67cc9176021538ab562209642046544539
     const supabase = await createClient()
     const { data: { user }, error } = await supabase.auth.getUser()
 

@@ -1,5 +1,6 @@
 'use client'
 
+<<<<<<< HEAD
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react'
 import { Bell, CheckCircle, AlertCircle, Info, X, ExternalLink } from 'lucide-react'
 
@@ -28,10 +29,24 @@ interface NotificationContextType {
   removeNotification: (id: string) => void
   clearAll: () => void
   unreadCount: number
+=======
+import React, { createContext, useContext, useEffect, useState } from 'react'
+import NotificationPopup from '@/components/notification-popup'
+import { useNotifications } from '@/hooks/use-notifications'
+import { useAuth } from './auth-context'
+
+interface NotificationContextType {
+  unreadCount: number
+  urgentNotifications: any[]
+  fetchNotifications: () => void
+  markAsRead: (ids: string[]) => void
+  dismissNotifications: (ids: string[]) => void
+>>>>>>> 5f0a3f67cc9176021538ab562209642046544539
 }
 
 const NotificationContext = createContext<NotificationContextType | undefined>(undefined)
 
+<<<<<<< HEAD
 export function NotificationProvider({ children }: { children: ReactNode }) {
   const [notifications, setNotifications] = useState<Notification[]>([])
 
@@ -88,10 +103,59 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
       unreadCount
     }}>
       {children}
+=======
+export function NotificationProvider({ children }: { children: React.ReactNode }) {
+  const { user } = useAuth()
+  const {
+    notifications,
+    loading,
+    error,
+    unreadCount,
+    urgentNotifications,
+    fetchNotifications,
+    markAsRead,
+    dismissNotifications
+  } = useNotifications()
+
+  // Only fetch notifications if user is logged in
+  useEffect(() => {
+    if (user) {
+      fetchNotifications()
+    }
+  }, [user, fetchNotifications])
+
+  const handleDownload = (downloadId: string) => {
+    // Open download link in new window
+    window.open(`/api/ai-downloads/${downloadId}/download`, '_blank')
+  }
+
+  const value = {
+    unreadCount,
+    urgentNotifications,
+    fetchNotifications,
+    markAsRead,
+    dismissNotifications
+  }
+
+  return (
+    <NotificationContext.Provider value={value}>
+      {children}
+      
+      {/* Show notification popups only for logged-in users */}
+      {user && !loading && (
+        <NotificationPopup
+          notifications={notifications}
+          onMarkAsRead={markAsRead}
+          onDismiss={dismissNotifications}
+          onDownload={handleDownload}
+        />
+      )}
+>>>>>>> 5f0a3f67cc9176021538ab562209642046544539
     </NotificationContext.Provider>
   )
 }
 
+<<<<<<< HEAD
 export function useNotifications() {
   const context = useContext(NotificationContext)
   if (context === undefined) {
@@ -337,4 +401,12 @@ export function NotificationContainer() {
         ))}
     </div>
   )
+=======
+export function useNotificationContext() {
+  const context = useContext(NotificationContext)
+  if (context === undefined) {
+    throw new Error('useNotificationContext must be used within a NotificationProvider')
+  }
+  return context
+>>>>>>> 5f0a3f67cc9176021538ab562209642046544539
 }

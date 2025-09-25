@@ -1,13 +1,47 @@
 import { NextRequest, NextResponse } from 'next/server'
+<<<<<<< HEAD
 import { db } from '@/lib/db'
 import { GamificationProgressService } from '@/lib/gamification-progress'
 import { generateTitleFromPrompt, extractTitleFromMarketplaceItem } from '@/lib/marketplace-title-extractor'
+=======
+import { getServerSession } from 'next-auth'
+import { authOptions } from '@/lib/auth'
+import { db } from '@/lib/db'
+import { GamificationProgressService } from '@/lib/gamification-progress'
+import { generateTitleFromPrompt, extractTitleFromMarketplaceItem } from '@/lib/marketplace-title-extractor'
+import { contentModeration } from '@/lib/content-moderation'
+
+// Helper function to check if user is admin or if in development mode
+async function shouldBypassRestrictions(): Promise<boolean> {
+  // Check if in development mode
+  if (process.env.NODE_ENV === 'development') {
+    return true
+  }
+
+  // Check if user is admin
+  try {
+    const session = await getServerSession(authOptions)
+    if (session?.user?.id) {
+      const user = await db.user.findUnique({
+        where: { id: session.user.id },
+        select: { role: true }
+      })
+      return user?.role === 'ADMIN'
+    }
+  } catch (error) {
+    console.error('Error checking user role:', error)
+  }
+
+  return false
+}
+>>>>>>> 5f0a3f67cc9176021538ab562209642046544539
 
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
     const category = searchParams.get('category')
     const type = searchParams.get('type')
+<<<<<<< HEAD
     const ethnicity = searchParams.get('ethnicity')
     const hairColor = searchParams.get('hairColor')
     const eyeColor = searchParams.get('eyeColor')
@@ -23,10 +57,65 @@ export async function GET(request: NextRequest) {
       where.category = category
     }
 
+=======
+    const minPrice = searchParams.get('minPrice')
+    const maxPrice = searchParams.get('maxPrice')
+    const search = searchParams.get('search')
+    const ethnicity = searchParams.get('ethnicity')
+    const hairColor = searchParams.get('hairColor')
+    const bodyType = searchParams.get('bodyType')
+    const attire = searchParams.get('attire')
+    const page = parseInt(searchParams.get('page') || '1')
+    const limit = parseInt(searchParams.get('limit') || '12')
+
+    const where: any = {
+      status: 'ACTIVE' // Only show active items by default
+    }
+
+    // Handle SFW/NSFW filtering
+    if (category === 'SFW') {
+      where.isNsfw = false
+    } else if (category === 'NSFW') {
+      where.isNsfw = true
+    } else if (category && category !== 'all' && category !== 'ETHNICITY' && category !== 'HAIR_COLOR' && category !== 'BODY_TYPE' && category !== 'ATTIRE') {
+      where.category = category
+    }
+
+    // Handle sub-category filtering
+    if (ethnicity && ethnicity !== 'all') {
+      where.tags = {
+        contains: ethnicity,
+        mode: 'insensitive'
+      }
+    }
+
+    if (hairColor && hairColor !== 'all') {
+      where.tags = {
+        contains: hairColor,
+        mode: 'insensitive'
+      }
+    }
+
+    if (bodyType && bodyType !== 'all') {
+      where.tags = {
+        contains: bodyType,
+        mode: 'insensitive'
+      }
+    }
+
+    if (attire && attire !== 'all') {
+      // Filter by attire tags - look for exact attire tag match
+      where.tags = {
+        contains: `"${attire}"`
+      }
+    }
+
+>>>>>>> 5f0a3f67cc9176021538ab562209642046544539
     if (type && type !== 'all') {
       where.type = type
     }
 
+<<<<<<< HEAD
     // Handle multiple tag filters
     const tagFilters = []
     if (ethnicity && ethnicity !== 'all') {
@@ -56,6 +145,8 @@ export async function GET(request: NextRequest) {
       }
     }
 
+=======
+>>>>>>> 5f0a3f67cc9176021538ab562209642046544539
     if (minPrice || maxPrice) {
       where.price = {}
       if (minPrice) where.price.gte = parseFloat(minPrice)
@@ -63,17 +154,24 @@ export async function GET(request: NextRequest) {
     }
 
     if (search) {
+<<<<<<< HEAD
       const searchConditions = [
+=======
+      where.OR = [
+>>>>>>> 5f0a3f67cc9176021538ab562209642046544539
         { title: { contains: search, mode: 'insensitive' } },
         { description: { contains: search, mode: 'insensitive' } },
         { tags: { contains: search, mode: 'insensitive' } }
       ]
+<<<<<<< HEAD
       
       if (where.OR) {
         where.OR = [...where.OR, ...searchConditions]
       } else {
         where.OR = searchConditions
       }
+=======
+>>>>>>> 5f0a3f67cc9176021538ab562209642046544539
     }
 
     const skip = (page - 1) * limit
@@ -81,7 +179,34 @@ export async function GET(request: NextRequest) {
     const [items, total] = await Promise.all([
       db.marketplaceItem.findMany({
         where,
+<<<<<<< HEAD
         include: {
+=======
+        select: {
+          id: true,
+          title: true,
+          description: true,
+          type: true,
+          category: true,
+          price: true,
+          currency: true,
+          status: true,
+          thumbnail: true,
+          images: true,
+          tags: true,
+          isNsfw: true,
+          userId: true,
+          positivePrompt: true,
+          negativePrompt: true,
+          promptConfig: true,
+          // New content moderation fields
+          contentLevel: true,
+          nudityLevel: true,
+          adultContent: true,
+          suggestiveContent: true,
+          artisticNudity: true,
+          moderationStatus: true,
+>>>>>>> 5f0a3f67cc9176021538ab562209642046544539
           user: {
             select: {
               id: true,
@@ -120,6 +245,7 @@ export async function GET(request: NextRequest) {
     ])
 
     // Process items to extract title information and parse tags
+<<<<<<< HEAD
     const processedItems = items.map(item => {
       const { displayTitle, isAutoGenerated } = extractTitleFromMarketplaceItem(item)
       return {
@@ -129,14 +255,65 @@ export async function GET(request: NextRequest) {
         isAutoGenerated
       }
     })
+=======
+    const bypassRestrictions = await shouldBypassRestrictions()
+    
+    const processedItems = items.map(item => {
+      const { displayTitle, isAutoGenerated } = extractTitleFromMarketplaceItem(item)
+      const parsedTags = item.tags ? JSON.parse(item.tags) : []
+      const parsedImages = item.images ? JSON.parse(item.images) : []
+      
+      // Apply content restrictions using enhanced moderation system (bypass for admin/dev mode)
+      if (!bypassRestrictions) {
+        // Use the moderation system to check content restrictions
+        const itemText = `${item.title} ${item.description || ''} ${item.tags || ''}`
+        const itemModeration = await contentModeration.moderateText(itemText)
+        
+        // Check gender restrictions
+        if (itemModeration.gender === 'MALE' || itemModeration.gender === 'MIXED') {
+          return null
+        }
+        
+        // Check restricted content
+        if (itemModeration.hasRestrictedContent) {
+          if (itemModeration.restrictedContentTypes.includes('child_content') ||
+              itemModeration.restrictedContentTypes.includes('animal_content')) {
+            return null
+          }
+        }
+        
+        // Check age restrictions
+        if (!itemModeration.ageAppropriate) {
+          return null
+        }
+      }
+      
+      return {
+        ...item,
+        tags: parsedTags,
+        images: parsedImages,
+        displayTitle,
+        isAutoGenerated
+      }
+    }).filter(item => item !== null) // Remove filtered items
+
+    // Calculate pagination based on filtered items if restrictions are applied, otherwise use original count
+    const displayTotal = bypassRestrictions ? total : processedItems.length
+    const displayPages = Math.ceil(displayTotal / limit)
+>>>>>>> 5f0a3f67cc9176021538ab562209642046544539
 
     return NextResponse.json({
       items: processedItems,
       pagination: {
         page,
         limit,
+<<<<<<< HEAD
         total,
         pages: Math.ceil(total / limit)
+=======
+        total: displayTotal,
+        pages: displayPages
+>>>>>>> 5f0a3f67cc9176021538ab562209642046544539
       }
     })
   } catch (error) {
@@ -150,6 +327,7 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
+<<<<<<< HEAD
     const authHeader = request.headers.get('authorization')
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
@@ -159,6 +337,16 @@ export async function POST(request: NextRequest) {
     // Here you would verify the token and get the user ID
     // For now, we'll use a placeholder
     const userId = 'user-id-placeholder'
+=======
+    const session = await getServerSession(authOptions)
+    
+    if (!session?.user?.id) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    const userId = session.user.id
+    const bypassRestrictions = await shouldBypassRestrictions()
+>>>>>>> 5f0a3f67cc9176021538ab562209642046544539
 
     const formData = await request.formData()
     const title = formData.get('title') as string
@@ -170,6 +358,16 @@ export async function POST(request: NextRequest) {
     const tags = formData.get('tags') as string
     const isNsfw = formData.get('isNsfw') === 'true'
     
+<<<<<<< HEAD
+=======
+    // New content moderation fields
+    const contentLevel = formData.get('contentLevel') as string
+    const nudityLevel = formData.get('nudityLevel') as string
+    const adultContent = formData.get('adultContent') === 'true'
+    const suggestiveContent = formData.get('suggestiveContent') === 'true'
+    const artisticNudity = formData.get('artisticNudity') === 'true'
+    
+>>>>>>> 5f0a3f67cc9176021538ab562209642046544539
     // Prompt-related fields
     const positivePrompt = formData.get('positivePrompt') as string
     const negativePrompt = formData.get('negativePrompt') as string
@@ -195,6 +393,58 @@ export async function POST(request: NextRequest) {
       )
     }
 
+<<<<<<< HEAD
+=======
+    // Parse and validate tags for content restrictions
+    const parsedTags = tags ? tags.split(',').map(t => t.trim()) : []
+    
+    // Perform content moderation analysis
+    const textToAnalyze = `${title} ${description || ''} ${tags || ''}`
+    const moderationResult = await contentModeration.moderateText(textToAnalyze)
+    
+    // Apply content restrictions (bypass for admin/dev mode)
+    if (!bypassRestrictions) {
+      // Use enhanced content moderation system
+      if (moderationResult.gender === 'MALE' || moderationResult.gender === 'MIXED') {
+        return NextResponse.json(
+          { error: 'Male content not allowed. Only female content is permitted.' },
+          { status: 400 }
+        )
+      }
+      
+      if (moderationResult.hasRestrictedContent) {
+        if (moderationResult.restrictedContentTypes.includes('child_content')) {
+          return NextResponse.json(
+            { error: 'Child content not allowed. Strictly prohibited.' },
+            { status: 400 }
+          )
+        }
+        
+        if (moderationResult.restrictedContentTypes.includes('animal_content')) {
+          return NextResponse.json(
+            { error: 'Animal content not allowed. Strictly prohibited.' },
+            { status: 400 }
+          )
+        }
+      }
+      
+      if (!moderationResult.ageAppropriate) {
+        return NextResponse.json(
+          { error: 'Content must feature subjects aged 18-40 only.' },
+          { status: 400 }
+        )
+      }
+      
+      // Check if content moderation status allows creation
+      if (moderationResult.moderationStatus === 'REJECTED') {
+        return NextResponse.json(
+          { error: 'Content rejected by moderation system', details: moderationResult.recommendations },
+          { status: 400 }
+        )
+      }
+    }
+
+>>>>>>> 5f0a3f67cc9176021538ab562209642046544539
     // Generate title from prompt data if not explicitly provided or if it's an auto-generated title
     let finalTitle = title
     let isAutoGenerated = false
@@ -263,6 +513,18 @@ export async function POST(request: NextRequest) {
         pdfFileSize: pdfFileSize || undefined,
         tags: tags ? JSON.stringify(tags.split(',').map(t => t.trim())) : undefined,
         isNsfw,
+<<<<<<< HEAD
+=======
+        // New content moderation fields
+        contentLevel: contentLevel as any || moderationResult.contentLevel,
+        nudityLevel: nudityLevel as any || moderationResult.nudityLevel,
+        adultContent: adultContent || moderationResult.adultContent,
+        suggestiveContent: suggestiveContent || moderationResult.suggestiveContent,
+        artisticNudity: artisticNudity || moderationResult.artisticNudity,
+        moderationStatus: moderationResult.moderationStatus,
+        moderationNotes: moderationResult.recommendations.join(', '),
+        moderatedAt: new Date(),
+>>>>>>> 5f0a3f67cc9176021538ab562209642046544539
         userId,
         // Store prompt-related fields
         promptConfig: promptConfig || undefined,
@@ -292,9 +554,22 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ 
       item, 
+<<<<<<< HEAD
       metadata: {
         titleGenerated: isAutoGenerated,
         titleSource: isAutoGenerated ? 'prompts' : 'user_input'
+=======
+      moderation: moderationResult,
+      metadata: {
+        titleGenerated: isAutoGenerated,
+        titleSource: isAutoGenerated ? 'prompts' : 'user_input',
+        contentModeration: {
+          status: moderationResult.moderationStatus,
+          contentLevel: moderationResult.contentLevel,
+          nudityLevel: moderationResult.nudityLevel,
+          recommendations: moderationResult.recommendations
+        }
+>>>>>>> 5f0a3f67cc9176021538ab562209642046544539
       }
     }, { status: 201 })
   } catch (error) {

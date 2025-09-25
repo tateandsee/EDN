@@ -75,6 +75,9 @@ const nextConfig: NextConfig = {
         pathname: '/**',
       },
     ],
+    // Enable local images
+    domains: ['localhost'],
+    unoptimized: false,
   },
   webpack: (config, { dev }) => {
     if (dev) {

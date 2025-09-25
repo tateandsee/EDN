@@ -12,7 +12,8 @@
     "db:migrate": "prisma migrate dev",
     "db:reset": "prisma migrate reset",
     "validate-supabase": "node scripts/validate-supabase-config.js",
-    "github-setup": "bash scripts/github-helper.sh"
+    "github-setup": "bash scripts/github-helper.sh",
+    "audit-images": "tsx scripts/audit-and-fix-images.ts"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",

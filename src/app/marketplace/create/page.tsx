@@ -11,6 +11,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Switch } from '@/components/ui/switch'
 import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
+<<<<<<< HEAD
+=======
+import { Slider } from '@/components/ui/slider'
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
+>>>>>>> 5f0a3f67cc9176021538ab562209642046544539
 import { useNSFW } from '@/contexts/nsfw-context'
 import { useAuth } from '@/contexts/auth-context'
 import { 
@@ -29,9 +34,18 @@ import {
   Info,
   CheckCircle,
   AlertCircle,
+<<<<<<< HEAD
   Package
 } from 'lucide-react'
 import Link from 'next/link'
+=======
+  Package,
+  Settings,
+  ChevronDown
+} from 'lucide-react'
+import Link from 'next/link'
+import { SDXLControls } from '@/components/sdxl-controls'
+>>>>>>> 5f0a3f67cc9176021538ab562209642046544539
 
 interface FormData {
   title: string
@@ -51,6 +65,12 @@ interface FormData {
   positivePrompt: string
   negativePrompt: string
   
+<<<<<<< HEAD
+=======
+  // SDXL configuration (native functionality)
+  sdxlConfig: any
+  
+>>>>>>> 5f0a3f67cc9176021538ab562209642046544539
   // File uploads
   images: File[]
   thumbnail: File | null
@@ -100,6 +120,10 @@ export default function CreateMarketplaceItemPage() {
     useCustomTitle: false,
     positivePrompt: '',
     negativePrompt: '',
+<<<<<<< HEAD
+=======
+    sdxlConfig: null,
+>>>>>>> 5f0a3f67cc9176021538ab562209642046544539
     images: [],
     thumbnail: null,
     pdfFile: null
@@ -111,6 +135,10 @@ export default function CreateMarketplaceItemPage() {
     accent: '#FF1744',
     bg: 'from-pink-900 via-purple-900 to-red-900',
     cardBg: 'rgba(30, 0, 30, 0.85)',
+<<<<<<< HEAD
+=======
+    cardBorder: 'rgba(255, 255, 255, 0.1)',
+>>>>>>> 5f0a3f67cc9176021538ab562209642046544539
     textPrimary: '#FFFFFF',
     textSecondary: '#E0E0E0',
   } : {
@@ -119,6 +147,10 @@ export default function CreateMarketplaceItemPage() {
     accent: '#FFE66D',
     bg: 'from-orange-200 via-cyan-200 to-yellow-200',
     cardBg: 'rgba(255, 255, 255, 0.9)',
+<<<<<<< HEAD
+=======
+    cardBorder: 'rgba(0, 0, 0, 0.1)',
+>>>>>>> 5f0a3f67cc9176021538ab562209642046544539
     textPrimary: '#1A202C',
     textSecondary: '#2D3748',
   }
@@ -174,6 +206,19 @@ export default function CreateMarketplaceItemPage() {
     }))
   }
 
+<<<<<<< HEAD
+=======
+  // SDXL Configuration handlers
+  const handleSDXLConfigChange = (config: any) => {
+    setFormData(prev => ({ ...prev, sdxlConfig: config }))
+  }
+
+  // Dummy handler for SDXLControls (since SDXL is now native functionality)
+  const handleSDXLGenerate = (useSDXL: boolean) => {
+    // SDXL is always enabled as native functionality, no toggle needed
+  }
+
+>>>>>>> 5f0a3f67cc9176021538ab562209642046544539
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!user) {
@@ -200,6 +245,14 @@ export default function CreateMarketplaceItemPage() {
       formDataToSend.append('positivePrompt', formData.positivePrompt)
       formDataToSend.append('negativePrompt', formData.negativePrompt)
       
+<<<<<<< HEAD
+=======
+      // SDXL Configuration (always included as native functionality)
+      if (formData.sdxlConfig) {
+        formDataToSend.append('promptConfig', JSON.stringify(formData.sdxlConfig))
+      }
+      
+>>>>>>> 5f0a3f67cc9176021538ab562209642046544539
       // Files
       if (formData.thumbnail) {
         formDataToSend.append('thumbnail', formData.thumbnail)
@@ -406,6 +459,29 @@ export default function CreateMarketplaceItemPage() {
                     />
                   </div>
 
+<<<<<<< HEAD
+=======
+                  {/* Advanced Generation Settings (Native SDXL Functionality) */}
+                  <Card style={{ backgroundColor: 'rgba(255,255,255,0.05)', borderColor: colors.cardBorder }}>
+                    <CardContent className="p-4">
+                      <div className="space-y-4">
+                        <div className="flex items-center">
+                          <Settings className="mr-2 h-5 w-5" style={{ color: colors.primary }} />
+                          <h3 className="text-lg font-semibold" style={{ color: colors.textPrimary }}>
+                            Advanced Generation Settings
+                          </h3>
+                        </div>
+                        <SDXLControls
+                          onConfigChange={handleSDXLConfigChange}
+                          onGenerate={handleSDXLGenerate}
+                          isNSFW={isNSFW}
+                          colors={colors}
+                        />
+                      </div>
+                    </CardContent>
+                  </Card>
+
+>>>>>>> 5f0a3f67cc9176021538ab562209642046544539
                   <div>
                     <Label style={{ color: colors.textSecondary }}>Tags</Label>
                     <div className="flex gap-2 mb-2">

@@ -2,7 +2,11 @@
 
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
+<<<<<<< HEAD
 import Image from 'next/image'
+=======
+import ImageWithFallback from '@/components/ui/image-with-fallback'
+>>>>>>> 5f0a3f67cc9176021538ab562209642046544539
 
 interface PlatformLogoProps {
   name: string
@@ -59,6 +63,7 @@ export default function PlatformLogo({ name, isNSFW = false, mode = 'sfw' }: Pla
       <CardContent className="p-6 text-center">
         <div className="w-20 h-20 mx-auto mb-3 rounded-full bg-white/90 backdrop-blur-sm shadow-md flex items-center justify-center overflow-hidden">
           {logoUrl ? (
+<<<<<<< HEAD
             <Image 
               src={logoUrl} 
               alt={name} 
@@ -74,6 +79,20 @@ export default function PlatformLogo({ name, isNSFW = false, mode = 'sfw' }: Pla
                 fallback.textContent = name.charAt(0).toUpperCase()
                 target.parentNode?.appendChild(fallback)
               }}
+=======
+            <ImageWithFallback
+              src={logoUrl}
+              alt={name}
+              width={80}
+              height={80}
+              className="w-full h-full object-contain p-2"
+              fallback={
+                <div className={`text-2xl font-bold ${colorscheme.text}`}>
+                  {name.charAt(0).toUpperCase()}
+                </div>
+              }
+              showFallbackText={false}
+>>>>>>> 5f0a3f67cc9176021538ab562209642046544539
             />
           ) : (
             <div className={`text-2xl font-bold ${colorscheme.text}`}>

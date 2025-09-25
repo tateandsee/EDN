@@ -10,6 +10,10 @@ import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { useNSFW } from '@/contexts/nsfw-context'
 import { useAuth } from '@/contexts/auth-context'
+<<<<<<< HEAD
+=======
+import AgeVerificationModal from '@/components/age-verification-modal'
+>>>>>>> 5f0a3f67cc9176021538ab562209642046544539
 import MarketplaceItemCard from '@/components/marketplace-item-card'
 import { 
   Sparkles, 
@@ -22,7 +26,13 @@ import {
   Store,
   RefreshCw,
   Info,
+<<<<<<< HEAD
   Loader2
+=======
+  Loader2,
+  Lock,
+  AlertTriangle
+>>>>>>> 5f0a3f67cc9176021538ab562209642046544539
 } from 'lucide-react'
 
 interface MarketplaceItem {
@@ -64,13 +74,23 @@ interface MarketplaceItem {
 
 export default function MarketplacePage() {
   const nsfwContext = useNSFW()
+<<<<<<< HEAD
   const isNSFW = nsfwContext?.isNSFW ?? true // Default to true if undefined
+=======
+  const isNSFW = nsfwContext?.isNSFW ?? false
+  const isAgeVerified = nsfwContext?.isAgeVerified ?? false
+  const showAgeVerification = nsfwContext?.showAgeVerification ?? false
+  const setShowAgeVerification = nsfwContext?.setShowAgeVerification ?? (() => {})
+  const setIsNSFW = nsfwContext?.setIsNSFW ?? (() => {})
+  const canBypassRestrictions = nsfwContext?.canBypassRestrictions ?? false
+>>>>>>> 5f0a3f67cc9176021538ab562209642046544539
   const { user } = useAuth()
   const [activeTab, setActiveTab] = useState('browse')
   const [items, setItems] = useState<MarketplaceItem[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   
+<<<<<<< HEAD
   // Debug: Log initial values
   console.log('🚀 MarketplacePage initialized:', {
     isNSFW,
@@ -85,14 +105,52 @@ export default function MarketplacePage() {
   const [selectedEthnicity, setSelectedEthnicity] = useState('all')
   const [selectedHairColor, setSelectedHairColor] = useState('all')
   const [selectedEyeColor, setSelectedEyeColor] = useState('all')
+=======
+  // Filter states
+  const [searchTerm, setSearchTerm] = useState('')
+  const [selectedCategory, setSelectedCategory] = useState('all') // Start with 'all' to avoid timing issues
+  const [selectedType, setSelectedType] = useState('all')
+>>>>>>> 5f0a3f67cc9176021538ab562209642046544539
   const [minPrice, setMinPrice] = useState('')
   const [maxPrice, setMaxPrice] = useState('')
   
   // Pagination states
   const [currentPage, setCurrentPage] = useState(1)
+<<<<<<< HEAD
   const [itemsPerPage, setItemsPerPage] = useState(12)
   const [totalItems, setTotalItems] = useState(0)
   const [totalPages, setTotalPages] = useState(1)
+=======
+  const [totalPages, setTotalPages] = useState(1)
+  const [totalItems, setTotalItems] = useState(0)
+  const [itemsPerPage, setItemsPerPage] = useState(12)
+  
+  // Sub-category states
+  const [selectedEthnicity, setSelectedEthnicity] = useState('all')
+  const [selectedHairColor, setSelectedHairColor] = useState('all')
+  const [selectedBodyType, setSelectedBodyType] = useState('all')
+  const [selectedAttire, setSelectedAttire] = useState('all')
+
+  // Check if user can access NSFW content
+  const canAccessNSFW = canBypassRestrictions || (user && isAgeVerified)
+
+  // Handle NSFW mode change with age verification
+  const handleNSFWModeChange = (newMode: boolean) => {
+    if (newMode && !canAccessNSFW) {
+      if (!user && !canBypassRestrictions) {
+        // Redirect to sign in if not logged in and not admin/dev mode
+        window.location.href = '/auth/signin'
+        return
+      }
+      // Show age verification modal only if not bypassing restrictions
+      if (!canBypassRestrictions) {
+        setShowAgeVerification(true)
+        return
+      }
+    }
+    setIsNSFW(newMode)
+  }
+>>>>>>> 5f0a3f67cc9176021538ab562209642046544539
   
   const sfwColors = {
     primary: '#FF6B35', // vibrant coral orange
@@ -100,6 +158,7 @@ export default function MarketplacePage() {
     accent: '#FFE66D', // golden yellow
     bg: 'from-orange-200 via-cyan-200 to-yellow-200',
     particle: '#FF6B35',
+<<<<<<< HEAD
     cardBg: 'rgba(255, 255, 255, 0.95)',
     cardBorder: 'rgba(0, 0, 0, 0.15)',
     textPrimary: '#1A202C', // dark gray
@@ -111,6 +170,14 @@ export default function MarketplacePage() {
     paginationActive: '#FF6B35', // active page color
     paginationText: '#2D3748', // text color
     paginationBorder: '#E2E8F0', // border color
+=======
+    cardBg: 'rgba(255, 255, 255, 0.9)',
+    cardBorder: 'rgba(0, 0, 0, 0.1)',
+    textPrimary: '#1A202C', // dark gray
+    textSecondary: '#2D3748', // medium gray
+    textLight: '#4A5568', // light gray
+    textOnWhite: '#2D3748' // text on white backgrounds
+>>>>>>> 5f0a3f67cc9176021538ab562209642046544539
   }
 
   const nsfwColors = {
@@ -119,6 +186,7 @@ export default function MarketplacePage() {
     accent: '#FF1744', // vibrant red
     bg: 'from-pink-900 via-purple-900 to-red-900',
     particle: '#FF69B4',
+<<<<<<< HEAD
     cardBg: 'rgba(30, 0, 30, 0.9)', // increased opacity for better contrast
     cardBorder: 'rgba(255, 20, 147, 0.6)', // more visible border
     textPrimary: '#FFFFFF',
@@ -130,10 +198,60 @@ export default function MarketplacePage() {
     paginationActive: '#FF1493', // active page color
     paginationText: '#FFFFFF', // text color
     paginationBorder: 'rgba(255, 20, 147, 0.4)', // border color
+=======
+    cardBg: 'rgba(30, 0, 30, 0.85)',
+    cardBorder: 'rgba(255, 20, 147, 0.5)',
+    textPrimary: '#FFFFFF',
+    textSecondary: '#E0E0E0',
+    textLight: '#B0B0B0',
+    textOnWhite: '#FFFFFF'
+>>>>>>> 5f0a3f67cc9176021538ab562209642046544539
   }
 
   const colors = isNSFW ? nsfwColors : sfwColors
 
+<<<<<<< HEAD
+=======
+  // Ethnicity options
+  const ethnicityOptions = [
+    { value: 'all', label: 'All Ethnicities' },
+    { value: 'asian', label: 'Asian' },
+    { value: 'caucasian', label: 'Caucasian' },
+    { value: 'mixed-race', label: 'Mixed Race' },
+    { value: 'persian', label: 'Persian' }
+  ]
+
+  // Hair color options
+  const hairColorOptions = [
+    { value: 'all', label: 'All Hair Colors' },
+    { value: 'blonde', label: 'Blonde' },
+    { value: 'dark_hair', label: 'Dark Hair' },
+    { value: 'red_hair', label: 'Red Hair' },
+    { value: 'grey_hair', label: 'Grey Hair' }
+  ]
+
+  // Body type options
+  const bodyTypeOptions = [
+    { value: 'all', label: 'All Body Types' },
+    { value: 'fit_and_toned', label: 'Fit and Toned' },
+    { value: 'chubby', label: 'Chubby' },
+    { value: 'voluptuous', label: 'Voluptuous' },
+    { value: 'average', label: 'Average' }
+  ]
+
+  // Attire options
+  const attireOptions = [
+    { value: 'all', label: 'All Attire' },
+    { value: 'erotic', label: 'Erotic' },
+    { value: 'swimwear', label: 'Swimwear' },
+    { value: 'cosplay', label: 'Cosplay' },
+    { value: 'sexy', label: 'Sexy' },
+    { value: 'underwear', label: 'Underwear' },
+    { value: 'semi-nude', label: 'Semi-Nude' },
+    { value: 'nude', label: 'Nude' }
+  ]
+
+>>>>>>> 5f0a3f67cc9176021538ab562209642046544539
   const [stats, setStats] = useState({
     totalItems: 0,
     activeCreators: 0,
@@ -159,8 +277,12 @@ export default function MarketplacePage() {
   }, [])
 
   // Fetch marketplace items
+<<<<<<< HEAD
   const fetchMarketplaceItems = async () => {
     console.log('🔄 fetchMarketplaceItems called')
+=======
+  const fetchMarketplaceItems = async (page = 1) => {
+>>>>>>> 5f0a3f67cc9176021538ab562209642046544539
     setLoading(true)
     setError(null)
     
@@ -168,6 +290,7 @@ export default function MarketplacePage() {
       const params = new URLSearchParams()
       if (selectedCategory !== 'all') params.append('category', selectedCategory)
       if (selectedType !== 'all') params.append('type', selectedType)
+<<<<<<< HEAD
       if (selectedEthnicity !== 'all') params.append('ethnicity', selectedEthnicity)
       if (selectedHairColor !== 'all') params.append('hairColor', selectedHairColor)
       if (selectedEyeColor !== 'all') params.append('eyeColor', selectedEyeColor)
@@ -202,11 +325,48 @@ export default function MarketplacePage() {
       setError('Failed to fetch marketplace items')
     } finally {
       console.log('🏁 Setting loading to false')
+=======
+      if (minPrice) params.append('minPrice', minPrice)
+      if (maxPrice) params.append('maxPrice', maxPrice)
+      if (searchTerm) params.append('search', searchTerm)
+      params.append('page', page.toString())
+      params.append('limit', itemsPerPage.toString())
+      
+      // Add sub-category parameters
+      if (selectedCategory === 'ETHNICITY' && selectedEthnicity !== 'all') {
+        params.append('ethnicity', selectedEthnicity)
+      }
+      if (selectedCategory === 'HAIR_COLOR' && selectedHairColor !== 'all') {
+        params.append('hairColor', selectedHairColor)
+      }
+      if (selectedCategory === 'BODY_TYPE' && selectedBodyType !== 'all') {
+        params.append('bodyType', selectedBodyType)
+      }
+      if (selectedCategory === 'ATTIRE' && selectedAttire !== 'all') {
+        params.append('attire', selectedAttire)
+      }
+      
+      const response = await fetch(`/api/marketplace/items?${params.toString()}`)
+      if (response.ok) {
+        const data = await response.json()
+        setItems(data.items || [])
+        setTotalPages(data.pagination?.pages || 1)
+        setTotalItems(data.pagination?.total || 0)
+        setCurrentPage(page)
+      } else {
+        setError('Failed to fetch marketplace items')
+      }
+    } catch (error) {
+      console.error('Error fetching marketplace items:', error)
+      setError('Failed to fetch marketplace items')
+    } finally {
+>>>>>>> 5f0a3f67cc9176021538ab562209642046544539
       setLoading(false)
     }
   }
 
   useEffect(() => {
+<<<<<<< HEAD
     console.log('🎯 useEffect triggered for fetching items!')
     console.log('📱 MarketplacePage mounted!')
     fetchMarketplaceItems()
@@ -239,6 +399,110 @@ export default function MarketplacePage() {
       totalPages
     })
   }, [loading, error, items, selectedCategory, isNSFW, totalItems, totalPages])
+=======
+    setCurrentPage(1)
+    fetchMarketplaceItems(1)
+  }, [selectedCategory, selectedType, minPrice, maxPrice, searchTerm, selectedEthnicity, selectedHairColor, selectedBodyType, selectedAttire, itemsPerPage])
+
+  // Handle category change with NSFW verification
+  const handleCategoryChange = (newCategory: string) => {
+    if (newCategory === 'NSFW') {
+      handleNSFWModeChange(true)
+      setSelectedCategory('NSFW')
+      return
+    } else if (newCategory === 'SFW') {
+      handleNSFWModeChange(false)
+      setSelectedCategory('SFW')
+      return
+    }
+    setSelectedCategory(newCategory)
+  }
+
+  // Update category filter when NSFW mode changes
+  useEffect(() => {
+    setSelectedCategory(isNSFW ? 'NSFW' : 'SFW')
+  }, [isNSFW])
+
+  // Initialize category based on NSFW mode on mount
+  useEffect(() => {
+    setSelectedCategory(isNSFW ? 'NSFW' : 'SFW')
+  }, []) // Run only on mount
+
+  // Pagination component
+  const Pagination = () => {
+    if (totalPages <= 1) return null
+
+    return (
+      <div className="flex flex-col items-center space-y-4 mt-8">
+        <div className="flex items-center space-x-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => fetchMarketplaceItems(currentPage - 1)}
+            disabled={currentPage === 1}
+            style={{
+              borderColor: colors.cardBorder,
+              color: colors.textPrimary,
+              opacity: currentPage === 1 ? 0.5 : 1
+            }}
+          >
+            Previous
+          </Button>
+          
+          <div className="flex space-x-1">
+            {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+              let pageNum
+              if (totalPages <= 5) {
+                pageNum = i + 1
+              } else if (currentPage <= 3) {
+                pageNum = i + 1
+              } else if (currentPage >= totalPages - 2) {
+                pageNum = totalPages - 4 + i
+              } else {
+                pageNum = currentPage - 2 + i
+              }
+              
+              return (
+                <Button
+                  key={pageNum}
+                  variant={currentPage === pageNum ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => fetchMarketplaceItems(pageNum)}
+                  style={{
+                    backgroundColor: currentPage === pageNum ? colors.primary : 'transparent',
+                    borderColor: colors.cardBorder,
+                    color: currentPage === pageNum ? colors.textOnWhite : colors.textPrimary,
+                    minWidth: '40px'
+                  }}
+                >
+                  {pageNum}
+                </Button>
+              )
+            })}
+          </div>
+          
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => fetchMarketplaceItems(currentPage + 1)}
+            disabled={currentPage === totalPages}
+            style={{
+              borderColor: colors.cardBorder,
+              color: colors.textPrimary,
+              opacity: currentPage === totalPages ? 0.5 : 1
+            }}
+          >
+            Next
+          </Button>
+        </div>
+        
+        <div className="text-sm" style={{ color: colors.textSecondary }}>
+          Showing {(currentPage - 1) * itemsPerPage + 1} to {Math.min(currentPage * itemsPerPage, totalItems)} of {totalItems} items
+        </div>
+      </div>
+    )
+  }
+>>>>>>> 5f0a3f67cc9176021538ab562209642046544539
 
   // Empty state component
   const EmptyState = () => (
@@ -271,6 +535,13 @@ export default function MarketplacePage() {
               setSelectedType('all')
               setMinPrice('')
               setMaxPrice('')
+<<<<<<< HEAD
+=======
+              setSelectedEthnicity('all')
+              setSelectedHairColor('all')
+              setSelectedBodyType('all')
+              setSelectedAttire('all')
+>>>>>>> 5f0a3f67cc9176021538ab562209642046544539
             }}
           >
             <RefreshCw className="mr-2 h-5 w-5" />
@@ -338,7 +609,12 @@ export default function MarketplacePage() {
   )
 
   return (
+<<<<<<< HEAD
     <div className={`min-h-screen bg-gradient-to-br ${colors.bg}`}>
+=======
+    <>
+      <div className={`min-h-screen bg-gradient-to-br ${colors.bg}`}>
+>>>>>>> 5f0a3f67cc9176021538ab562209642046544539
       {/* Hero Section */}
       <div className="relative h-96 overflow-hidden">
         <div className="absolute inset-0 bg-black/20" />
@@ -378,6 +654,7 @@ export default function MarketplacePage() {
         </div>
       </div>
 
+<<<<<<< HEAD
       {/* NSFW Mode Toggle */}
       <div className="container mx-auto px-4 py-6">
         <Card className="mb-8" style={{ backgroundColor: colors.cardBg, borderColor: colors.cardBorder }}>
@@ -415,6 +692,8 @@ export default function MarketplacePage() {
         </Card>
       </div>
 
+=======
+>>>>>>> 5f0a3f67cc9176021538ab562209642046544539
       {/* Stats Section */}
       <div className="container mx-auto px-4 py-12">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-12">
@@ -483,6 +762,7 @@ export default function MarketplacePage() {
           </TabsList>
 
           <TabsContent value="browse" className="space-y-6">
+<<<<<<< HEAD
             {/* Filters */}
             <Card style={{ backgroundColor: colors.cardBg, borderColor: colors.cardBorder }}>
               <CardHeader>
@@ -490,6 +770,178 @@ export default function MarketplacePage() {
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+=======
+            {/* Category Tabs */}
+            <Card style={{ backgroundColor: colors.cardBg, borderColor: colors.cardBorder }}>
+              <CardHeader>
+                <CardTitle style={{ color: colors.textPrimary }}>Categories</CardTitle>
+                <CardDescription style={{ color: colors.textSecondary }}>
+                  Browse by content type and characteristics
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Tabs value={selectedCategory} onValueChange={handleCategoryChange} className="w-full">
+                  <TabsList className="grid w-full grid-cols-2 md:grid-cols-6 mb-6" style={{ backgroundColor: colors.cardBg }}>
+                    <TabsTrigger 
+                      value="all" 
+                      className="data-[state=active]:bg-white/20 text-xs md:text-sm"
+                      style={{ color: colors.textPrimary }}
+                    >
+                      All
+                    </TabsTrigger>
+                    <TabsTrigger 
+                      value={isNSFW ? 'NSFW' : 'SFW'} 
+                      className="data-[state=active]:bg-white/20 text-xs md:text-sm"
+                      style={{ color: colors.textPrimary }}
+                    >
+                      {isNSFW ? 'NSFW' : 'SFW'}
+                    </TabsTrigger>
+                    <TabsTrigger 
+                      value="ETHNICITY" 
+                      className="data-[state=active]:bg-white/20 text-xs md:text-sm"
+                      style={{ color: colors.textPrimary }}
+                    >
+                      Ethnicity
+                    </TabsTrigger>
+                    <TabsTrigger 
+                      value="HAIR_COLOR" 
+                      className="data-[state=active]:bg-white/20 text-xs md:text-sm"
+                      style={{ color: colors.textPrimary }}
+                    >
+                      Hair Color
+                    </TabsTrigger>
+                    <TabsTrigger 
+                      value="BODY_TYPE" 
+                      className="data-[state=active]:bg-white/20 text-xs md:text-sm"
+                      style={{ color: colors.textPrimary }}
+                    >
+                      Body Type
+                    </TabsTrigger>
+                    <TabsTrigger 
+                      value="ATTIRE" 
+                      className="data-[state=active]:bg-white/20 text-xs md:text-sm"
+                      style={{ color: colors.textPrimary }}
+                    >
+                      Attire
+                    </TabsTrigger>
+                  </TabsList>
+
+                  {/* Sub-category Filters */}
+                  {selectedCategory === 'ETHNICITY' && (
+                    <div className="mb-6">
+                      <label className="block text-sm font-medium mb-3" style={{ color: colors.textSecondary }}>
+                        Select Ethnicity
+                      </label>
+                      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
+                        {ethnicityOptions.map(option => (
+                          <Button
+                            key={option.value}
+                            variant={selectedEthnicity === option.value ? "default" : "outline"}
+                            size="sm"
+                            className="text-xs md:text-sm"
+                            style={{
+                              backgroundColor: selectedEthnicity === option.value ? colors.primary : 'transparent',
+                              borderColor: colors.cardBorder,
+                              color: selectedEthnicity === option.value ? colors.textOnWhite : colors.textPrimary
+                            }}
+                            onClick={() => setSelectedEthnicity(option.value)}
+                          >
+                            {option.label}
+                          </Button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {selectedCategory === 'HAIR_COLOR' && (
+                    <div className="mb-6">
+                      <label className="block text-sm font-medium mb-3" style={{ color: colors.textSecondary }}>
+                        Select Hair Color
+                      </label>
+                      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
+                        {hairColorOptions.map(option => (
+                          <Button
+                            key={option.value}
+                            variant={selectedHairColor === option.value ? "default" : "outline"}
+                            size="sm"
+                            className="text-xs md:text-sm"
+                            style={{
+                              backgroundColor: selectedHairColor === option.value ? colors.primary : 'transparent',
+                              borderColor: colors.cardBorder,
+                              color: selectedHairColor === option.value ? colors.textOnWhite : colors.textPrimary
+                            }}
+                            onClick={() => setSelectedHairColor(option.value)}
+                          >
+                            {option.label}
+                          </Button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {selectedCategory === 'BODY_TYPE' && (
+                    <div className="mb-6">
+                      <label className="block text-sm font-medium mb-3" style={{ color: colors.textSecondary }}>
+                        Select Body Type
+                      </label>
+                      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
+                        {bodyTypeOptions.map(option => (
+                          <Button
+                            key={option.value}
+                            variant={selectedBodyType === option.value ? "default" : "outline"}
+                            size="sm"
+                            className="text-xs md:text-sm"
+                            style={{
+                              backgroundColor: selectedBodyType === option.value ? colors.primary : 'transparent',
+                              borderColor: colors.cardBorder,
+                              color: selectedBodyType === option.value ? colors.textOnWhite : colors.textPrimary
+                            }}
+                            onClick={() => setSelectedBodyType(option.value)}
+                          >
+                            {option.label}
+                          </Button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {selectedCategory === 'ATTIRE' && (
+                    <div className="mb-6">
+                      <label className="block text-sm font-medium mb-3" style={{ color: colors.textSecondary }}>
+                        Select Attire
+                      </label>
+                      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+                        {attireOptions.map(option => (
+                          <Button
+                            key={option.value}
+                            variant={selectedAttire === option.value ? "default" : "outline"}
+                            size="sm"
+                            className="text-xs md:text-sm"
+                            style={{
+                              backgroundColor: selectedAttire === option.value ? colors.primary : 'transparent',
+                              borderColor: colors.cardBorder,
+                              color: selectedAttire === option.value ? colors.textOnWhite : colors.textPrimary
+                            }}
+                            onClick={() => setSelectedAttire(option.value)}
+                          >
+                            {option.label}
+                          </Button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </Tabs>
+              </CardContent>
+            </Card>
+
+            {/* Additional Filters */}
+            <Card style={{ backgroundColor: colors.cardBg, borderColor: colors.cardBorder }}>
+              <CardHeader>
+                <CardTitle style={{ color: colors.textPrimary }}>Additional Filters</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+>>>>>>> 5f0a3f67cc9176021538ab562209642046544539
                   <div>
                     <label className="block text-sm font-medium mb-2" style={{ color: colors.textSecondary }}>
                       Search
@@ -512,6 +964,7 @@ export default function MarketplacePage() {
                   
                   <div>
                     <label className="block text-sm font-medium mb-2" style={{ color: colors.textSecondary }}>
+<<<<<<< HEAD
                       Category
                     </label>
                     <Select value={selectedCategory} onValueChange={setSelectedCategory}>
@@ -532,6 +985,8 @@ export default function MarketplacePage() {
                   
                   <div>
                     <label className="block text-sm font-medium mb-2" style={{ color: colors.textSecondary }}>
+=======
+>>>>>>> 5f0a3f67cc9176021538ab562209642046544539
                       Type
                     </label>
                     <Select value={selectedType} onValueChange={setSelectedType}>
@@ -553,6 +1008,7 @@ export default function MarketplacePage() {
                   
                   <div>
                     <label className="block text-sm font-medium mb-2" style={{ color: colors.textSecondary }}>
+<<<<<<< HEAD
                       Ethnicity
                     </label>
                     <Select value={selectedEthnicity} onValueChange={setSelectedEthnicity}>
@@ -617,6 +1073,8 @@ export default function MarketplacePage() {
                   
                   <div>
                     <label className="block text-sm font-medium mb-2" style={{ color: colors.textSecondary }}>
+=======
+>>>>>>> 5f0a3f67cc9176021538ab562209642046544539
                       Min Price
                     </label>
                     <Input
@@ -648,6 +1106,32 @@ export default function MarketplacePage() {
                       }}
                     />
                   </div>
+<<<<<<< HEAD
+=======
+
+                  <div>
+                    <label className="block text-sm font-medium mb-2" style={{ color: colors.textSecondary }}>
+                      Items Per Page
+                    </label>
+                    <Select value={itemsPerPage.toString()} onValueChange={(value) => {
+                      setItemsPerPage(parseInt(value))
+                      setCurrentPage(1)
+                    }}>
+                      <SelectTrigger style={{ 
+                        backgroundColor: colors.cardBg,
+                        borderColor: colors.cardBorder,
+                        color: colors.textPrimary
+                      }}>
+                        <SelectValue placeholder="12" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="12">12 per page</SelectItem>
+                        <SelectItem value="24">24 per page</SelectItem>
+                        <SelectItem value="48">48 per page</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+>>>>>>> 5f0a3f67cc9176021538ab562209642046544539
                 </div>
               </CardContent>
             </Card>
@@ -661,7 +1145,11 @@ export default function MarketplacePage() {
               <EmptyState />
             ) : (
               <>
+<<<<<<< HEAD
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+=======
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4 md:gap-6">
+>>>>>>> 5f0a3f67cc9176021538ab562209642046544539
                   {items.map((item) => (
                     <MarketplaceItemCard 
                       key={item.id} 
@@ -670,6 +1158,7 @@ export default function MarketplacePage() {
                     />
                   ))}
                 </div>
+<<<<<<< HEAD
                 
                 {/* Pagination Controls */}
                 {totalPages > 1 && (
@@ -920,6 +1409,9 @@ export default function MarketplacePage() {
                     </div>
                   </div>
                 )}
+=======
+                <Pagination />
+>>>>>>> 5f0a3f67cc9176021538ab562209642046544539
               </>
             )}
           </TabsContent>
@@ -1020,5 +1512,11 @@ export default function MarketplacePage() {
         </Tabs>
       </div>
     </div>
+<<<<<<< HEAD
+=======
+    
+    <AgeVerificationModal />
+    </>
+>>>>>>> 5f0a3f67cc9176021538ab562209642046544539
   )
 }

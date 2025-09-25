@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+<<<<<<< HEAD
 import { db } from '@/lib/db'
 import { GamificationProgressService } from '@/lib/gamification-progress'
 
@@ -23,6 +24,14 @@ export async function GET(request: NextRequest) {
       )
     }
 
+=======
+import { supabase } from '@/lib/supabase'
+import { db } from '@/lib/db'
+import { GamificationProgressService } from '@/lib/gamification-progress'
+
+export async function GET(request: NextRequest) {
+  try {
+>>>>>>> 5f0a3f67cc9176021538ab562209642046544539
     // Get the current user from Supabase
     const { data: { user }, error: authError } = await supabase.auth.getUser()
     

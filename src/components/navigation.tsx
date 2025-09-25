@@ -47,14 +47,19 @@ export default function Navigation() {
   return (
     <nav className={`fixed top-0 left-0 right-0 z-50 ${scheme.bg} backdrop-blur-md border-b ${scheme.border} transition-all duration-300`}>
       <div className="container mx-auto px-4">
-        <div className="flex items-center justify-between h-24">
+        <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <div className="flex items-center">
-            <img 
-              src="/logo.png" 
-              alt="EDN Logo" 
-              className="h-24 w-auto object-contain"
-            />
+            <div className="relative">
+              <img 
+                src="/logo.png?t=20240921" 
+                alt="EDN Logo" 
+                className="h-24 w-auto object-contain shimmer"
+              />
+              <div className="absolute -top-1 -right-1 w-4 h-4 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full flex items-center justify-center">
+                <Zap className="h-2 w-2 text-white" />
+              </div>
+            </div>
           </div>
 
           {/* Desktop Navigation */}

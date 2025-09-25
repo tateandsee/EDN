@@ -332,7 +332,11 @@ export default function FeaturesPage() {
                     Get Started Free
                     <Sparkles className="ml-2 h-4 w-4" />
                   </Button>
+<<<<<<< HEAD
                   <Button variant="outline" className="px-8 py-3 text-lg font-semibold text-gray-900" style={{ borderColor: colors.primary }}>
+=======
+                  <Button variant="outline" className="px-8 py-3 text-lg font-semibold" style={{ borderColor: colors.primary, color: colors.primary }}>
+>>>>>>> 5f0a3f67cc9176021538ab562209642046544539
                     Schedule Demo
                     <Calendar className="ml-2 h-4 w-4" />
                   </Button>

@@ -46,6 +46,10 @@ import {
   Tag,
   X
 } from 'lucide-react'
+<<<<<<< HEAD
+=======
+import ImageWithFallback from '@/components/ui/image-with-fallback'
+>>>>>>> 5f0a3f67cc9176021538ab562209642046544539
 
 export default function AdminPage() {
   const [activeTab, setActiveTab] = useState('overview')
@@ -1965,7 +1969,17 @@ export default function AdminPage() {
                                 <TableCell style={{ color: colors.textPrimary }}>
                                   <div className="flex items-center gap-3">
                                     {item.thumbnail && (
+<<<<<<< HEAD
                                       <img src={item.thumbnail} alt={item.title} className="w-10 h-10 rounded object-cover" />
+=======
+                                      <ImageWithFallback
+                                        src={item.thumbnail}
+                                        alt={item.title}
+                                        className="w-10 h-10 rounded object-cover"
+                                        fallbackClassName="w-10 h-10 rounded object-cover"
+                                        showFallbackText={false}
+                                      />
+>>>>>>> 5f0a3f67cc9176021538ab562209642046544539
                                     )}
                                     <div>
                                       <p className="font-medium">{item.title}</p>

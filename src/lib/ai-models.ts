@@ -29,6 +29,22 @@ export interface ImageGenerationRequest {
   loraModel?: string
   faceCloning?: boolean
   faceImage?: string
+<<<<<<< HEAD
+=======
+  // SDXL specific parameters
+  sdxlModel?: 'stable-diffusion-xl-pro' | 'stable-diffusion-xl-turbo' | 'stable-diffusion-xl-refiner'
+  sampler?: 'DPM++ 2M Karras' | 'Euler a' | 'DDIM' | 'UniPC'
+  scheduler?: 'Karras' | 'Exponential' | 'Normal'
+  stylePreset?: 'photorealistic' | 'anime' | 'fantasy' | 'cinematic' | 'digital-art'
+  qualityPreset?: 'standard' | 'high' | 'ultra'
+  batchSize?: number
+  loraConfigs?: Array<{
+    name: string
+    weight: number
+    triggerWord?: string
+    strength: number
+  }>
+>>>>>>> 5f0a3f67cc9176021538ab562209642046544539
 }
 
 export interface VideoGenerationRequest {
@@ -135,7 +151,11 @@ class AIModelIntegration {
   }
 
   /**
+<<<<<<< HEAD
    * Setup image generation models including LoRA
+=======
+   * Setup image generation models including Enhanced SDXL and LoRA
+>>>>>>> 5f0a3f67cc9176021538ab562209642046544539
    */
   private setupImageGenerationModels(): void {
     const models: AIModelConfig[] = [
@@ -152,6 +172,7 @@ class AIModelIntegration {
         priority: 1
       },
       {
+<<<<<<< HEAD
         name: 'Stable_Diffusion_XL',
         type: 'image_generation',
         model: 'stable-diffusion-xl',
@@ -159,6 +180,48 @@ class AIModelIntegration {
           resolution: '1024x1024',
           steps: 30,
           guidance: 7.5
+=======
+        name: 'Stable_Diffusion_XL_Pro',
+        type: 'image_generation',
+        model: 'stable-diffusion-xl-pro',
+        parameters: {
+          resolution: '1024x1024',
+          steps: 40,
+          guidance: 7.5,
+          sampler: 'DPM++ 2M Karras',
+          scheduler: 'Karras',
+          quality: 'ultra'
+        },
+        enabled: true,
+        priority: 1
+      },
+      {
+        name: 'Stable_Diffusion_XL_Turbo',
+        type: 'image_generation',
+        model: 'stable-diffusion-xl-turbo',
+        parameters: {
+          resolution: '512x512',
+          steps: 20,
+          guidance: 7.0,
+          sampler: 'Euler a',
+          scheduler: 'Normal',
+          speed: 'fast'
+        },
+        enabled: true,
+        priority: 2
+      },
+      {
+        name: 'Stable_Diffusion_XL_Refiner',
+        type: 'image_generation',
+        model: 'stable-diffusion-xl-refiner',
+        parameters: {
+          resolution: '1024x1024',
+          steps: 25,
+          guidance: 6.0,
+          sampler: 'DPM++ 2M Karras',
+          scheduler: 'Karras',
+          purpose: 'refinement'
+>>>>>>> 5f0a3f67cc9176021538ab562209642046544539
         },
         enabled: true,
         priority: 2
@@ -172,7 +235,11 @@ class AIModelIntegration {
           style: 'natural'
         },
         enabled: true,
+<<<<<<< HEAD
         priority: 3
+=======
+        priority: 4
+>>>>>>> 5f0a3f67cc9176021538ab562209642046544539
       }
     ]
 
@@ -420,7 +487,11 @@ class AIModelIntegration {
   }
 
   /**
+<<<<<<< HEAD
    * Generate image using AI models
+=======
+   * Generate image using AI models with SDXL support
+>>>>>>> 5f0a3f67cc9176021538ab562209642046544539
    */
   private async generateImage(request: ImageGenerationRequest): Promise<AIModelResponse> {
     if (!this.zai) throw new Error('ZAI SDK not initialized')
@@ -429,6 +500,14 @@ class AIModelIntegration {
       // Select the best model for the request
       const model = this.selectBestModel('image_generation', request.isNSFW)
       
+<<<<<<< HEAD
+=======
+      // Use SDXL-specific generation if SDXL model is requested
+      if (request.sdxlModel) {
+        return await this.generateImageWithSDXL(request)
+      }
+      
+>>>>>>> 5f0a3f67cc9176021538ab562209642046544539
       // Prepare prompt with LoRA model if specified
       let enhancedPrompt = request.prompt
       if (request.loraModel) {
@@ -489,6 +568,81 @@ class AIModelIntegration {
   }
 
   /**
+<<<<<<< HEAD
+=======
+   * Generate image using SDXL with advanced features
+   */
+  private async generateImageWithSDXL(request: ImageGenerationRequest): Promise<AIModelResponse> {
+    const startTime = Date.now()
+    
+    try {
+      // Import SDXL service dynamically to avoid circular dependencies
+      const { StableDiffusionXLService } = await import('@/services/ai/stable-diffusion-xl.service')
+      const sdxlService = StableDiffusionXLService.getInstance()
+      
+      // Ensure SDXL service is initialized
+      if (!sdxlService['initialized']) {
+        await sdxlService.initialize()
+      }
+
+      // Convert ImageGenerationRequest to SDXLGenerationRequest
+      const sdxlRequest = {
+        prompt: request.prompt,
+        negativePrompt: request.negativePrompt,
+        config: {
+          model: request.sdxlModel || 'stable-diffusion-xl-pro',
+          resolution: `${request.width}x${request.height}` as any,
+          steps: request.steps || 30,
+          guidance: request.guidance || 7.5,
+          sampler: request.sampler || 'DPM++ 2M Karras',
+          scheduler: request.scheduler || 'Karras'
+        },
+        loraConfigs: request.loraConfigs,
+        stylePreset: request.stylePreset,
+        qualityPreset: request.qualityPreset,
+        isNSFW: request.isNSFW,
+        batchSize: request.batchSize || 1
+      }
+
+      // Generate images using SDXL service
+      const result = await sdxlService.generateImages(sdxlRequest)
+
+      if (!result.success) {
+        throw new Error(result.error || 'SDXL generation failed')
+      }
+
+      // Convert SDXL result to AIModelResponse format
+      const generatedImages = result.images?.map(img => ({
+        url: img.url,
+        base64: img.base64,
+        metadata: img.metadata
+      })) || []
+
+      return {
+        success: true,
+        data: {
+          images: generatedImages,
+          model: request.sdxlModel,
+          processingTime: result.processingTime
+        },
+        processingTime: Date.now() - startTime,
+        modelUsed: request.sdxlModel || 'stable-diffusion-xl-pro',
+        metadata: {
+          resolution: `${request.width}x${request.height}`,
+          stylePreset: request.stylePreset,
+          qualityPreset: request.qualityPreset,
+          isNSFW: request.isNSFW,
+          loraModelsUsed: result.metadata?.loraModelsUsed || []
+        }
+      }
+
+    } catch (error) {
+      throw new Error(`SDXL image generation failed: ${error}`)
+    }
+  }
+
+  /**
+>>>>>>> 5f0a3f67cc9176021538ab562209642046544539
    * Generate video using AI models
    */
   private async generateVideo(request: VideoGenerationRequest): Promise<AIModelResponse> {

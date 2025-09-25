@@ -105,6 +105,21 @@ export class AuthService {
         return null
       }
 
+      // Check if database is available
+      if (!process.env.DATABASE_URL) {
+        // Return a basic user object without database
+        return {
+          id: user.id,
+          email: user.email || '',
+          name: user.user_metadata?.name || user.email?.split('@')[0],
+          avatar: user.user_metadata?.avatar_url,
+          role: 'CREATOR',
+          verified: false,
+          subscriptions: [],
+          affiliate: null
+        }
+      }
+
       // Get user data from database
       const dbUser = await db.user.findUnique({
         where: { id: user.id },
@@ -169,3 +184,29 @@ export class AuthService {
 
 // Export singleton instance
 export const authService = new AuthService()
+
+// Export authOptions for compatibility with existing API routes
+export const authOptions = {
+  providers: [],
+  session: {
+    strategy: 'jwt' as const,
+  },
+  secret: process.env.NEXTAUTH_SECRET || 'fallback-secret',
+  pages: {
+    signIn: '/auth/signin',
+  },
+  callbacks: {
+    async jwt({ token, user }: any) {
+      if (user) {
+        token.id = user.id
+      }
+      return token
+    },
+    async session({ session, token }: any) {
+      if (token) {
+        session.user.id = token.id as string
+      }
+      return session
+    },
+  },
+}

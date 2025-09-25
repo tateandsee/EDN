@@ -300,7 +300,11 @@ export default function PricingPage() {
                   </div>
                 )}
 
+<<<<<<< HEAD
                 <Card className={`backdrop-blur-sm border-2 ${
+=======
+                <Card className={`backdrop-blur-sm border-2 h-full ${
+>>>>>>> 5f0a3f67cc9176021538ab562209642046544539
                   plan.isHighlighted 
                     ? 'bg-white/20 border-yellow-500/50 shadow-lg shadow-yellow-500/20' 
                     : plan.id === 'ULTIMATE'
@@ -459,6 +463,7 @@ export default function PricingPage() {
                     </tr>
                     <tr className="border-b" style={{ borderColor: colors.cardBorder }}>
                       <td className="py-4 px-4 font-bold" style={{ color: colors.textPrimary }}>
+<<<<<<< HEAD
                         Storage
                       </td>
                       {pricingPlans.map(plan => (
@@ -479,6 +484,8 @@ export default function PricingPage() {
                     </tr>
                     <tr className="border-b" style={{ borderColor: colors.cardBorder }}>
                       <td className="py-4 px-4 font-bold" style={{ color: colors.textPrimary }}>
+=======
+>>>>>>> 5f0a3f67cc9176021538ab562209642046544539
                         Support
                       </td>
                       {featureComparison.support.map(item => (

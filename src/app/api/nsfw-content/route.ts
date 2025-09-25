@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+<<<<<<< HEAD
 import { db } from '@/lib/db'
 import { contentModeration } from '@/lib/content-moderation'
 
@@ -25,6 +26,14 @@ export async function POST(request: NextRequest) {
       )
     }
 
+=======
+import { supabase } from '@/lib/supabase'
+import { db } from '@/lib/db'
+import { contentModeration } from '@/lib/content-moderation'
+
+export async function POST(request: NextRequest) {
+  try {
+>>>>>>> 5f0a3f67cc9176021538ab562209642046544539
     const { data: { user }, error } = await supabase.auth.getUser()
 
     if (error || !user) {
@@ -194,6 +203,7 @@ export async function POST(request: NextRequest) {
 
 export async function GET(request: NextRequest) {
   try {
+<<<<<<< HEAD
     // Check if Supabase is configured
     if (!supabase) {
       return NextResponse.json(
@@ -202,6 +212,8 @@ export async function GET(request: NextRequest) {
       )
     }
 
+=======
+>>>>>>> 5f0a3f67cc9176021538ab562209642046544539
     const { data: { user }, error } = await supabase.auth.getUser()
 
     if (error || !user) {
@@ -277,6 +289,7 @@ export async function GET(request: NextRequest) {
 
 export async function PUT(request: NextRequest) {
   try {
+<<<<<<< HEAD
     // Check if Supabase is configured
     if (!supabase) {
       return NextResponse.json(
@@ -285,6 +298,8 @@ export async function PUT(request: NextRequest) {
       )
     }
 
+=======
+>>>>>>> 5f0a3f67cc9176021538ab562209642046544539
     const { data: { user }, error } = await supabase.auth.getUser()
 
     if (error || !user) {
@@ -369,6 +384,7 @@ export async function PUT(request: NextRequest) {
 
 export async function DELETE(request: NextRequest) {
   try {
+<<<<<<< HEAD
     // Check if Supabase is configured
     if (!createClient) {
       return NextResponse.json(
@@ -377,6 +393,8 @@ export async function DELETE(request: NextRequest) {
       )
     }
 
+=======
+>>>>>>> 5f0a3f67cc9176021538ab562209642046544539
     const supabase = await createClient()
     const { data: { user }, error } = await supabase.auth.getUser()
 

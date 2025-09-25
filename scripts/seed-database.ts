@@ -95,14 +95,20 @@ async function main() {
 
   for (const platform of platforms) {
 <<<<<<< HEAD
+<<<<<<< HEAD
     await prisma.platform.create({
       data: platform
 =======
+=======
+>>>>>>> 5f0a3f67cc9176021538ab562209642046544539
     await prisma.platform.upsert({
       where: { name: platform.name },
       update: platform,
       create: platform
+<<<<<<< HEAD
 >>>>>>> cadd3e232a800360949ea9e6ac6d97516abdaa71
+=======
+>>>>>>> 5f0a3f67cc9176021538ab562209642046544539
     })
   }
 

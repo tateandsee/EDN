@@ -1,8 +1,13 @@
+<<<<<<< HEAD
 import { getSupabaseConfig } from '@/lib/config'
+=======
+import { createClient } from '@/lib/supabase-client'
+>>>>>>> 5f0a3f67cc9176021538ab562209642046544539
 import { NextResponse } from 'next/server'
 
 export async function GET() {
   try {
+<<<<<<< HEAD
     const supabaseConfig = getSupabaseConfig()
     
     // Check if Supabase is configured
@@ -16,6 +21,8 @@ export async function GET() {
 
     // Import dynamically only if configured
     const { createClient } = await import('@/lib/supabase-client')
+=======
+>>>>>>> 5f0a3f67cc9176021538ab562209642046544539
     const supabase = createClient()
     
     // Test basic connection

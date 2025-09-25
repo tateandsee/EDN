@@ -33,6 +33,9 @@ export default function Home() {
       button: 'bg-orange-500 hover:bg-orange-600',
       buttonOutline: 'border-orange-500 text-orange-500 hover:bg-orange-50',
       gradient: 'from-orange-500 to-cyan-500',
+      platformBg: 'bg-cyan-100',
+      platformBorder: 'border-cyan-200',
+      platformText: 'text-cyan-700'
     },
     nsfw: {
       background: 'bg-gradient-to-br from-pink-900 via-purple-900 to-red-900',
@@ -46,6 +49,9 @@ export default function Home() {
       button: 'bg-pink-600 hover:bg-pink-700',
       buttonOutline: 'border-pink-400 text-pink-400 hover:bg-pink-900',
       gradient: 'from-pink-500 to-purple-500',
+      platformBg: 'bg-pink-900',
+      platformBorder: 'border-pink-700',
+      platformText: 'text-pink-300'
     }
   }
 

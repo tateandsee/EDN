@@ -35,8 +35,16 @@ import {
   FolderOpen,
   Trash2,
   Clock,
+<<<<<<< HEAD
   Shield
 } from 'lucide-react'
+=======
+  Shield,
+  Cpu,
+  Upload
+} from 'lucide-react'
+import { SDXLControls } from '@/components/sdxl-controls'
+>>>>>>> 5f0a3f67cc9176021538ab562209642046544539
 
 export default function CreatePage() {
   const { isNSFW } = useNSFW()
@@ -102,6 +110,23 @@ export default function CreatePage() {
     virtualTryOn: false
   })
 
+<<<<<<< HEAD
+=======
+  // SDXL state
+  const [useSDXL, setUseSDXL] = useState(false)
+  const [sdxlConfig, setSDXLConfig] = useState<any>(null)
+  const [activeTab, setActiveTab] = useState('appearance')
+
+  // LoRA Training state
+  const [faceImages, setFaceImages] = useState<File[]>([])
+  const [bodyImages, setBodyImages] = useState<File[]>([])
+  const [isTraining, setIsTraining] = useState(false)
+  const [trainingProgress, setTrainingProgress] = useState(0)
+  const [trainingStatus, setTrainingStatus] = useState('')
+  const [trainedLoRA, setTrainedLoRA] = useState<string | null>(null)
+  const [showTrainingSection, setShowTrainingSection] = useState(false)
+
+>>>>>>> 5f0a3f67cc9176021538ab562209642046544539
   const nsfwColors = {
     primary: '#FF1493', // deep hot pink
     secondary: '#00CED1', // dark turquoise
@@ -290,6 +315,15 @@ export default function CreatePage() {
   }
 
   const handleGenerate = async () => {
+<<<<<<< HEAD
+=======
+    // If using SDXL, use SDXL generation
+    if (useSDXL && sdxlConfig) {
+      await handleSDXLGenerate()
+      return
+    }
+
+>>>>>>> 5f0a3f67cc9176021538ab562209642046544539
     // First, moderate the content if using custom prompts
     if (useCustomPrompt && (positivePrompt || negativePrompt)) {
       setIsModerating(true)
@@ -440,6 +474,82 @@ export default function CreatePage() {
     }
   }
 
+<<<<<<< HEAD
+=======
+  const handleSDXLGenerate = async () => {
+    if (!sdxlConfig) return
+
+    setIsGenerating(true)
+    setProgress(0)
+    setGeneratedContent(null)
+    setGeneratedVideo(null)
+    setGeneratedContents([])
+
+    try {
+      const response = await fetch('/api/sdxl/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...sdxlConfig,
+          isNSFW
+        })
+      })
+
+      const result = await response.json()
+      
+      if (result.success) {
+        // Simulate progress for SDXL generation
+        const totalTime = result.processingTime || 5000
+        const steps = 8
+        const stepTime = totalTime / steps
+        
+        let currentStep = 0
+        const interval = setInterval(() => {
+          setProgress(prev => {
+            const newProgress = prev + (100 / steps)
+            currentStep++
+            
+            if (newProgress >= 100) {
+              clearInterval(interval)
+              setIsGenerating(false)
+              
+              // Handle generated images
+              if (result.images && result.images.length > 0) {
+                if (result.images.length === 1) {
+                  setGeneratedContent(result.images[0].url)
+                } else {
+                  setGeneratedContents(result.images.map((img: any) => img.url))
+                }
+              }
+              
+              return 100
+            }
+            
+            return newProgress
+          })
+        }, stepTime)
+      } else {
+        setIsGenerating(false)
+        console.error('SDXL generation failed:', result.error)
+      }
+    } catch (error) {
+      setIsGenerating(false)
+      console.error('SDXL generation error:', error)
+    }
+  }
+
+  const handleSDXLConfigChange = (config: any) => {
+    setSDXLConfig(config)
+  }
+
+  const handleSDXLGenerateRequest = (useSDXLMode: boolean) => {
+    setUseSDXL(useSDXLMode)
+    if (useSDXLMode) {
+      handleSDXLGenerate()
+    }
+  }
+
+>>>>>>> 5f0a3f67cc9176021538ab562209642046544539
   const handleSavePrompt = () => {
     if (newPromptName.trim() && (positivePrompt.trim() || negativePrompt.trim())) {
       const newPrompt = {
@@ -487,6 +597,117 @@ export default function CreatePage() {
     setSavedModels(savedModels.filter(m => m.id !== id))
   }
 
+<<<<<<< HEAD
+=======
+  // LoRA Training Functions
+  const handleFaceImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(event.target.files || [])
+    if (faceImages.length + files.length <= 5) {
+      setFaceImages([...faceImages, ...files])
+    } else {
+      alert('Maximum 5 face images allowed')
+    }
+  }
+
+  const handleBodyImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(event.target.files || [])
+    if (bodyImages.length + files.length <= 5) {
+      setBodyImages([...bodyImages, ...files])
+    } else {
+      alert('Maximum 5 body images allowed')
+    }
+  }
+
+  const removeFaceImage = (index: number) => {
+    setFaceImages(faceImages.filter((_, i) => i !== index))
+  }
+
+  const removeBodyImage = (index: number) => {
+    setBodyImages(bodyImages.filter((_, i) => i !== index))
+  }
+
+  const startTraining = async () => {
+    if (faceImages.length < 5 || bodyImages.length < 5) {
+      alert('Please upload 5 face images and 5 body images')
+      return
+    }
+
+    setIsTraining(true)
+    setTrainingProgress(0)
+    setTrainingStatus('Initializing training...')
+
+    try {
+      const formData = new FormData()
+      faceImages.forEach((file, index) => {
+        formData.append(`faceImage${index}`, file)
+      })
+      bodyImages.forEach((file, index) => {
+        formData.append(`bodyImage${index}`, file)
+      })
+      formData.append('targetAccuracy', '95')
+      formData.append('modelType', 'female')
+      formData.append('ageRange', '18-40')
+      formData.append('restrictions', JSON.stringify({
+        noChildren: true,
+        noMen: true,
+        noAnimals: true,
+        noPain: true
+      }))
+
+      const response = await fetch('/api/sdxl/lora/train', {
+        method: 'POST',
+        body: formData
+      })
+
+      const result = await response.json()
+      
+      if (result.success) {
+        // Simulate training progress
+        const trainingSteps = 10
+        const stepTime = 1000 // 1 second per step
+        
+        for (let step = 1; step <= trainingSteps; step++) {
+          await new Promise(resolve => setTimeout(resolve, stepTime))
+          setTrainingProgress((step / trainingSteps) * 100)
+          setTrainingStatus(`Training step ${step}/${trainingSteps}...`)
+        }
+
+        setTrainingStatus('Training completed!')
+        setTrainedLoRA(result.loraId)
+        
+        // Add the trained LoRA to SDXL config if available
+        if (sdxlConfig) {
+          const newLoRA = {
+            name: result.loraId,
+            weight: 1.0,
+            triggerWord: 'trained_model',
+            strength: 1.0
+          }
+          setSDXLConfig({
+            ...sdxlConfig,
+            loraConfigs: [...(sdxlConfig.loraConfigs || []), newLoRA]
+          })
+        }
+      } else {
+        setTrainingStatus('Training failed: ' + result.error)
+      }
+    } catch (error) {
+      console.error('Training failed:', error)
+      setTrainingStatus('Training failed: ' + error.message)
+    } finally {
+      setIsTraining(false)
+    }
+  }
+
+  const resetTraining = () => {
+    setFaceImages([])
+    setBodyImages([])
+    setTrainingProgress(0)
+    setTrainingStatus('')
+    setTrainedLoRA(null)
+  }
+
+>>>>>>> 5f0a3f67cc9176021538ab562209642046544539
   return (
     <div className={`min-h-screen bg-gradient-to-br ${colors.bg} relative overflow-hidden transition-all duration-1000`}>
       {/* Hero Section */}
@@ -632,11 +853,20 @@ export default function CreatePage() {
                 </CardHeader>
                 <CardContent className="space-y-6">
                   <Tabs defaultValue="appearance" className="w-full">
+<<<<<<< HEAD
                     <TabsList className="grid w-full grid-cols-7">
+=======
+                    <TabsList className="grid w-full grid-cols-9">
+>>>>>>> 5f0a3f67cc9176021538ab562209642046544539
                       <TabsTrigger value="appearance">Appearance</TabsTrigger>
                       <TabsTrigger value="advanced">Advanced</TabsTrigger>
                       <TabsTrigger value="features">Features</TabsTrigger>
                       <TabsTrigger value="video">Video</TabsTrigger>
+<<<<<<< HEAD
+=======
+                      <TabsTrigger value="sdxl">SDXL</TabsTrigger>
+                      <TabsTrigger value="training">LoRA Train</TabsTrigger>
+>>>>>>> 5f0a3f67cc9176021538ab562209642046544539
                       <TabsTrigger value="prompts">Prompts</TabsTrigger>
                       <TabsTrigger value="bulk">Bulk</TabsTrigger>
                       <TabsTrigger value="saved">Saved</TabsTrigger>
@@ -815,6 +1045,206 @@ export default function CreatePage() {
                       </div>
                     </TabsContent>
 
+<<<<<<< HEAD
+=======
+                    <TabsContent value="sdxl" className="space-y-4">
+                      <SDXLControls
+                        onConfigChange={handleSDXLConfigChange}
+                        onGenerate={handleSDXLGenerateRequest}
+                        isNSFW={isNSFW}
+                        colors={colors}
+                      />
+                    </TabsContent>
+
+                    <TabsContent value="training" className="space-y-4">
+                      <Card style={{ backgroundColor: colors.cardBg, borderColor: colors.cardBorder }}>
+                        <CardHeader>
+                          <CardTitle style={{ color: colors.primary }} className="flex items-center">
+                            <Cpu className="inline mr-2 h-5 w-5" />
+                            LoRA Training Studio
+                          </CardTitle>
+                          <CardDescription style={{ color: colors.textSecondary }}>
+                            Train a custom LoRA model with your images (5 face + 5 body images, 95% accuracy)
+                          </CardDescription>
+                        </CardHeader>
+                        <CardContent className="space-y-6">
+                          {/* Training Parameters Display */}
+                          <div className="grid grid-cols-2 gap-4 p-4 rounded-lg bg-muted/30">
+                            <div>
+                              <span className="text-sm font-medium" style={{ color: colors.primary }}>Model Type:</span>
+                              <span className="ml-2 text-sm" style={{ color: colors.textSecondary }}>Female Only</span>
+                            </div>
+                            <div>
+                              <span className="text-sm font-medium" style={{ color: colors.primary }}>Age Range:</span>
+                              <span className="ml-2 text-sm" style={{ color: colors.textSecondary }}>18-40 years</span>
+                            </div>
+                            <div>
+                              <span className="text-sm font-medium" style={{ color: colors.primary }}>Target Accuracy:</span>
+                              <span className="ml-2 text-sm" style={{ color: colors.textSecondary }}>95%</span>
+                            </div>
+                            <div>
+                              <span className="text-sm font-medium" style={{ color: colors.primary }}>Restrictions:</span>
+                              <span className="ml-2 text-sm" style={{ color: colors.textSecondary }}>No children, men, animals, or pain</span>
+                            </div>
+                          </div>
+
+                          {/* Face Images Upload */}
+                          <div>
+                            <Label className="text-sm font-medium mb-2 block" style={{ color: colors.primary }}>
+                              Face Images ({faceImages.length}/5)
+                            </Label>
+                            <div className="border-2 border-dashed rounded-lg p-4 text-center">
+                              <input
+                                type="file"
+                                accept="image/*"
+                                multiple
+                                onChange={handleFaceImageUpload}
+                                disabled={isTraining || faceImages.length >= 5}
+                                className="hidden"
+                                id="face-upload"
+                              />
+                              <label htmlFor="face-upload" className="cursor-pointer">
+                                <Upload className="mx-auto h-8 w-8 mb-2" style={{ color: colors.primary }} />
+                                <p className="text-sm" style={{ color: colors.textSecondary }}>
+                                  {faceImages.length < 5 ? 'Click to upload face images' : 'Maximum face images uploaded'}
+                                </p>
+                              </label>
+                            </div>
+                            {faceImages.length > 0 && (
+                              <div className="grid grid-cols-5 gap-2 mt-4">
+                                {faceImages.map((file, index) => (
+                                  <div key={index} className="relative">
+                                    <img
+                                      src={URL.createObjectURL(file)}
+                                      alt={`Face ${index + 1}`}
+                                      className="w-full h-20 object-cover rounded"
+                                    />
+                                    <button
+                                      onClick={() => removeFaceImage(index)}
+                                      disabled={isTraining}
+                                      className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 text-xs"
+                                    >
+                                      ×
+                                    </button>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+
+                          {/* Body Images Upload */}
+                          <div>
+                            <Label className="text-sm font-medium mb-2 block" style={{ color: colors.primary }}>
+                              Body Images ({bodyImages.length}/5)
+                            </Label>
+                            <div className="border-2 border-dashed rounded-lg p-4 text-center">
+                              <input
+                                type="file"
+                                accept="image/*"
+                                multiple
+                                onChange={handleBodyImageUpload}
+                                disabled={isTraining || bodyImages.length >= 5}
+                                className="hidden"
+                                id="body-upload"
+                              />
+                              <label htmlFor="body-upload" className="cursor-pointer">
+                                <Upload className="mx-auto h-8 w-8 mb-2" style={{ color: colors.primary }} />
+                                <p className="text-sm" style={{ color: colors.textSecondary }}>
+                                  {bodyImages.length < 5 ? 'Click to upload body images' : 'Maximum body images uploaded'}
+                                </p>
+                              </label>
+                            </div>
+                            {bodyImages.length > 0 && (
+                              <div className="grid grid-cols-5 gap-2 mt-4">
+                                {bodyImages.map((file, index) => (
+                                  <div key={index} className="relative">
+                                    <img
+                                      src={URL.createObjectURL(file)}
+                                      alt={`Body ${index + 1}`}
+                                      className="w-full h-20 object-cover rounded"
+                                    />
+                                    <button
+                                      onClick={() => removeBodyImage(index)}
+                                      disabled={isTraining}
+                                      className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 text-xs"
+                                    >
+                                      ×
+                                    </button>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+
+                          {/* Training Progress */}
+                          {isTraining && (
+                            <div className="space-y-4">
+                              <div>
+                                <Label className="text-sm font-medium mb-2 block" style={{ color: colors.primary }}>
+                                  Training Progress
+                                </Label>
+                                <Progress value={trainingProgress} className="w-full" />
+                                <p className="text-sm mt-1" style={{ color: colors.textSecondary }}>
+                                  {trainingStatus}
+                                </p>
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Training Result */}
+                          {trainedLoRA && (
+                            <div className="p-4 rounded-lg bg-green-500/20 border border-green-500">
+                              <p className="text-sm font-medium text-green-700">
+                                ✓ LoRA model trained successfully! Model ID: {trainedLoRA}
+                              </p>
+                              <p className="text-sm text-green-600 mt-1">
+                                Your custom LoRA has been added to the SDXL configuration.
+                              </p>
+                            </div>
+                          )}
+
+                          {/* Action Buttons */}
+                          <div className="flex gap-4">
+                            <Button
+                              onClick={startTraining}
+                              disabled={isTraining || faceImages.length < 5 || bodyImages.length < 5}
+                              className="flex-1"
+                              style={{ 
+                                backgroundColor: colors.primary,
+                                color: colors.textOnWhite 
+                              }}
+                            >
+                              {isTraining ? (
+                                <>
+                                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                  Training...
+                                </>
+                              ) : (
+                                <>
+                                  <Sparkles className="mr-2 h-4 w-4" />
+                                  Start Training
+                                </>
+                              )}
+                            </Button>
+                            
+                            <Button
+                              onClick={resetTraining}
+                              variant="outline"
+                              disabled={isTraining}
+                              style={{ 
+                                borderColor: colors.primary,
+                                color: colors.primary 
+                              }}
+                            >
+                              <Trash2 className="mr-2 h-4 w-4" />
+                              Reset
+                            </Button>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    </TabsContent>
+
+>>>>>>> 5f0a3f67cc9176021538ab562209642046544539
                     <TabsContent value="video" className="space-y-4">
                       <div className="flex items-center space-x-2 mb-4">
                         <Switch

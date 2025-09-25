@@ -13,10 +13,13 @@ const femaleModelNames = [
   'Genesis', 'Aaliyah', 'Kennedy', 'Samantha', 'Maya', 'Willow', 'Kinsley', 'Naomi', 'Aaliyah', 'Paisley'
 ]
 
+<<<<<<< HEAD
 const ethnicities = ['Caucasian', 'Asian', 'Mixed Race', 'Persian']
 const hairColors = ['Golden', 'Red', 'Dark']
 const eyeColors = ['Blue', 'Green', 'Brown']
 
+=======
+>>>>>>> 5f0a3f67cc9176021538ab562209642046544539
 const sfwDescriptions = [
   'Elegant AI-generated female model with professional portrait photography',
   'Beautiful digital art featuring a sophisticated female character',
@@ -110,6 +113,7 @@ function getRandomPrompt(): string {
   return modelPrompts[Math.floor(Math.random() * modelPrompts.length)]
 }
 
+<<<<<<< HEAD
 function getRandomEthnicity(): string {
   return ethnicities[Math.floor(Math.random() * ethnicities.length)]
 }
@@ -207,6 +211,8 @@ function createNsfwSvg(skinColor: string, hairColor: string, eyeColor: string): 
 </svg>`
 }
 
+=======
+>>>>>>> 5f0a3f67cc9176021538ab562209642046544539
 async function main() {
   console.log('🌱 Seeding marketplace with AI-generated female models...')
 
@@ -254,6 +260,7 @@ async function main() {
     const sfwItems = []
     for (let i = 0; i < 30; i++) {
       const modelName = femaleModelNames[i]
+<<<<<<< HEAD
       const ethnicity = getRandomEthnicity()
       const hairColor = getRandomHairColor()
       const eyeColor = getRandomEyeColor()
@@ -279,10 +286,31 @@ async function main() {
       
       const item = await prisma.marketplaceItem.create({
         data: itemData
+=======
+      const item = await prisma.marketplaceItem.create({
+        data: {
+          title: `EDN ${modelName} - Premium AI Female Model`,
+          description: getRandomDescription(false),
+          type: MarketplaceType.AI_MODEL,
+          category: MarketplaceCategory.SFW,
+          price: getRandomPrice(false),
+          currency: 'USD',
+          status: MarketplaceStatus.ACTIVE,
+          isNsfw: false,
+          tags: JSON.stringify(['AI model', 'female', 'portrait', 'digital art', 'premium', 'professional']),
+          positivePrompt: getRandomPrompt(),
+          negativePrompt: 'deformed, ugly, disfigured, poor quality, blurry, low resolution',
+          fullPrompt: `${getRandomPrompt()} deformed, ugly, disfigured, poor quality, blurry, low resolution`,
+          userId: aiModelGoddess.id,
+          thumbnail: `https://ui-avatars.com/api/?name=${modelName}&background=FF6B35&color=fff`,
+          images: JSON.stringify([`https://ui-avatars.com/api/?name=${modelName}&background=FF6B35&color=fff`])
+        }
+>>>>>>> 5f0a3f67cc9176021538ab562209642046544539
       })
       sfwItems.push(item)
     }
 
+<<<<<<< HEAD
     // Create 30 NSFW items
     console.log('🔥 Creating 30 NSFW AI-generated female model listings...')
     const nsfwItems = []
@@ -313,11 +341,57 @@ async function main() {
       
       const item = await prisma.marketplaceItem.create({
         data: itemData
+=======
+    // Create 30 NSFW items with specific attire categories
+    console.log('🔥 Creating 30 NSFW AI-generated female model listings...')
+    const nsfwItems = []
+    const attireCategories = ['erotic', 'swimwear', 'cosplay', 'sexy', 'underwear', 'semi-nude', 'nude']
+    
+    for (let i = 30; i < 60; i++) {
+      const modelName = femaleModelNames[i]
+      const attireIndex = Math.floor(Math.random() * attireCategories.length)
+      const attireCategory = attireCategories[attireIndex]
+      
+      // Create specific tags based on attire category
+      const baseTags = ['AI model', 'female', 'portrait', 'digital art', 'premium']
+      const attireTags = {
+        'erotic': ['erotic', 'sensual', 'passionate', 'alluring'],
+        'swimwear': ['swimwear', 'bikini', 'beach', 'summer', 'swimsuit'],
+        'cosplay': ['cosplay', 'costume', 'roleplay', 'character', 'fantasy'],
+        'sexy': ['sexy', 'hot', 'attractive', 'stunning', 'beautiful'],
+        'underwear': ['underwear', 'lingerie', 'intimate', 'seductive', 'elegant'],
+        'semi-nude': ['semi-nude', 'partially clothed', 'suggestive', 'artistic', 'tasteful'],
+        'nude': ['nude', 'naked', 'unclothed', 'bare', 'natural']
+      }
+      
+      const item = await prisma.marketplaceItem.create({
+        data: {
+          title: `EDN ${modelName} - Premium AI Female Model`,
+          description: getRandomDescription(true),
+          type: MarketplaceType.AI_MODEL,
+          category: MarketplaceCategory.NSFW,
+          price: getRandomPrice(true),
+          currency: 'USD',
+          status: MarketplaceStatus.ACTIVE,
+          isNsfw: true,
+          tags: JSON.stringify([...baseTags, ...attireTags[attireCategory]]),
+          positivePrompt: getRandomPrompt(),
+          negativePrompt: 'deformed, ugly, disfigured, poor quality, blurry, low resolution',
+          fullPrompt: `${getRandomPrompt()} deformed, ugly, disfigured, poor quality, blurry, low resolution`,
+          userId: aiModelGoddess.id,
+          thumbnail: `https://ui-avatars.com/api/?name=${modelName}&background=FF1493&color=fff`,
+          images: JSON.stringify([`https://ui-avatars.com/api/?name=${modelName}&background=FF1493&color=fff`])
+        }
+>>>>>>> 5f0a3f67cc9176021538ab562209642046544539
       })
       nsfwItems.push(item)
     }
 
+<<<<<<< HEAD
     // Create some completed orders to establish the baseline revenue
+=======
+    // Create some completed orders to establish the baseline revenue of $9,747
+>>>>>>> 5f0a3f67cc9176021538ab562209642046544539
     console.log('💰 Creating baseline revenue data...')
     
     // Create a buyer user for the orders
@@ -337,29 +411,55 @@ async function main() {
       })
     }
 
+<<<<<<< HEAD
     // Create orders with random items
     const allItems = [...sfwItems, ...nsfwItems]
     const orders = []
     
     for (let i = 0; i < 50; i++) {
       const randomItem = allItems[Math.floor(Math.random() * allItems.length)]
+=======
+    // Calculate how many orders we need to reach approximately $9,747
+    const targetRevenue = 9747
+    let currentRevenue = 0
+    const orders = []
+
+    // Create orders with random items until we reach the target
+    const allItems = [...sfwItems, ...nsfwItems]
+    
+    while (currentRevenue < targetRevenue && orders.length < 200) {
+      const randomItem = allItems[Math.floor(Math.random() * allItems.length)]
+      const orderAmount = randomItem.price
+>>>>>>> 5f0a3f67cc9176021538ab562209642046544539
       
       await prisma.marketplaceOrder.create({
         data: {
           userId: buyerUser.id,
           itemId: randomItem.id,
+<<<<<<< HEAD
           amount: randomItem.price,
+=======
+          amount: orderAmount,
+>>>>>>> 5f0a3f67cc9176021538ab562209642046544539
           currency: 'USD',
           status: 'COMPLETED',
           paymentId: `payment_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
         }
       })
       
+<<<<<<< HEAD
       orders.push(randomItem.price)
     }
 
     const totalRevenue = orders.reduce((sum, price) => sum + price, 0)
     console.log(`✅ Created ${orders.length} orders with total revenue: $${totalRevenue.toFixed(2)}`)
+=======
+      currentRevenue += orderAmount
+      orders.push(orderAmount)
+    }
+
+    console.log(`✅ Created ${orders.length} orders with total revenue: $${currentRevenue.toFixed(2)}`)
+>>>>>>> 5f0a3f67cc9176021538ab562209642046544539
 
     console.log('🎉 Marketplace seeding completed successfully!')
     console.log(`📊 Summary:`)
@@ -367,7 +467,11 @@ async function main() {
     console.log(`   - SFW items: ${sfwItems.length}`)
     console.log(`   - NSFW items: ${nsfwItems.length}`)
     console.log(`   - Creator: AI Model Goddess`)
+<<<<<<< HEAD
     console.log(`   - Total revenue: $${totalRevenue.toFixed(2)}`)
+=======
+    console.log(`   - Baseline revenue: $${currentRevenue.toFixed(2)}`)
+>>>>>>> 5f0a3f67cc9176021538ab562209642046544539
 
   } catch (error) {
     console.error('❌ Error seeding marketplace:', error)

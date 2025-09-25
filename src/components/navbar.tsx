@@ -30,6 +30,7 @@ export default function Navbar() {
     <nav className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-14 items-center px-4">
         <div className="mr-4 hidden md:flex">
+<<<<<<< HEAD
           <Link href="/" className="mr-6 flex items-center space-x-3">
             <div className="relative">
               {/* Logo Image */}
@@ -48,6 +49,19 @@ export default function Navbar() {
             </div>
           </Link>
           <nav className="flex items-center space-x-6 text-sm font-medium">
+=======
+          <Link href="/" className="mr-6 flex items-center">
+            <div className="relative">
+              {/* Logo Image */}
+              <img 
+                src="/logo.svg?t=20240921" 
+                alt="EDN Logo" 
+                className="h-20 w-auto object-contain"
+              />
+            </div>
+          </Link>
+          <nav className="flex items-center space-x-3 text-sm font-medium">
+>>>>>>> 5f0a3f67cc9176021538ab562209642046544539
             <Link
               href="/dashboard"
               className="transition-colors hover:text-foreground/80 text-foreground/60"
@@ -88,6 +102,7 @@ export default function Navbar() {
           
           <div className="flex items-center space-x-4">
             <div className="flex items-center space-x-2">
+<<<<<<< HEAD
               <Label htmlFor="sfw-toggle" className="text-sm font-medium">
                 SFW
               </Label>
@@ -97,6 +112,17 @@ export default function Navbar() {
                 onCheckedChange={(checked) => setIsNSFW(!checked)}
               />
               <Label htmlFor="sfw-toggle" className="text-sm font-medium">
+=======
+              <Label htmlFor="nsfw-toggle" className={`text-sm font-medium ${!isNSFW ? 'text-foreground' : 'text-muted-foreground'}`}>
+                SFW
+              </Label>
+              <Switch
+                id="nsfw-toggle"
+                checked={isNSFW}
+                onCheckedChange={(checked) => setIsNSFW(checked)}
+              />
+              <Label htmlFor="nsfw-toggle" className={`text-sm font-medium ${isNSFW ? 'text-pink-500 font-semibold' : 'text-muted-foreground'}`}>
+>>>>>>> 5f0a3f67cc9176021538ab562209642046544539
                 NSFW
               </Label>
             </div>

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+<<<<<<< HEAD
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 
@@ -42,17 +43,28 @@ const mockNotifications = [
   }
 ]
 
+=======
+import { db } from '@/lib/db'
+import { getServerSession } from 'next-auth'
+import { authOptions } from '@/lib/auth'
+
+>>>>>>> 5f0a3f67cc9176021538ab562209642046544539
 export async function GET(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions)
     
+<<<<<<< HEAD
     if (!session) {
+=======
+    if (!session?.user?.id) {
+>>>>>>> 5f0a3f67cc9176021538ab562209642046544539
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
     const { searchParams } = new URL(request.url)
     const unreadOnly = searchParams.get('unreadOnly') === 'true'
     const limit = parseInt(searchParams.get('limit') || '20')
+<<<<<<< HEAD
     const offset = parseInt(searchParams.get('offset') || '0')
 
     let filteredNotifications = mockNotifications
@@ -122,6 +134,53 @@ export async function POST(request: NextRequest) {
       { error: 'Internal server error' },
       { status: 500 }
     )
+=======
+
+    const where = {
+      userId: session.user.id,
+      ...(unreadOnly ? { isRead: false } : {})
+    }
+
+    const notifications = await db.notification.findMany({
+      where,
+      include: {
+        download: {
+          select: {
+            id: true,
+            fileName: true,
+            expiresAt: true
+          }
+        }
+      },
+      orderBy: { createdAt: 'desc' },
+      take: limit
+    })
+
+    // Calculate time-sensitive information
+    const notificationsWithInfo = notifications.map(notification => {
+      const now = new Date()
+      let timeLeft = null
+      
+      if (notification.download?.expiresAt) {
+        const expiresAt = new Date(notification.download.expiresAt)
+        const timeLeftMs = expiresAt.getTime() - now.getTime()
+        timeLeft = Math.max(0, Math.floor(timeLeftMs / (1000 * 60 * 60))) // hours
+      } else {
+        timeLeft = null
+      }
+
+      return {
+        ...notification,
+        timeLeft,
+        isUrgent: timeLeft !== null && timeLeft <= 3
+      }
+    })
+
+    return NextResponse.json({ notifications: notificationsWithInfo })
+  } catch (error) {
+    console.error('Error fetching notifications:', error)
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+>>>>>>> 5f0a3f67cc9176021538ab562209642046544539
   }
 }
 
@@ -129,6 +188,7 @@ export async function PATCH(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions)
     
+<<<<<<< HEAD
     if (!session) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
@@ -222,5 +282,46 @@ export async function DELETE(request: NextRequest) {
       { error: 'Internal server error' },
       { status: 500 }
     )
+=======
+    if (!session?.user?.id) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    const { notificationIds, action } = await request.json()
+
+    if (!notificationIds || !Array.isArray(notificationIds) || !action) {
+      return NextResponse.json({ error: 'Invalid request' }, { status: 400 })
+    }
+
+    const updateData = {}
+    switch (action) {
+      case 'mark_read':
+        Object.assign(updateData, { isRead: true })
+        break
+      case 'mark_unread':
+        Object.assign(updateData, { isRead: false })
+        break
+      case 'dismiss':
+        Object.assign(updateData, { isDismissed: true })
+        break
+      default:
+        return NextResponse.json({ error: 'Invalid action' }, { status: 400 })
+    }
+
+    await db.notification.updateMany({
+      where: {
+        id: {
+          in: notificationIds
+        },
+        userId: session.user.id
+      },
+      data: updateData
+    })
+
+    return NextResponse.json({ success: true })
+  } catch (error) {
+    console.error('Error updating notifications:', error)
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+>>>>>>> 5f0a3f67cc9176021538ab562209642046544539
   }
 }

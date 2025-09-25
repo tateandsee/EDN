@@ -126,7 +126,11 @@ export function BlurredPromptDisplay({
             </div>
             {showBlurred && (
               <div className="text-xs text-gray-500 dark:text-gray-400 mt-1 italic">
+<<<<<<< HEAD
                 Purchase required to view this professional-grade prompt
+=======
+                Full prompt and config available after purchase
+>>>>>>> 5f0a3f67cc9176021538ab562209642046544539
               </div>
             )}
           </div>
@@ -159,7 +163,11 @@ export function BlurredPromptDisplay({
             </div>
             {showBlurred && (
               <div className="text-xs text-gray-500 dark:text-gray-400 mt-1 italic">
+<<<<<<< HEAD
                 Purchase required to view this professional-grade prompt
+=======
+                Full prompt and config available after purchase
+>>>>>>> 5f0a3f67cc9176021538ab562209642046544539
               </div>
             )}
           </div>
